@@ -1,13 +1,11 @@
-package by.vchaikovski.coffeshop.entity;
+package by.vchaikovski.coffeeshop.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class Bill {
     public enum BillStatus {PAID, NOT_PAID}
 
-    private static AtomicLong atomicId = new AtomicLong(0);
     private long id;
     private BigDecimal amount;
     private LocalDateTime dateOfIssue;
@@ -15,7 +13,6 @@ public class Bill {
     private BillStatus status;
 
     public Bill(BigDecimal amount, LocalDateTime dateOfIssue) {
-        id = atomicId.incrementAndGet();
         this.amount = amount;
         this.dateOfIssue = dateOfIssue;
         status = BillStatus.NOT_PAID;
@@ -23,6 +20,10 @@ public class Bill {
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public BigDecimal getAmount() {
@@ -66,7 +67,7 @@ public class Bill {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first * (int) id;
+        result = result * first + (int) id;
         result = result * first + (amount != null ? amount.hashCode() : 0);
         result = result * first + (dateOfIssue != null ? dateOfIssue.hashCode() : 0);
         result = result * first + (dateOfPayment != null ? dateOfPayment.hashCode() : 0);

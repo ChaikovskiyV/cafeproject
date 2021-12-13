@@ -1,11 +1,8 @@
-package by.vchaikovski.coffeshop.entity;
-
-import java.util.concurrent.atomic.AtomicLong;
+package by.vchaikovski.coffeeshop.entity;
 
 public class Delivery {
     public enum DeliveryType {DELIVERY, PICK_UP}
 
-    private static AtomicLong atomicId = new AtomicLong(0);
     private long id;
     private DeliveryType deliveryType;
     private AddressDelivery address;
@@ -21,6 +18,10 @@ public class Delivery {
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public DeliveryType getDeliveryType() {
@@ -52,7 +53,7 @@ public class Delivery {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first * (int) id;
+        result = result * first + (int) id;
         result = result * first + (deliveryType != null ? deliveryType.hashCode() : 0);
         result = result * first + (address != null ? address.hashCode() : 0);
 

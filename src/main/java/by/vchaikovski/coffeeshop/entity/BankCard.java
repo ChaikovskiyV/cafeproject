@@ -1,17 +1,11 @@
-package by.vchaikovski.coffeshop.entity;
+package by.vchaikovski.coffeeshop.entity;
 
 import java.math.BigDecimal;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class BankCard {
-    private static AtomicLong atomicId = new AtomicLong(0);
     private long id;
     private String cardNumber;
     private BigDecimal amount;
-
-    {
-        id = atomicId.incrementAndGet();
-    }
 
     public BankCard(String cardNumber, BigDecimal amount) {
         this.cardNumber = cardNumber;
@@ -25,6 +19,10 @@ public class BankCard {
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getCardNumber() {
@@ -54,7 +52,7 @@ public class BankCard {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first * (int) id;
+        result = result * first + (int) id;
         result = result * first + (cardNumber != null ? cardNumber.hashCode() : 0);
         result = result * first + (amount != null ? amount.hashCode() : 0);
 

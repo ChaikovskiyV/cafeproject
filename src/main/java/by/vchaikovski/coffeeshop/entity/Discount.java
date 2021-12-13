@@ -1,29 +1,28 @@
-package by.vchaikovski.coffeshop.entity;
-
-import java.util.concurrent.atomic.AtomicLong;
+package by.vchaikovski.coffeeshop.entity;
 
 public class Discount {
     public enum DiscountType {ZERO, FOR_STAFF, PERSONAL}
 
-    private static AtomicLong atomicId = new AtomicLong(0);
     private long id;
     private DiscountType type;
     private int rate;
 
     public Discount(DiscountType type, int rate) {
-        id = atomicId.incrementAndGet();
         this.type = type;
         this.rate = (type == DiscountType.ZERO) ? 0 : rate;
     }
 
     public Discount(DiscountType type) {
-        id = atomicId.incrementAndGet();
         this.type = type;
         rate = 0;
     }
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public DiscountType getType() {
@@ -54,7 +53,7 @@ public class Discount {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first * (int) id;
+        result = result * first + (int) id;
         result = result * first + (type != null ? type.hashCode() : 0);
         result = result * first + rate;
 

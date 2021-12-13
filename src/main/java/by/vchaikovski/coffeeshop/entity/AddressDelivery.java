@@ -1,18 +1,11 @@
-package by.vchaikovski.coffeshop.entity;
-
-import java.util.concurrent.atomic.AtomicLong;
+package by.vchaikovski.coffeeshop.entity;
 
 public class AddressDelivery {
-    private static AtomicLong atomicId = new AtomicLong(0);
     private long id;
     private String streetName;
     private int houseNumber;
     private int buildingNumber;
     private int flatNumber;
-
-    {
-        id = atomicId.incrementAndGet();
-    }
 
     public AddressDelivery(String streetName, int houseNumber, int buildingNumber, int flatNumber) {
         this.streetName = streetName;
@@ -24,19 +17,20 @@ public class AddressDelivery {
     public AddressDelivery(String streetName, int houseNumber, int flatNumber) {
         this.streetName = streetName;
         this.houseNumber = houseNumber;
-        this.buildingNumber = buildingNumber;
         this.flatNumber = flatNumber;
     }
 
     public AddressDelivery(String streetName, int houseNumber) {
         this.streetName = streetName;
         this.houseNumber = houseNumber;
-        this.buildingNumber = buildingNumber;
-        this.flatNumber = flatNumber;
     }
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getStreetName() {

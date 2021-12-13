@@ -1,11 +1,8 @@
-package by.vchaikovski.coffeshop.entity;
-
-import java.util.concurrent.atomic.AtomicLong;
+package by.vchaikovski.coffeeshop.entity;
 
 public class User {
     public enum UserRole {ADMINISTRATOR, VISITOR, COURIER, BARISTA}
 
-    private static AtomicLong atomicId = new AtomicLong(0);
     private long id;
     private String login;
     private String password;
@@ -16,7 +13,6 @@ public class User {
     private UserRole role;
 
     public User(String login, String password, String firstName, String lastName, String email, String phone, UserRole role) {
-        id = atomicId.incrementAndGet();
         this.login = login;
         this.password = password;
         this.firstName = firstName;
@@ -28,6 +24,10 @@ public class User {
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getLogin() {
@@ -104,7 +104,7 @@ public class User {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first * (int) id;
+        result = result * first + (int) id;
         result = result * first + (login != null ? login.hashCode() : 0);
         result = result * first + (password != null ? password.hashCode() : 0);
         result = result * first + (firstName != null ? firstName.hashCode() : 0);
