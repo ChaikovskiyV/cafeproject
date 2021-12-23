@@ -4,25 +4,31 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Menu {
+public class Menu extends AbstractEntity {
     public enum FoodType {BEVERAGE, SUPPLEMENT, PASTRY}
 
     private long id;
     private String name;
     private FoodType type;
     private BigDecimal price;
-    private int foodQuantity;
+    private int quantityInStock;
     private LocalDate productionDate;
     private LocalDate expirationDate;
+    private String description;
     private Image foodImage;
 
-    public Menu(String name, FoodType type, BigDecimal price, int foodQuantity, LocalDate productionDate, LocalDate expirationDate, Image foodImage) {
+    public Menu() {
+    }
+
+    public Menu(String name, FoodType type, BigDecimal price, int quantityInStock, LocalDate productionDate,
+                LocalDate expirationDate, String description, Image foodImage) {
         this.name = name;
         this.type = type;
         this.price = price;
-        this.foodQuantity = foodQuantity;
+        this.quantityInStock = quantityInStock; //TODO consider maybe it's excess
         this.productionDate = productionDate;
         this.expirationDate = expirationDate;
+        this.description = description;
         this.foodImage = foodImage;
     }
 
@@ -58,12 +64,12 @@ public class Menu {
         this.price = price;
     }
 
-    public int getFoodQuantity() {
-        return foodQuantity;
+    public int getQuantityInStock() {
+        return quantityInStock;
     }
 
-    public void setFoodQuantity(int foodQuantity) {
-        this.foodQuantity = foodQuantity;
+    public void setFoodQuantity(int quantityInStock) {
+        this.quantityInStock = quantityInStock;
     }
 
     public LocalDate getProductionDate() {
@@ -82,6 +88,14 @@ public class Menu {
         this.expirationDate = expirationDate;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public Image getFoodImage() {
         return foodImage;
     }
@@ -95,11 +109,12 @@ public class Menu {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Menu menu = (Menu) o;
-        return id == menu.id && foodQuantity == menu.foodQuantity && type == menu.type &&
+        return id == menu.id && quantityInStock == menu.quantityInStock && type == menu.type &&
                 (name != null ? name.equals(menu.name) : menu.name == null) &&
                 (price != null ? price.equals(menu.price) : menu.price == null) &&
                 (productionDate != null ? productionDate.equals(menu.productionDate) : menu.productionDate == null) &&
                 (expirationDate != null ? expirationDate.equals(menu.expirationDate) : menu.expirationDate == null) &&
+                (description != null ? description.equals(menu.description) : menu.description == null) &&
                 (foodImage != null ? foodImage.equals(menu.foodImage) : menu.foodImage == null);
     }
 
@@ -111,9 +126,10 @@ public class Menu {
         result = result * first + (name != null ? name.hashCode() : 0);
         result = result * first + (type != null ? type.hashCode() : 0);
         result = result * first + (price != null ? price.hashCode() : 0);
-        result = result * first * foodQuantity;
+        result = result * first * quantityInStock;
         result = result * first + (productionDate != null ? productionDate.hashCode() : 0);
         result = result * first + (expirationDate != null ? expirationDate.hashCode() : 0);
+        result = result * first + (description != null ? description.hashCode() : 0);
         result = result * first + (foodImage != null ? foodImage.hashCode() : 0);
 
         return result;
@@ -121,7 +137,7 @@ public class Menu {
 
     @Override
     public String toString() {
-        return new StringBuilder("Food{")
+        return new StringBuffer("Food{")
                 .append("id=")
                 .append(id)
                 .append(", name='")
@@ -130,12 +146,14 @@ public class Menu {
                 .append(type)
                 .append(", price=")
                 .append(price)
-                .append(", foodQuantity=")
-                .append(foodQuantity)
+                .append(", quantityInStock=") //TODO consider maybe it's excess
+                .append(quantityInStock)
                 .append(", productionDate=")
                 .append(productionDate)
                 .append(", expirationDate=")
                 .append(expirationDate)
+                .append(", description=")
+                .append(description)
                 .append('}')
                 .toString();
     }

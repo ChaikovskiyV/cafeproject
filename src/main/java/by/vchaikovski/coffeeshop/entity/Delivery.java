@@ -1,19 +1,28 @@
 package by.vchaikovski.coffeeshop.entity;
 
-public class Delivery {
+import java.time.LocalDateTime;
+
+public class Delivery extends AbstractEntity {
     public enum DeliveryType {DELIVERY, PICK_UP}
 
     private long id;
     private DeliveryType deliveryType;
+    private LocalDateTime deliveryTime;
     private AddressDelivery address;
 
-    public Delivery(DeliveryType deliveryType, AddressDelivery address) {
-        this.deliveryType = deliveryType;
+    public Delivery() {
+        deliveryType = DeliveryType.PICK_UP;
+    }
+
+    public Delivery(LocalDateTime deliveryTime, AddressDelivery address) {
+        deliveryType = DeliveryType.DELIVERY;
+        this.deliveryTime = deliveryTime;
         this.address = address;
     }
 
-    public Delivery(DeliveryType deliveryType) {
-        this.deliveryType = deliveryType;
+    public Delivery(LocalDateTime deliveryTime) {
+        deliveryType = DeliveryType.PICK_UP;
+        this.deliveryTime = deliveryTime;
     }
 
     public long getId() {
@@ -32,11 +41,22 @@ public class Delivery {
         this.deliveryType = deliveryType;
     }
 
+    public LocalDateTime getDeliveryTime() {
+        return deliveryTime;
+    }
+
+    public void setDeliveryTime(LocalDateTime deliveryTime) {
+        this.deliveryTime = deliveryTime;
+    }
+
     public AddressDelivery getAddress() {
         return address;
     }
 
     public void setAddress(AddressDelivery address) {
+        if (deliveryType == DeliveryType.PICK_UP) {
+            deliveryType = DeliveryType.DELIVERY;
+        }
         this.address = address;
     }
 
@@ -46,7 +66,8 @@ public class Delivery {
         if (o == null || getClass() != o.getClass()) return false;
         Delivery delivery = (Delivery) o;
         return id == delivery.id && deliveryType == delivery.deliveryType &&
-                address != null ? address.equals(delivery.address) : delivery.address == null;
+                (deliveryTime != null ? deliveryTime.equals(delivery.deliveryTime) : delivery.deliveryTime == null) &&
+                (address != null ? address.equals(delivery.address) : delivery.address == null);
     }
 
     @Override
@@ -55,6 +76,7 @@ public class Delivery {
         int result = 1;
         result = result * first + (int) id;
         result = result * first + (deliveryType != null ? deliveryType.hashCode() : 0);
+        result = result * first + (deliveryTime != null ? deliveryTime.hashCode() : 0);
         result = result * first + (address != null ? address.hashCode() : 0);
 
         return result;
@@ -62,11 +84,13 @@ public class Delivery {
 
     @Override
     public String toString() {
-        return new StringBuilder("Delivery{")
+        return new StringBuffer("Delivery{")
                 .append("id=")
                 .append(id)
                 .append(", deliveryType=")
                 .append(deliveryType)
+                .append(", deliveryTime=")
+                .append(deliveryTime)
                 .append(", address=")
                 .append(address)
                 .append('}')

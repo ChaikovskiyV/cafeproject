@@ -1,6 +1,6 @@
 package by.vchaikovski.coffeeshop.pool;
 
-import by.vchaikovski.coffeeshop.exception.CoffeeHouseException;
+import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,12 +9,28 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-public class ProxyConnection implements Connection {
+class ProxyConnection implements Connection {
     private static final Logger logger = LogManager.getLogger();
     private Connection connection;
 
     ProxyConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    @Override
+    public void close() throws SQLException {
+        try {
+            if(!connection.getAutoCommit()) {
+                connection.setAutoCommit(true);
+            }
+            ConnectionPool.getInstance().releaseConnection(this);
+        } catch (ConnectionPoolException e) {
+            logger.error("Exception from close", e);
+        }
+    }
+
+    void reallyClose() throws SQLException {
+            connection.close();
     }
 
     @Override
@@ -55,24 +71,6 @@ public class ProxyConnection implements Connection {
     @Override
     public void rollback() throws SQLException {
         connection.rollback();
-    }
-
-    @Override
-    public void close() {
-        try {
-            CoffeeHouseConnectionPool.getInstance().releaseConnection(connection);
-        } catch (CoffeeHouseException e) {
-            logger.error("Exception from close", e);
-        }
-    }
-
-    void reallyClose() throws CoffeeHouseException {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            logger.error("Exception from reallyClose", e);
-            throw new CoffeeHouseException("Exception from reallyClose", e);
-        }
     }
 
     @Override

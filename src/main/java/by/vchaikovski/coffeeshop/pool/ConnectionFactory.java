@@ -41,10 +41,10 @@ class ConnectionFactory {
             Class.forName(databaseDriver);
         } catch (IOException e) {
             logger.fatal(() -> "The file " + DATABASE_PROPERTIES + " was not found.", e);
-            throw new RuntimeException();
+            throw new RuntimeException("The file " + DATABASE_PROPERTIES + " was not found.", e);
         } catch (ClassNotFoundException e) {
             logger.fatal(() -> "Driver " + databaseDriver + " was not found.", e);
-            throw new RuntimeException();
+            throw new RuntimeException("Driver " + databaseDriver + " was not found.", e);
         }
     }
 
@@ -67,11 +67,12 @@ class ConnectionFactory {
     }
 
     Connection getConnection() {
-        Connection connection = null;
+        Connection connection;
         try {
             connection = DriverManager.getConnection(databaseUrl, databaseUser, databasePassword);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(() -> "Connection with " + databaseUrl + " was not created.", e);
+            throw new RuntimeException("Connection with " + databaseUrl + " was not created.", e);
         }
         return connection;
     }

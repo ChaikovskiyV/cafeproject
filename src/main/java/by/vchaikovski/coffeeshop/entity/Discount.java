@@ -1,20 +1,16 @@
 package by.vchaikovski.coffeeshop.entity;
 
-public class Discount {
-    public enum DiscountType {ZERO, FOR_STAFF, PERSONAL}
+public class Discount extends AbstractEntity {
+    public enum DiscountType {ZERO, STAFF, PERSONAL}
 
     private long id;
     private DiscountType type;
     private int rate;
 
-    public Discount(DiscountType type, int rate) {
-        this.type = type;
-        this.rate = (type == DiscountType.ZERO) ? 0 : rate;
-    }
-
-    public Discount(DiscountType type) {
-        this.type = type;
-        rate = 0;
+    public Discount(DiscountBuilder builder) {
+        id = builder.id;
+        type = builder.type;
+        rate = builder.rate;
     }
 
     public long getId() {
@@ -38,7 +34,7 @@ public class Discount {
     }
 
     public void setRate(int rate) {
-        this.rate = (type == DiscountType.ZERO) ? 0 : rate;
+        this.rate = Math.max(rate, 0);
     }
 
     @Override
@@ -62,7 +58,7 @@ public class Discount {
 
     @Override
     public String toString() {
-        return new StringBuilder("Discount{")
+        return new StringBuffer("Discount{")
                 .append("id=")
                 .append(id)
                 .append(", type=")
@@ -71,5 +67,43 @@ public class Discount {
                 .append(rate)
                 .append('}')
                 .toString();
+    }
+
+    public static class DiscountBuilder {
+        private long id;
+        private DiscountType type;
+        private int rate;
+
+        public DiscountBuilder() {
+        }
+
+        public DiscountBuilder(long id, DiscountType type, int rate) {
+            this.id = id;
+            this.type = type;
+            this.rate = rate;
+        }
+
+        public DiscountBuilder setId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public DiscountBuilder setType(DiscountType type) {
+            this.type = type;
+            return this;
+        }
+
+        public DiscountBuilder setRate(int rate) {
+            this.rate = rate;
+            return this;
+        }
+
+        public boolean isValid() {
+            return type != null;
+        }
+
+        public Discount build() {
+            return new Discount(this);
+        }
     }
 }

@@ -1,21 +1,29 @@
 package by.vchaikovski.coffeeshop.entity;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class Bill {
+public class Bill extends AbstractEntity {
     public enum BillStatus {PAID, NOT_PAID}
 
+    private static final Logger logger = LogManager.getLogger();
     private long id;
-    private BigDecimal amount;
-    private LocalDateTime dateOfIssue;
-    private LocalDateTime dateOfPayment;
+    private BigDecimal totalPrice;
+    private LocalDateTime paymentDate;
     private BillStatus status;
 
-    public Bill(BigDecimal amount, LocalDateTime dateOfIssue) {
-        this.amount = amount;
-        this.dateOfIssue = dateOfIssue;
-        status = BillStatus.NOT_PAID;
+    public Bill(BillBuilder builder) {
+        if (builder == null || !builder.isValid()) {
+            logger.error(() -> "The builder " + builder + " is not valid.");
+            throw new IllegalArgumentException("The builder " + builder + " is not valid.");
+        }
+        id = builder.id;
+        totalPrice = builder.totalPrice;
+        paymentDate = builder.paymentDate;
+        status = builder.status;
     }
 
     public long getId() {
@@ -26,22 +34,20 @@ public class Bill {
         this.id = id;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
     }
 
-    public LocalDateTime getDateOfIssue() {
-        return dateOfIssue;
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
-    public LocalDateTime getDateOfPayment() {
-        return dateOfPayment;
+    public LocalDateTime getPaymentDate() {
+        return paymentDate;
     }
 
-    public void setDateOfPayment(LocalDateTime dateOfPayment) {
-        if (dateOfIssue.isAfter(dateOfIssue)) {
-            this.dateOfPayment = dateOfPayment;
-        }
+    public void setPaymentDate(LocalDateTime paymentDate) {
+        this.paymentDate = paymentDate;
     }
 
     public BillStatus getStatus() {
@@ -58,9 +64,8 @@ public class Bill {
         if (o == null || getClass() != o.getClass()) return false;
         Bill bill = (Bill) o;
         return id == bill.id && status == bill.status &&
-                (amount != null ? amount.equals(bill.amount) : bill.amount == null) &&
-                (dateOfIssue != null ? dateOfIssue.equals(bill.dateOfIssue) : bill.dateOfIssue == null) &&
-                (dateOfPayment != null ? dateOfPayment.equals(bill.dateOfPayment) : bill.dateOfPayment == null);
+                (totalPrice != null ? totalPrice.equals(bill.totalPrice) : bill.totalPrice == null) &&
+                (paymentDate != null ? paymentDate.equals(bill.paymentDate) : bill.paymentDate == null);
     }
 
     @Override
@@ -68,9 +73,8 @@ public class Bill {
         int first = 31;
         int result = 1;
         result = result * first + (int) id;
-        result = result * first + (amount != null ? amount.hashCode() : 0);
-        result = result * first + (dateOfIssue != null ? dateOfIssue.hashCode() : 0);
-        result = result * first + (dateOfPayment != null ? dateOfPayment.hashCode() : 0);
+        result = result * first + (totalPrice != null ? totalPrice.hashCode() : 0);
+        result = result * first + (paymentDate != null ? paymentDate.hashCode() : 0);
         result = result * first + (status != null ? status.hashCode() : 0);
 
         return result;
@@ -78,17 +82,61 @@ public class Bill {
 
     @Override
     public String toString() {
-        return new StringBuilder("Bill{")
+        return new StringBuffer("Bill{")
                 .append("id=")
                 .append(id)
-                .append(", amount=")
-                .append(amount)
-                .append(", dateOfIssue=")
-                .append(", dateOfPayment=")
-                .append(dateOfPayment)
+                .append(", totalPrice=")
+                .append(totalPrice)
+                .append(", paymentDate=")
+                .append(paymentDate)
                 .append(", status=")
                 .append(status)
                 .append('}')
                 .toString();
+    }
+
+    public static class BillBuilder {
+        private long id;
+        private BigDecimal totalPrice;
+        private LocalDateTime paymentDate;
+        private BillStatus status;
+
+        public BillBuilder() {
+        }
+
+        public BillBuilder(long id, BigDecimal totalPrice, LocalDateTime paymentDate, BillStatus status) {
+            this.id = id;
+            this.totalPrice = totalPrice;
+            this.paymentDate = paymentDate;
+            this.status = status;
+        }
+
+        public BillBuilder setId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public BillBuilder setTotalPrice(BigDecimal totalPrice) {
+            this.totalPrice = totalPrice;
+            return this;
+        }
+
+        public BillBuilder setPaymentDate(LocalDateTime paymentDate) {
+            this.paymentDate = paymentDate;
+            return this;
+        }
+
+        public BillBuilder setStatus(BillStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public boolean isValid() {
+            return totalPrice != null && status != null;
+        }
+
+        public Bill build() {
+            return new Bill(this);
+        }
     }
 }

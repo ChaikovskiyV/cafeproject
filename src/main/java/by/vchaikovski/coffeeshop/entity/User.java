@@ -1,25 +1,40 @@
 package by.vchaikovski.coffeeshop.entity;
 
-public class User {
-    public enum UserRole {ADMINISTRATOR, VISITOR, COURIER, BARISTA}
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+public class User extends AbstractEntity {
+    public enum Role {ADMINISTRATOR, VISITOR, COURIER, BARISTA}
+
+    public enum Status {BANNED, UNBANNED}
+
+    private static final Logger logger = LogManager.getLogger();
     private long id;
     private String login;
     private String password;
     private String firstName;
     private String lastName;
     private String email;
-    private String phone;
-    private UserRole role;
+    private String phoneNumber;
+    private Role role;
+    private Status status;
+    private Discount discount;
 
-    public User(String login, String password, String firstName, String lastName, String email, String phone, UserRole role) {
-        this.login = login;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phone = phone;
-        this.role = role;
+    public User(UserBuilder builder) {
+        if (builder == null || !builder.isValid()) {
+            logger.error(() -> "The builder " + builder + " is not valid.");
+            throw new IllegalArgumentException("The builder " + builder + " is not valid.");
+        }
+        this.id = builder.id;
+        this.login = builder.login;
+        this.password = builder.password;
+        this.firstName = builder.firstName;
+        this.lastName = builder.lastName;
+        this.email = builder.email;
+        this.phoneNumber = builder.phoneNumber;
+        this.role = builder.role;
+        this.status = builder.status;
+        this.discount = builder.discount;
     }
 
     public long getId() {
@@ -70,20 +85,36 @@ public class User {
         this.email = email;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
-    public UserRole getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(UserRole role) {
+    public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Discount getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Discount discount) {
+        this.discount = discount;
     }
 
     @Override
@@ -96,8 +127,9 @@ public class User {
                 (firstName != null ? firstName.equals(user.firstName) : user.firstName == null) &&
                 (lastName != null ? lastName.equals(user.lastName) : user.lastName == null) &&
                 (email != null ? email.equalsIgnoreCase(user.email) : user.email == null) &&
-                (phone != null ? phone.equals(user.phone) : user.phone == null) &&
-                role == user.role;
+                (discount != null ? discount.equals(user.discount) : user.discount == null) &&
+                (phoneNumber != null ? phoneNumber.equals(user.phoneNumber) : user.phoneNumber == null) &&
+                role == user.role && status == user.status;
     }
 
     @Override
@@ -110,15 +142,17 @@ public class User {
         result = result * first + (firstName != null ? firstName.hashCode() : 0);
         result = result * first + (lastName != null ? lastName.hashCode() : 0);
         result = result * first + (email != null ? email.hashCode() : 0);
-        result = result * first + (phone != null ? phone.hashCode() : 0);
+        result = result * first + (phoneNumber != null ? phoneNumber.hashCode() : 0);
         result = result * first + (role != null ? role.hashCode() : 0);
+        result = result * first + (discount != null ? discount.hashCode() : 0);
+        result = result * first + (status != null ? status.hashCode() : 0);
 
         return result;
     }
 
     @Override
     public String toString() {
-        return new StringBuilder("User{")
+        return new StringBuffer("User{")
                 .append("id=")
                 .append(id)
                 .append(", firstName='")
@@ -131,11 +165,104 @@ public class User {
                 .append("******")
                 .append(", email='")
                 .append(email)
-                .append(", phone='")
-                .append(phone)
+                .append(", phoneNumber='")
+                .append(phoneNumber)
                 .append(", role=")
                 .append(role)
+                .append(", status=")
+                .append(status)
+                .append(", discount=")
+                .append(discount)
                 .append('}')
                 .toString();
+    }
+
+    public static class UserBuilder {
+        private long id;
+        private String login;
+        private String password;
+        private String firstName;
+        private String lastName;
+        private String email;
+        private String phoneNumber;
+        private Role role;
+        private Status status;
+        private Discount discount;
+
+        public UserBuilder() {
+        }
+
+        public UserBuilder(long id, String login, String password, String firstName, String lastName, String email,
+                           String phoneNumber, Role role, Status status, Discount discount) {
+            this.id = id;
+            this.login = login;
+            this.password = password;
+            this.firstName = firstName;
+            this.lastName = lastName;
+            this.email = email;
+            this.phoneNumber = phoneNumber;
+            this.role = role;
+            this.status = status;
+            this.discount = discount;
+        }
+
+        public UserBuilder setId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public UserBuilder setLogin(String login) {
+            this.login = login;
+            return this;
+        }
+
+        public UserBuilder setPassword(String password) {
+            this.password = password;
+            return this;
+        }
+
+        public UserBuilder setFirstName(String firstName) {
+            this.firstName = firstName;
+            return this;
+        }
+
+        public UserBuilder setLastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public UserBuilder setEmail(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public UserBuilder setPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
+
+        public UserBuilder setRole(Role role) {
+            this.role = role;
+            return this;
+        }
+
+        public UserBuilder setStatus(Status status) {
+            this.status = status;
+            return this;
+        }
+
+        public UserBuilder setDiscount(Discount discount) {
+            this.discount = discount;
+            return this;
+        }
+
+        public boolean isValid() {
+            return login != null && password != null && firstName != null && lastName != null &&
+                    email != null && phoneNumber != null && role != null && status != null;
+        }
+
+        public User build() {
+            return new User(this);
+        }
     }
 }

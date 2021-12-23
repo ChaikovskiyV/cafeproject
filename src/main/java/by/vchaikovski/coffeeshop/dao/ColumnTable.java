@@ -1,0 +1,55 @@
+package by.vchaikovski.coffeeshop.dao;
+
+public enum ColumnTable {
+    ;
+    private static final String USER_ID = "user_id";
+    private static final String USER_LOGIN = "login";
+    private static final String USER_PASSWORD = "password";
+    private static final String USER_FIRST_NAME = "first_name";
+    private static final String USER_LAST_NAME = "last_name";
+    private static final String USER_EMAIL = "email";
+    private static final String USER_PHONE = "phone";
+    private static final String USER_STATUS = "user_status";
+    private static final String USER_DISCOUNT_ID = "fk_discount_id";
+    private static final String DISCOUNT_ID = "discount_id";
+    private static final String DISCOUNT_TYPE = "type";
+    private static final String DISCOUNT_RATE = "rate";
+    private static final String CARD_ID = "card_id";
+    private static final String CARD_NUMBER = "number";
+    private static final String CARD_VALIDITY_PERIOD = "validity_period";
+    private static final String CARD_AMOUNT = "amount";
+    private static final String ORDER_ID = "order_id";
+    private static final String ORDER_STATUS = "order_status";
+    private static final String ORDER_CREATION_DATE = "creation_date";
+    private static final String ORDER_READY_DATE = "ready_date";
+    private static final String ORDER_COMMENT = "comment";
+    private static final String ORDER_EVALUATION = "evaluation";
+    private static final String ORDER_DELIVERY_ID = "fk_delivery_id";
+    private static final String ORDER_BILL_ID = "fk_bill_id";
+    private static final String ORDER_USER_ID = "fk_user_id";
+    private static final String BILL_ID = "bill_id";
+    private static final String BILL_TOTAL_PRICE = "total_price";
+    private static final String BILL_STATUS = "bill_status";
+    private static final String BILL_PAYMENT_DATE = "payment_date";
+    private static final String MENU_ID = "menu_id";
+    private static final String MENU_NAME = "name";
+    private static final String MENU_TYPE = "product_type";
+    private static final String MENU_DESCRIPTION = "description";
+    private static final String MENU_PRICE = "price";
+    private static final String MENU_QUANTITY_IN_STOCK = "quantity_in_stock"; //TODO consider to delete it
+    private static final String MENU_PRODUCTION_DATE = "production_date";
+    private static final String MENU_EXPIRATION_DATE = "expiration_date";
+    private static final String MENU_IMAGE = "image";
+    private static final String CART_ORDER_ID = "fk_order_id";
+    private static final String CART_MENU_ID = "fk_menu_id";
+    private static final String CART_QUANTITY = "quantity";
+    private static final String DELIVERY_ID = "delivery_id";
+    private static final String DELIVERY_TYPE = "delivery_type";
+    private static final String DELIVERY_TIME = "delivery_time";
+    private static final String DELIVERY_ADDRESS = "fk_address_id";
+    private static final String ADDRESS_ID = "address_id";
+    private static final String ADDRESS_STREET = "street";
+    private static final String ADDRESS_HOUSE_NUMBER = "house_number";
+    private static final String ADDRESS_BUILDING_NUMBER = "building_number";
+    private static final String ADDRESS_FLAT_NUMBER = "flat_number";
+}
