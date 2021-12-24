@@ -56,7 +56,7 @@ public class BillDaoImpl implements BillDao {
         ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
-            resultSet = statement.executeQuery(FIND_BILL_BY_ID + id);
+            resultSet = statement.executeQuery(FIND_ALL_BILLS + FIND_BILL_BY_ID + id);
             if (resultSet.next()) {
                 bill = BillMapper.createBill(resultSet);
             }
