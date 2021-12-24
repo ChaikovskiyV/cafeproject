@@ -28,4 +28,8 @@ public interface OrderDao extends BaseDao<FoodOrder> {
     List<FoodOrder> findByBill(Bill bill);
 
     List<FoodOrder> findByUser(User user);
+
+    boolean updateOrderStatus(long id, FoodOrder.OrderStatus orderStatus);
+
+    boolean updateGoodsNumberInCart(long id, int goodsNumber);
 }

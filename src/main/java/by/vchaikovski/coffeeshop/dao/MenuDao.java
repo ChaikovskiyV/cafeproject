@@ -28,4 +28,16 @@ public interface MenuDao extends BaseDao<Menu> {
     List<Menu> findByExpirationDate(LocalDateTime startPeriod, LocalDateTime endPeriod);
 
     List<Menu> findWithOutDescription(); //TODO may be it can be deleted
+
+    boolean updateMenuName(long id, String name);
+
+    boolean updateMenuFoodType(long id, Menu.FoodType foodType);
+
+    boolean updateMenuPrice(long id, BigDecimal price);
+
+    boolean updateMenuQuantityInStock(long id, int quantityInStock);
+
+    boolean updateMenuProductionDate (long id, LocalDateTime productionDate);
+
+    boolean updateMenuExpirationDate(long id, LocalDateTime expirationDate);
 }

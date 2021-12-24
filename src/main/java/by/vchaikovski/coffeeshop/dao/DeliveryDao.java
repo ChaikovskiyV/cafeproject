@@ -14,4 +14,8 @@ public interface DeliveryDao extends BaseDao<Delivery> {
     List<Delivery> findByDateDelivery(LocalDateTime dateTime);
 
     List<Delivery> findByDateDelivery(LocalDateTime startPeriod, LocalDateTime endPeriod);
+
+    boolean updateDeliveryType(long id, Delivery.DeliveryType deliveryType);
+
+    boolean updateDeliveryDate(long id, LocalDateTime deliveryDate);
 }
