@@ -1,37 +1,25 @@
 package by.vchaikovski.coffeeshop.entity;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Bill extends AbstractEntity {
     public enum BillStatus {PAID, NOT_PAID}
 
-    private static final Logger logger = LogManager.getLogger();
-    private long id;
     private BigDecimal totalPrice;
     private LocalDateTime paymentDate;
     private BillStatus status;
 
     public Bill(BillBuilder builder) {
         if (builder == null || !builder.isValid()) {
-            logger.error(() -> "The builder " + builder + " is not valid.");
-            throw new IllegalArgumentException("The builder " + builder + " is not valid.");
+            String message = "The builder " + builder + " is not valid.";
+            logger.error(message);
+            throw new IllegalArgumentException(message);
         }
-        id = builder.id;
+        super.setId(builder.id);
         totalPrice = builder.totalPrice;
         paymentDate = builder.paymentDate;
-        status = builder.status;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+        status = builder.status != null ? builder.status : BillStatus.NOT_PAID;
     }
 
     public BigDecimal getTotalPrice() {
@@ -63,16 +51,16 @@ public class Bill extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Bill bill = (Bill) o;
-        return id == bill.id && status == bill.status &&
+        return super.equals(bill) && status == bill.status &&
                 (totalPrice != null ? totalPrice.equals(bill.totalPrice) : bill.totalPrice == null) &&
                 (paymentDate != null ? paymentDate.equals(bill.paymentDate) : bill.paymentDate == null);
     }
 
     @Override
     public int hashCode() {
-        int first = 31;
+        final int first = 31;
         int result = 1;
-        result = result * first + (int) id;
+        result = result * first + super.hashCode();
         result = result * first + (totalPrice != null ? totalPrice.hashCode() : 0);
         result = result * first + (paymentDate != null ? paymentDate.hashCode() : 0);
         result = result * first + (status != null ? status.hashCode() : 0);
@@ -82,14 +70,12 @@ public class Bill extends AbstractEntity {
 
     @Override
     public String toString() {
-        return new StringBuffer("Bill{")
-                .append("id=")
-                .append(id)
-                .append(", totalPrice=")
+        return new StringBuffer(super.toString())
+                .append(", totalPrice = ")
                 .append(totalPrice)
-                .append(", paymentDate=")
+                .append(", paymentDate = ")
                 .append(paymentDate)
-                .append(", status=")
+                .append(", status = ")
                 .append(status)
                 .append('}')
                 .toString();
@@ -100,16 +86,6 @@ public class Bill extends AbstractEntity {
         private BigDecimal totalPrice;
         private LocalDateTime paymentDate;
         private BillStatus status;
-
-        public BillBuilder() {
-        }
-
-        public BillBuilder(long id, BigDecimal totalPrice, LocalDateTime paymentDate, BillStatus status) {
-            this.id = id;
-            this.totalPrice = totalPrice;
-            this.paymentDate = paymentDate;
-            this.status = status;
-        }
 
         public BillBuilder setId(long id) {
             this.id = id;
@@ -132,7 +108,7 @@ public class Bill extends AbstractEntity {
         }
 
         public boolean isValid() {
-            return totalPrice != null && status != null;
+            return totalPrice != null;
         }
 
         public Bill build() {

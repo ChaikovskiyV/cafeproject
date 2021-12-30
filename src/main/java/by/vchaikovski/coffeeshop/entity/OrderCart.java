@@ -1,16 +1,22 @@
 package by.vchaikovski.coffeeshop.entity;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-public class OrderCart extends AbstractEntity{
-    static final Logger logger = LogManager.getLogger();
-    private Map<Menu, Integer> cart;
+public class OrderCart extends AbstractEntity {
+    @Override
+    public void setId(long id) {
+        throw new UnsupportedOperationException("The setId(long id) method is not supported.");
+    }
+
+    @Override
+    public long getId() {
+        throw new UnsupportedOperationException("The getId() method is not supported.");
+    }
+
+    private final Map<Menu, Integer> cart;
 
     public OrderCart() {
         cart = new HashMap<>();
@@ -20,20 +26,20 @@ public class OrderCart extends AbstractEntity{
         return cart;
     }
 
-    public void addProduct(Menu menu) {
+    public void addProduct(Menu menu, int quantity) {
         if (cart.containsKey(menu)) {
             int number = cart.get(menu);
-            cart.put(menu, ++number);
+            cart.put(menu, number + quantity);
         } else {
-            cart.put(menu, 1);
+            cart.put(menu, quantity);
         }
     }
 
-    public void reduceNumber(Menu menu) {
+    public void reduceNumber(Menu menu, int quantity) {
         if (cart.containsKey(menu)) {
             int number = cart.get(menu);
-            if (number > 1) {
-                cart.put(menu, --number);
+            if (number > quantity) {
+                cart.put(menu, number - quantity);
             } else {
                 cart.remove(menu);
             }
@@ -55,8 +61,23 @@ public class OrderCart extends AbstractEntity{
         return totalPrice;
     }
 
-    public long findProductsNumber() {
+    public long findProductsNumber() { // TODO review this method
         return cart.values().stream().count();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        OrderCart orderCart = (OrderCart) o;
+        return cart.equals(orderCart.cart);
+    }
+
+    @Override
+    public int hashCode() {
+        int first = 31;
+        return first * cart.hashCode();
     }
 
     @Override

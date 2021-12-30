@@ -1,35 +1,34 @@
 package by.vchaikovski.coffeeshop.dao;
 
-import by.vchaikovski.coffeeshop.entity.Bill;
-import by.vchaikovski.coffeeshop.entity.Delivery;
 import by.vchaikovski.coffeeshop.entity.FoodOrder;
-import by.vchaikovski.coffeeshop.entity.User;
+import by.vchaikovski.coffeeshop.entity.OrderCart;
+import by.vchaikovski.coffeeshop.exception.DaoException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderDao extends BaseDao<FoodOrder> {
-    List<FoodOrder> findByOrderStatus(FoodOrder.OrderStatus orderStatus);
+    List<FoodOrder> findByOrderStatus(FoodOrder.OrderStatus orderStatus) throws DaoException;
 
-    List<FoodOrder> findByCreationDate(LocalDateTime creationDate);
+    List<FoodOrder> findByCreationDate(LocalDateTime creationDate) throws DaoException;
 
-    List<FoodOrder> findByCreationDate(LocalDateTime startPeriod, LocalDateTime endPeriod);
+    List<FoodOrder> findByCreationDate(LocalDateTime startPeriod, LocalDateTime endPeriod) throws DaoException;
 
-    List<FoodOrder> findByGoodsNumberInCart(int goodsNumber);
+    List<FoodOrder> findByEvaluation(FoodOrder.OrderEvaluation orderEvaluation) throws DaoException;
 
-    List<FoodOrder> findByGoodsNumberInCart(int minNumber, int maxNumber);
+    List<FoodOrder> findByDelivery(long deliveryId) throws DaoException;
 
-    List<FoodOrder> findWithComment();
+    List<FoodOrder> findByBill(long billId) throws DaoException;
 
-    List<FoodOrder> findByEvaluation(FoodOrder.OrderEvaluation orderEvaluation);
+    List<FoodOrder> findByUser(long userId) throws DaoException;
 
-    List<FoodOrder> findByDelivery(Delivery delivery);
+    boolean updateOrderStatus(long id, FoodOrder.OrderStatus orderStatus) throws DaoException;
 
-    List<FoodOrder> findByBill(Bill bill);
+    boolean updateGoodsNumberInCart(long id, int goodsNumber) throws DaoException;
 
-    List<FoodOrder> findByUser(User user);
+    int createOrderCart(OrderCart orderCart, long orderId) throws DaoException;
 
-    boolean updateOrderStatus(long id, FoodOrder.OrderStatus orderStatus);
+    boolean deleteOrderCartByOrderId(long orderId) throws DaoException;
 
-    boolean updateGoodsNumberInCart(long id, int goodsNumber);
+    boolean deleteOrderCartByOrderIdAndMenuId(long orderId, long menuId) throws DaoException;
 }

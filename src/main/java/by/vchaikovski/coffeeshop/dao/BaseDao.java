@@ -1,7 +1,6 @@
 package by.vchaikovski.coffeeshop.dao;
 
 import by.vchaikovski.coffeeshop.entity.AbstractEntity;
-import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,6 +13,8 @@ import java.util.Optional;
 
 public interface BaseDao<T extends AbstractEntity> {
     Logger logger = LogManager.getLogger();
+    String TIME_FORMAT = "yyyy-MM-dd HH:mm";
+    String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     int FIRST_PARAMETER_INDEX = 1;
     int SECOND_PARAMETER_INDEX = 2;
     int THIRD_PARAMETER_INDEX = 3;
@@ -27,15 +28,15 @@ public interface BaseDao<T extends AbstractEntity> {
     int ELEVENTH_PARAMETER_INDEX = 11;
     int TWELFTH_PARAMETER_INDEX = 12;
 
-    List<T> findAll() throws DaoException, ConnectionPoolException;
+    List<T> findAll() throws DaoException;
 
-    Optional<T> findById(long id) throws ConnectionPoolException, DaoException;
+    Optional<T> findById(long id) throws DaoException;
 
-    long create(T entity) throws ConnectionPoolException, DaoException;
+    long create(T entity) throws DaoException;
 
-    boolean update(long id, T entity) throws ConnectionPoolException, DaoException;
+    boolean update(long id, T entity) throws DaoException;
 
-    boolean deleteById(long id) throws ConnectionPoolException, DaoException;
+    boolean deleteById(long id) throws DaoException;
 
     default void close(Statement statement) {
         if (statement != null) {

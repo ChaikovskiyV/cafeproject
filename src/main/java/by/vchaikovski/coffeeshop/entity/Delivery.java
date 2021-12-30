@@ -5,32 +5,20 @@ import java.time.LocalDateTime;
 public class Delivery extends AbstractEntity {
     public enum DeliveryType {DELIVERY, PICK_UP}
 
-    private long id;
     private DeliveryType deliveryType;
     private LocalDateTime deliveryTime;
     private AddressDelivery address;
 
-    public Delivery() {
-        deliveryType = DeliveryType.PICK_UP;
-    }
-
-    public Delivery(LocalDateTime deliveryTime, AddressDelivery address) {
-        deliveryType = DeliveryType.DELIVERY;
-        this.deliveryTime = deliveryTime;
-        this.address = address;
-    }
-
-    public Delivery(LocalDateTime deliveryTime) {
-        deliveryType = DeliveryType.PICK_UP;
-        this.deliveryTime = deliveryTime;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public Delivery(DeliveryBuilder builder) {
+        if (builder == null || !builder.isValid()) {
+            String message = "The builder " + builder + " is not valid.";
+            logger.error(message);
+            throw new IllegalArgumentException(message);
+        }
+        super.setId(builder.id);
+        deliveryType = builder.deliveryType;
+        deliveryTime = builder.deliveryTime;
+        address = builder.address;
     }
 
     public DeliveryType getDeliveryType() {
@@ -65,7 +53,7 @@ public class Delivery extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Delivery delivery = (Delivery) o;
-        return id == delivery.id && deliveryType == delivery.deliveryType &&
+        return super.equals(delivery) && deliveryType == delivery.deliveryType &&
                 (deliveryTime != null ? deliveryTime.equals(delivery.deliveryTime) : delivery.deliveryTime == null) &&
                 (address != null ? address.equals(delivery.address) : delivery.address == null);
     }
@@ -74,7 +62,7 @@ public class Delivery extends AbstractEntity {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first + (int) id;
+        result = result * first + super.hashCode();
         result = result * first + (deliveryType != null ? deliveryType.hashCode() : 0);
         result = result * first + (deliveryTime != null ? deliveryTime.hashCode() : 0);
         result = result * first + (address != null ? address.hashCode() : 0);
@@ -84,16 +72,49 @@ public class Delivery extends AbstractEntity {
 
     @Override
     public String toString() {
-        return new StringBuffer("Delivery{")
-                .append("id=")
-                .append(id)
-                .append(", deliveryType=")
+        return new StringBuffer(super.toString())
+                .append(", deliveryType = ")
                 .append(deliveryType)
-                .append(", deliveryTime=")
+                .append(", deliveryTime = ")
                 .append(deliveryTime)
-                .append(", address=")
+                .append(", address = ")
                 .append(address)
                 .append('}')
                 .toString();
+    }
+
+    public static class DeliveryBuilder {
+        private long id;
+        private DeliveryType deliveryType;
+        private LocalDateTime deliveryTime;
+        private AddressDelivery address;
+
+        public DeliveryBuilder setId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public DeliveryBuilder setDeliveryType(DeliveryType deliveryType) {
+            this.deliveryType = deliveryType;
+            return this;
+        }
+
+        public DeliveryBuilder setDeliveryTime(LocalDateTime deliveryTime) {
+            this.deliveryTime = deliveryTime;
+            return this;
+        }
+
+        public DeliveryBuilder setAddress(AddressDelivery address) {
+            this.address = address;
+            return this;
+        }
+
+        public boolean isValid() {
+            return deliveryType != null && deliveryTime != null;
+        }
+
+        public Delivery build() {
+            return new Delivery(this);
+        }
     }
 }

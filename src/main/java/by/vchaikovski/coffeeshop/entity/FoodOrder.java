@@ -3,11 +3,10 @@ package by.vchaikovski.coffeeshop.entity;
 import java.time.LocalDateTime;
 
 public class FoodOrder extends AbstractEntity {
-    public enum OrderStatus {WAITING, ACCEPTED, REJECTED, PREPARING, READY, DELIVERED, COMPLETED}
+    public enum OrderStatus {WAITING, ACCEPTED, REJECTED, READY, DELIVERED, COMPLETED}
 
-    public enum OrderEvaluation {BAD, NOT_BAD, NICE, GREAT, BRILLIANT}
+    public enum OrderEvaluation {BAD, NICE, GREAT, BRILLIANT}
 
-    private long id;
     private OrderStatus status;
     private LocalDateTime creationDate;
     private String comment;
@@ -17,23 +16,21 @@ public class FoodOrder extends AbstractEntity {
     private Bill bill;
     private User user;
 
-    public FoodOrder() {
-    }
-
-    public FoodOrder(User user, Delivery delivery, Bill bill) {
-        this.status = OrderStatus.WAITING;
-        creationDate = LocalDateTime.now();
-        this.user = user;
-        this.delivery = delivery;
-        this.bill = bill;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public FoodOrder(FoodOrderBuilder builder) {
+        if (builder == null || !builder.isValid()) {
+            String message = "The builder " + builder + " is not valid.";
+            logger.error(message);
+            throw new IllegalArgumentException(message);
+        }
+        super.setId(builder.id);
+        status = builder.status != null ? builder.status : OrderStatus.WAITING;
+        creationDate = builder.creationDate != null ? builder.creationDate : LocalDateTime.now();
+        comment = builder.comment;
+        evaluation = builder.evaluation;
+        cart = builder.cart;
+        delivery = builder.delivery;
+        bill = builder.bill;
+        user = builder.user;
     }
 
     public OrderStatus getStatus() {
@@ -105,7 +102,7 @@ public class FoodOrder extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FoodOrder foodOrder = (FoodOrder) o;
-        return id == foodOrder.id && status == foodOrder.status && evaluation == foodOrder.evaluation &&
+        return super.equals(foodOrder) && status == foodOrder.status && evaluation == foodOrder.evaluation &&
                 (creationDate != null ? creationDate.equals(foodOrder.creationDate) : foodOrder.creationDate == null) &&
                 (comment != null ? comment.equals(foodOrder.comment) : foodOrder.comment == null) &&
                 (cart != null ? cart.equals(foodOrder.cart) : foodOrder.cart == null) &&
@@ -118,7 +115,7 @@ public class FoodOrder extends AbstractEntity {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first + (int) id;
+        result = result * first + super.hashCode();
         result = result * first + (status != null ? status.hashCode() : 0);
         result = result * first + (creationDate != null ? creationDate.hashCode() : 0);
         result = result * first + (comment != null ? comment.hashCode() : 0);
@@ -133,26 +130,89 @@ public class FoodOrder extends AbstractEntity {
 
     @Override
     public String toString() {
-        return new StringBuffer("FoodOrder{")
-                .append("id=")
-                .append(id)
-                .append(", status=")
+        return new StringBuffer(super.toString())
+                .append(", status = ")
                 .append(status)
-                .append(", creationDate=")
+                .append(", creationDate = ")
                 .append(creationDate)
-                .append(", user=")
+                .append(", user = ")
                 .append(user)
-                .append(", comment='")
+                .append(", comment = ")
                 .append(comment)
-                .append(", cart=")
+                .append(", cart = ")
                 .append(cart)
-                .append(", delivery=")
+                .append(", delivery = ")
                 .append(delivery)
-                .append(", bill=")
+                .append(", bill = ")
                 .append(bill)
-                .append("', evaluation=")
+                .append("', evaluation = ")
                 .append(evaluation)
                 .append('}')
                 .toString();
+    }
+
+    public static class FoodOrderBuilder {
+        private long id;
+        private OrderStatus status;
+        private LocalDateTime creationDate;
+        private String comment;
+        private OrderEvaluation evaluation;
+        private OrderCart cart;
+        private Delivery delivery;
+        private Bill bill;
+        private User user;
+
+        public FoodOrderBuilder setId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public FoodOrderBuilder setStatus(OrderStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public FoodOrderBuilder setCreationDate(LocalDateTime creationDate) {
+            this.creationDate = creationDate;
+            return this;
+        }
+
+        public FoodOrderBuilder setComment(String comment) {
+            this.comment = comment;
+            return this;
+        }
+
+        public FoodOrderBuilder setEvaluation(OrderEvaluation evaluation) {
+            this.evaluation = evaluation;
+            return this;
+        }
+
+        public FoodOrderBuilder setCart(OrderCart cart) {
+            this.cart = cart;
+            return this;
+        }
+
+        public FoodOrderBuilder setDelivery(Delivery delivery) {
+            this.delivery = delivery;
+            return this;
+        }
+
+        public FoodOrderBuilder setBill(Bill bill) {
+            this.bill = bill;
+            return this;
+        }
+
+        public FoodOrderBuilder setUser(User user) {
+            this.user = user;
+            return this;
+        }
+
+        public boolean isValid() {
+            return cart != null && delivery != null && bill != null && user != null;
+        }
+
+        public FoodOrder build() {
+            return new FoodOrder(this);
+        }
     }
 }

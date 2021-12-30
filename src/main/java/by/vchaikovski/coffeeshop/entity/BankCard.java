@@ -1,35 +1,23 @@
 package by.vchaikovski.coffeeshop.entity;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class BankCard extends AbstractEntity {
-    private static final Logger logger = LogManager.getLogger();
-    private long id;
     private String cardNumber;
     private LocalDate expirationDate;
     private BigDecimal amount;
 
     public BankCard(BankCardBuilder builder) {
-        if (builder == null || builder.isValid()) {
-            logger.error(() -> "The builder " + builder + " is not valid.");
-            throw new IllegalArgumentException("The builder " + builder + " is not valid.");
+        if (builder == null || !builder.isValid()) {
+            String message = "The builder " + builder + " is not valid.";
+            logger.error(message);
+            throw new IllegalArgumentException(message);
         }
-        this.id = builder.id;
-        this.cardNumber = builder.cardNumber;
-        this.expirationDate = builder.expirationDate;
-        this.amount = builder.amount;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+        super.setId(builder.id);
+        cardNumber = builder.cardNumber;
+        expirationDate = builder.expirationDate;
+        amount = builder.amount;
     }
 
     public String getCardNumber() {
@@ -63,7 +51,7 @@ public class BankCard extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BankCard bankCard = (BankCard) o;
-        return id == bankCard.id && (amount != null ? amount.equals(bankCard.amount) : bankCard.amount == null) &&
+        return super.equals(bankCard) && (amount != null ? amount.equals(bankCard.amount) : bankCard.amount == null) &&
                 (expirationDate != null ? expirationDate.equals(bankCard.expirationDate) : bankCard.expirationDate == null) &&
                 (cardNumber != null ? cardNumber.equals(bankCard.cardNumber) : bankCard.cardNumber == null);
     }
@@ -72,7 +60,7 @@ public class BankCard extends AbstractEntity {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first + (int) id;
+        result = result * first + super.hashCode();
         result = result * first + (cardNumber != null ? cardNumber.hashCode() : 0);
         result = result * first + (expirationDate != null ? expirationDate.hashCode() : 0);
         result = result * first + (amount != null ? amount.hashCode() : 0);
@@ -82,14 +70,12 @@ public class BankCard extends AbstractEntity {
 
     @Override
     public String toString() {
-        return new StringBuffer("BankCard{")
-                .append("id=")
-                .append(id)
-                .append(", cardNumber=")
+        return new StringBuffer(super.toString())
+                .append(", cardNumber = ")
                 .append(cardNumber)
-                .append(", expirationDate=")
+                .append(", expirationDate = ")
                 .append(expirationDate)
-                .append(", amount=")
+                .append(", amount = ")
                 .append(amount)
                 .append('}')
                 .toString();
@@ -100,16 +86,6 @@ public class BankCard extends AbstractEntity {
         private String cardNumber;
         private LocalDate expirationDate;
         private BigDecimal amount;
-
-        public BankCardBuilder() {
-        }
-
-        public BankCardBuilder(long id, String cardNumber, LocalDate expirationDate, BigDecimal amount) {
-            this.id = id;
-            this.cardNumber = cardNumber;
-            this.expirationDate = expirationDate;
-            this.amount = amount;
-        }
 
         public BankCardBuilder setId(long id) {
             this.id = id;

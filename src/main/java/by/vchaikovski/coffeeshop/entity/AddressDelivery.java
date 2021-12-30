@@ -1,11 +1,6 @@
 package by.vchaikovski.coffeeshop.entity;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class AddressDelivery extends AbstractEntity {
-    private static final Logger logger = LogManager.getLogger();
-    private long id;
     private String streetName;
     private String houseNumber;
     private int buildingNumber;
@@ -13,22 +8,15 @@ public class AddressDelivery extends AbstractEntity {
 
     private AddressDelivery(AddressDeliveryBuilder builder) {
         if (builder == null || !builder.isValid()) {
-            logger.error(() -> "The builder " + builder + " is not valid.");
-            throw new IllegalArgumentException("The builder " + builder + " is not valid.");
+            String message = "The builder " + builder + " is not valid.";
+            logger.error(message);
+            throw new IllegalArgumentException(message);
         }
-        id = builder.id;
+        super.setId(builder.id);
         streetName = builder.streetName;
         houseNumber = builder.houseNumber;
         buildingNumber = builder.buildingNumber;
         flatNumber = builder.flatNumber;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getStreetName() {
@@ -68,7 +56,7 @@ public class AddressDelivery extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AddressDelivery address = (AddressDelivery) o;
-        return id == address.id && buildingNumber == address.buildingNumber && flatNumber == address.flatNumber &&
+        return super.equals(address) && buildingNumber == address.buildingNumber && flatNumber == address.flatNumber &&
                 (houseNumber != null ? houseNumber.equals(address.houseNumber) : address.houseNumber == null) &&
                 (streetName != null ? streetName.equals(address.streetName) : address.streetName == null);
     }
@@ -77,7 +65,7 @@ public class AddressDelivery extends AbstractEntity {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first + (int) id;
+        result = result * first + super.hashCode();
         result = result * first + (streetName != null ? streetName.hashCode() : 0);
         result = result * first + (houseNumber != null ? houseNumber.hashCode() : 0);
         result = result * first + buildingNumber;
@@ -88,16 +76,14 @@ public class AddressDelivery extends AbstractEntity {
 
     @Override
     public String toString() {
-        return new StringBuffer("AddressDelivery{")
-                .append("id=")
-                .append(id)
-                .append(", streetName='")
+        return new StringBuffer(super.toString())
+                .append(", streetName = ")
                 .append(streetName)
-                .append(", houseNumber=")
+                .append(", houseNumber = ")
                 .append(houseNumber)
-                .append(", buildingNumber=")
+                .append(", buildingNumber = ")
                 .append(buildingNumber)
-                .append(", flatNumber=")
+                .append(", flatNumber = ")
                 .append(flatNumber)
                 .append('}')
                 .toString();
@@ -109,17 +95,6 @@ public class AddressDelivery extends AbstractEntity {
         private String houseNumber;
         private int buildingNumber;
         private int flatNumber;
-
-        public AddressDeliveryBuilder() {
-        }
-
-        public AddressDeliveryBuilder(long id, String streetName, String houseNumber, int buildingNumber, int flatNumber) {
-            this.id = id;
-            this.streetName = streetName;
-            this.houseNumber = houseNumber;
-            this.buildingNumber = buildingNumber;
-            this.flatNumber = flatNumber;
-        }
 
         public AddressDeliveryBuilder setId(long id) {
             this.id = id;

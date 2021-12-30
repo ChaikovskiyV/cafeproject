@@ -1,27 +1,26 @@
 package by.vchaikovski.coffeeshop.dao.impl;
 
 import by.vchaikovski.coffeeshop.dao.BillDao;
-import by.vchaikovski.coffeeshop.dao.mapper.BillMapper;
+import by.vchaikovski.coffeeshop.dao.mapper.impl.BillMapperImpl;
 import by.vchaikovski.coffeeshop.entity.Bill;
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.pool.ConnectionPool;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class BillDaoImpl implements BillDao {
-    private static final Logger logger = LogManager.getLogger();
+    private static final String UPDATE_MESSAGE = "The query \"update bill with id=";
     private static final String FIND_ALL_BILLS = "SELECT bill_id, total_price, bill_status, payment_date FROM bills";
     private static final String FIND_BILL_BY_ID = " WHERE bill_id=";
-    private static final String FIND_BILL_BY_STATUS = " WHERE bill_status=";
-    private static final String FIND_BILL_BY_PAYMENT_DATE = " WHERE payment_date=";
+    private static final String FIND_BILL_BY_STATUS = " WHERE bill_status=?";
+    private static final String FIND_BILL_BY_PAYMENT_DATE = " WHERE payment_date=?";
     private static final String FIND_BILL_BY_PAYMENT_PERIOD = " WHERE payment_date>=? AND payment_date<=?";
     private static final String FIND_BILL_BY_PRICE = " WHERE total_price>=? AND total_price<=?";
     private static final String UPDATE_BILL_STATUS = "UPDATE bills SET bill_status=? WHERE bill_id=?";
@@ -31,100 +30,56 @@ public class BillDaoImpl implements BillDao {
     private static final String DELETE_BILL_BY_ID = "DELETE FROM bills WHERE id=";
 
     @Override
-    public List<Bill> findAll() throws DaoException, ConnectionPoolException {
+    public List<Bill> findAll() throws DaoException {
         List<Bill> bills = new ArrayList<>();
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             Statement statement = connection.createStatement()) {
-            resultSet = statement.executeQuery(FIND_ALL_BILLS);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(FIND_ALL_BILLS)) {
             while (resultSet.next()) {
-                Bill bill = BillMapper.createBill(resultSet);
+                Bill bill = new BillMapperImpl().createEntity(resultSet);
                 bills.add(bill);
             }
-        } catch (SQLException e) {
-            logger.error("Exception from findAll method. DataBase connection error.", e);
-            throw new DaoException("Exception from findAll method. DataBase connection error.", e);
-        } finally {
-            close(resultSet);
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"find all bills\" is failed. DataBase connection error.";
+            logger.error(message, e);
+            throw new DaoException(message, e);
         }
         return bills;
     }
 
     @Override
-    public Optional<Bill> findById(long id) throws ConnectionPoolException, DaoException {
+    public Optional<Bill> findById(long id) throws DaoException {
         Bill bill = null;
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             Statement statement = connection.createStatement()) {
-            resultSet = statement.executeQuery(FIND_ALL_BILLS + FIND_BILL_BY_ID + id);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(FIND_ALL_BILLS + FIND_BILL_BY_ID + id)) {
             if (resultSet.next()) {
-                bill = BillMapper.createBill(resultSet);
+                bill = new BillMapperImpl().createEntity(resultSet);
             }
-        } catch (SQLException e) {
-            logger.error("Exception from findById method. DataBase connection error.", e);
-            throw new DaoException("Exception from findById method. DataBase connection error.", e);
-        } finally {
-            close(resultSet);
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"find a bill by id=" + id + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
         }
-        return bill != null ? Optional.of(bill) : Optional.empty();
+        return Optional.ofNullable(bill);
     }
 
     @Override
-    public List<Bill> findByStatus(Bill.BillStatus billStatus) throws ConnectionPoolException, DaoException {
+    public List<Bill> findByStatus(Bill.BillStatus billStatus) throws DaoException {
         List<Bill> bills = new ArrayList<>();
         ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             Statement statement = connection.createStatement()) {
-            resultSet = statement.executeQuery(FIND_ALL_BILLS + FIND_BILL_BY_STATUS + billStatus);
-            while (resultSet.next()) {
-                Bill bill = BillMapper.createBill(resultSet);
-                bills.add(bill);
-            }
-        } catch (SQLException e) {
-            logger.error("Exception from findByStatus method. DataBase connection error.", e);
-            throw new DaoException("Exception from findByStatus method. DataBase connection error.", e);
-        } finally {
-            close(resultSet);
-        }
-        return bills;
-    }
-
-    @Override
-    public List<Bill> findByPaymentDate(LocalDateTime dateTime) throws ConnectionPoolException, DaoException {
-        List<Bill> bills = new ArrayList<>();
-        ResultSet resultSet = null;
-        try (Connection connection = ConnectionPool.getInstance().getConnection();
-             Statement statement = connection.createStatement()) {
-            resultSet = statement.executeQuery(FIND_ALL_BILLS + FIND_BILL_BY_PAYMENT_DATE + dateTime);
-            while (resultSet.next()) {
-                Bill bill = BillMapper.createBill(resultSet);
-                bills.add(bill);
-            }
-        } catch (SQLException e) {
-            logger.error("Exception from findByPaymentDate method. DataBase connection error.", e);
-            throw new DaoException("Exception from findByPaymentDate method. DataBase connection error.", e);
-        } finally {
-            close(resultSet);
-        }
-        return bills;
-    }
-
-    @Override
-    public List<Bill> findByPaymentDate(LocalDateTime startPeriod, LocalDateTime endPeriod) throws ConnectionPoolException, DaoException {
-        List<Bill> bills = new ArrayList<>();
-        ResultSet resultSet = null;
-        try (Connection connection = ConnectionPool.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL_BILLS + FIND_BILL_BY_PAYMENT_PERIOD)) {
-            statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(startPeriod.toLocalDate()));
-            statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(endPeriod.toLocalDate()));
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_BILLS + FIND_BILL_BY_STATUS)) {
+            statement.setString(FIRST_PARAMETER_INDEX, billStatus.name());
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                Bill bill = BillMapper.createBill(resultSet);
+                Bill bill = new BillMapperImpl().createEntity(resultSet);
                 bills.add(bill);
             }
-        } catch (SQLException e) {
-            logger.error("Exception from findByPaymentDate method. DataBase connection error.", e);
-            throw new DaoException("Exception from findByPaymentDate method. DataBase connection error.", e);
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"find bills by status=" + billStatus + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
         } finally {
             close(resultSet);
         }
@@ -132,7 +87,55 @@ public class BillDaoImpl implements BillDao {
     }
 
     @Override
-    public List<Bill> findBillByPrice(BigDecimal minPrice, BigDecimal maxPrice) throws ConnectionPoolException, DaoException {
+    public List<Bill> findByPaymentDate(LocalDateTime paymentDate) throws DaoException {
+        List<Bill> bills = new ArrayList<>();
+        ResultSet resultSet = null;
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_BILLS + FIND_BILL_BY_PAYMENT_DATE)) {
+            statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(paymentDate.format(timeFormatter)));
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Bill bill = new BillMapperImpl().createEntity(resultSet);
+                bills.add(bill);
+            }
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"find bills by paymentDate=" + paymentDate.format(timeFormatter) + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        } finally {
+            close(resultSet);
+        }
+        return bills;
+    }
+
+    @Override
+    public List<Bill> findByPaymentDate(LocalDateTime startPeriod, LocalDateTime endPeriod) throws DaoException {
+        List<Bill> bills = new ArrayList<>();
+        ResultSet resultSet = null;
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_BILLS + FIND_BILL_BY_PAYMENT_PERIOD)) {
+            statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(startPeriod.format(timeFormatter)));
+            statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(endPeriod.format(timeFormatter)));
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Bill bill = new BillMapperImpl().createEntity(resultSet);
+                bills.add(bill);
+            }
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"find bills by paymentPeriod from " + startPeriod.format(timeFormatter) +
+                    " to " + endPeriod.format(timeFormatter) + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        } finally {
+            close(resultSet);
+        }
+        return bills;
+    }
+
+    @Override
+    public List<Bill> findBillByPrice(BigDecimal minPrice, BigDecimal maxPrice) throws DaoException {
         List<Bill> bills = new ArrayList<>();
         ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
@@ -141,12 +144,13 @@ public class BillDaoImpl implements BillDao {
             statement.setBigDecimal(SECOND_PARAMETER_INDEX, maxPrice);
             resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                Bill bill = BillMapper.createBill(resultSet);
+                Bill bill = new BillMapperImpl().createEntity(resultSet);
                 bills.add(bill);
             }
-        } catch (SQLException e) {
-            logger.error("Exception from findByPrice method. DataBase connection error.", e);
-            throw new DaoException("Exception from findByPrice method. DataBase connection error.", e);
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"find bills by price from " + minPrice + " to " + maxPrice + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
         } finally {
             close(resultSet);
         }
@@ -154,52 +158,61 @@ public class BillDaoImpl implements BillDao {
     }
 
     @Override
-    public boolean updateBillStatus(long id, Bill.BillStatus status) throws ConnectionPoolException, DaoException {
+    public boolean update(long id, Bill bill) {
+        throw new UnsupportedOperationException("The update(long id, Bill bill) method is not supported");
+    }
+
+    @Override
+    public boolean updateBillStatus(long id, Bill.BillStatus status) throws DaoException {
         int rowsNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_BILL_STATUS)) {
             statement.setString(FIRST_PARAMETER_INDEX, status.name());
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException e) {
-            logger.error(() -> "Updating bill with id " + id + " by status " + status + " can't be executed.", e);
-            throw new DaoException("Updating bill with id " + id + " by status " + status + " can't be executed.", e);
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = UPDATE_MESSAGE + id + " by status=" + status.name() + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
         }
         return rowsNumber != 0;
     }
 
     @Override
-    public boolean updateBillPaymentDate(long id, LocalDateTime paymentDate) throws ConnectionPoolException, DaoException {
+    public boolean updateBillPaymentDate(long id, LocalDateTime paymentDate) throws DaoException {
         int rowsNumber;
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_BILL_PAYMENT_DATE)) {
-            statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(paymentDate.toLocalDate()));
+            statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(paymentDate.format(timeFormatter)));
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException e) {
-            logger.error(() -> "Updating bill with id " + id + " by paymentDate " + paymentDate + " can't be executed.", e);
-            throw new DaoException("Updating bill with id " + id + " by paymentDate " + paymentDate + " can't be executed.", e);
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = UPDATE_MESSAGE + id + " by paymentDate=" + paymentDate.format(timeFormatter) + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
         }
         return rowsNumber != 0;
     }
 
     @Override
-    public boolean updateBillPrice(long id, BigDecimal newPrice) throws DaoException, ConnectionPoolException {
+    public boolean updateBillPrice(long id, BigDecimal newPrice) throws DaoException {
         int rowsNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_BILL_PRICE)) {
             statement.setBigDecimal(FIRST_PARAMETER_INDEX, newPrice);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException e) {
-            logger.error(() -> "Updating bill with id " + id + " by price " + newPrice + " can't be executed.", e);
-            throw new DaoException("Updating bill with id " + id + " by price " + newPrice + " can't be executed.", e);
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = UPDATE_MESSAGE + id + " by price=" + newPrice + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
         }
         return rowsNumber != 0;
     }
 
     @Override
-    public long create(Bill bill) throws ConnectionPoolException, DaoException {
+    public long create(Bill bill) throws DaoException {
         ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_BILL, Statement.RETURN_GENERATED_KEYS)) {
@@ -213,28 +226,25 @@ public class BillDaoImpl implements BillDao {
                 billId = resultSet.getLong(FIRST_PARAMETER_INDEX);
             }
             return billId;
-        } catch (SQLException e) {
-            logger.error(() -> "Bill " + bill + " can't be added in dataBase. DataBase connection error.", e);
-            throw new DaoException("Bill " + bill + " can't be added in dataBase. DataBase connection error.", e);
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"create bill " + bill + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
         } finally {
             close(resultSet);
         }
     }
 
     @Override
-    public boolean update(long id, Bill bill) {
-        throw new UnsupportedOperationException("update(long id, Bill bill) method is not supported");
-    }
-
-    @Override
-    public boolean deleteById(long id) throws ConnectionPoolException, DaoException {
+    public boolean deleteById(long id) throws DaoException {
         int rowsNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             rowsNumber = statement.executeUpdate(DELETE_BILL_BY_ID + id);
-        } catch (SQLException e) {
-            logger.error("Exception from deleteById method. DataBase connection error.", e);
-            throw new DaoException("Exception from deleteById method. DataBase connection error.", e);
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"delete bill with id=" + id + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
         }
         return rowsNumber != 0;
     }

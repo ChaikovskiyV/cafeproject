@@ -3,22 +3,18 @@ package by.vchaikovski.coffeeshop.entity;
 public class Discount extends AbstractEntity {
     public enum DiscountType {ZERO, STAFF, PERSONAL}
 
-    private long id;
     private DiscountType type;
     private int rate;
 
     public Discount(DiscountBuilder builder) {
-        id = builder.id;
-        type = builder.type;
+        if (builder == null) {
+            String message = "The builder " + builder + " is not valid.";
+            logger.error(message);
+            throw new IllegalArgumentException(message);
+        }
+        super.setId(builder.id);
+        type = builder.type != null ? builder.type : DiscountType.ZERO;
         rate = builder.rate;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public DiscountType getType() {
@@ -42,14 +38,14 @@ public class Discount extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Discount discount = (Discount) o;
-        return id == discount.id && rate == discount.rate && type == discount.type;
+        return super.equals(discount) && rate == discount.rate && type == discount.type;
     }
 
     @Override
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first + (int) id;
+        result = result * first + super.hashCode();
         result = result * first + (type != null ? type.hashCode() : 0);
         result = result * first + rate;
 
@@ -58,12 +54,10 @@ public class Discount extends AbstractEntity {
 
     @Override
     public String toString() {
-        return new StringBuffer("Discount{")
-                .append("id=")
-                .append(id)
-                .append(", type=")
+        return new StringBuffer(super.toString())
+                .append(", type = ")
                 .append(type)
-                .append(", rate=")
+                .append(", rate = ")
                 .append(rate)
                 .append('}')
                 .toString();
@@ -73,15 +67,6 @@ public class Discount extends AbstractEntity {
         private long id;
         private DiscountType type;
         private int rate;
-
-        public DiscountBuilder() {
-        }
-
-        public DiscountBuilder(long id, DiscountType type, int rate) {
-            this.id = id;
-            this.type = type;
-            this.rate = rate;
-        }
 
         public DiscountBuilder setId(long id) {
             this.id = id;
@@ -96,10 +81,6 @@ public class Discount extends AbstractEntity {
         public DiscountBuilder setRate(int rate) {
             this.rate = rate;
             return this;
-        }
-
-        public boolean isValid() {
-            return type != null;
         }
 
         public Discount build() {

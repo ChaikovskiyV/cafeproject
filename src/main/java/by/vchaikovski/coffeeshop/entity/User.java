@@ -1,15 +1,10 @@
 package by.vchaikovski.coffeeshop.entity;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class User extends AbstractEntity {
     public enum Role {ADMINISTRATOR, VISITOR, COURIER, BARISTA}
 
     public enum Status {BANNED, UNBANNED}
 
-    private static final Logger logger = LogManager.getLogger();
-    private long id;
     private String login;
     private String password;
     private String firstName;
@@ -22,27 +17,20 @@ public class User extends AbstractEntity {
 
     public User(UserBuilder builder) {
         if (builder == null || !builder.isValid()) {
-            logger.error(() -> "The builder " + builder + " is not valid.");
-            throw new IllegalArgumentException("The builder " + builder + " is not valid.");
+            String message = "The builder " + builder + " is not valid.";
+            logger.error(message);
+            throw new IllegalArgumentException(message);
         }
-        this.id = builder.id;
-        this.login = builder.login;
-        this.password = builder.password;
-        this.firstName = builder.firstName;
-        this.lastName = builder.lastName;
-        this.email = builder.email;
-        this.phoneNumber = builder.phoneNumber;
-        this.role = builder.role;
-        this.status = builder.status;
-        this.discount = builder.discount;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+        super.setId(builder.id);
+        login = builder.login;
+        password = builder.password;
+        firstName = builder.firstName;
+        lastName = builder.lastName;
+        email = builder.email;
+        phoneNumber = builder.phoneNumber;
+        role = builder.role;
+        status = builder.status != null ? builder.status : Status.UNBANNED;
+        discount = builder.discount;
     }
 
     public String getLogin() {
@@ -122,7 +110,7 @@ public class User extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id && (login != null ? login.equals(user.login) : user.login == null) &&
+        return super.equals(user) && (login != null ? login.equals(user.login) : user.login == null) &&
                 (password != null ? password.equals(user.password) : user.password == null) &&
                 (firstName != null ? firstName.equals(user.firstName) : user.firstName == null) &&
                 (lastName != null ? lastName.equals(user.lastName) : user.lastName == null) &&
@@ -136,7 +124,7 @@ public class User extends AbstractEntity {
     public int hashCode() {
         int first = 31;
         int result = 1;
-        result = result * first + (int) id;
+        result = result * first + super.hashCode();
         result = result * first + (login != null ? login.hashCode() : 0);
         result = result * first + (password != null ? password.hashCode() : 0);
         result = result * first + (firstName != null ? firstName.hashCode() : 0);
@@ -152,9 +140,7 @@ public class User extends AbstractEntity {
 
     @Override
     public String toString() {
-        return new StringBuffer("User{")
-                .append("id=")
-                .append(id)
+        return new StringBuffer(super.toString())
                 .append(", firstName='")
                 .append(firstName)
                 .append(", lastName='")
@@ -188,23 +174,6 @@ public class User extends AbstractEntity {
         private Role role;
         private Status status;
         private Discount discount;
-
-        public UserBuilder() {
-        }
-
-        public UserBuilder(long id, String login, String password, String firstName, String lastName, String email,
-                           String phoneNumber, Role role, Status status, Discount discount) {
-            this.id = id;
-            this.login = login;
-            this.password = password;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.email = email;
-            this.phoneNumber = phoneNumber;
-            this.role = role;
-            this.status = status;
-            this.discount = discount;
-        }
 
         public UserBuilder setId(long id) {
             this.id = id;
@@ -258,7 +227,7 @@ public class User extends AbstractEntity {
 
         public boolean isValid() {
             return login != null && password != null && firstName != null && lastName != null &&
-                    email != null && phoneNumber != null && role != null && status != null;
+                    email != null && phoneNumber != null && role != null;
         }
 
         public User build() {
