@@ -1,4 +1,6 @@
 /.idea
 Main.java
 /target
+*.txt
 *.class
+*.properties
