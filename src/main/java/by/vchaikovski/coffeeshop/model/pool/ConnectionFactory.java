@@ -1,17 +1,14 @@
-package by.vchaikovski.coffeeshop.pool;
+package by.vchaikovski.coffeeshop.model.pool;
 
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -20,7 +17,7 @@ class ConnectionFactory {
     private static final AtomicBoolean isCreated = new AtomicBoolean(false);
     private static final ReentrantLock singletonLock = new ReentrantLock();
     private static final Properties properties = new Properties();
-    private static final String DATABASE_PROPERTIES = "database.properties";
+    private static final String DATABASE_PROPERTIES = "database";
     private static final String PROPERTY_URL = "db.url";
     private static final String PROPERTY_USER = "db.user";
     private static final String PROPERTY_PASSWORD = "db.password";
@@ -32,16 +29,13 @@ class ConnectionFactory {
     private static ConnectionFactory instance;
 
     static {
-        try (InputStream inputStream = Files.newInputStream(Path.of(DATABASE_PROPERTIES))) {
-            properties.load(inputStream);
-            databaseUrl = properties.getProperty(PROPERTY_URL);
-            databaseUser = properties.getProperty(PROPERTY_USER);
-            databasePassword = properties.getProperty(PROPERTY_PASSWORD);
-            databaseDriver = properties.getProperty(PROPERTY_DRIVER);
+        try {
+            ResourceBundle bundle = ResourceBundle.getBundle(DATABASE_PROPERTIES);
+            databaseUrl = bundle.getString(PROPERTY_URL);
+            databaseUser = bundle.getString(PROPERTY_USER);
+            databasePassword = bundle.getString(PROPERTY_PASSWORD);
+            databaseDriver = bundle.getString(PROPERTY_DRIVER);
             Class.forName(databaseDriver);
-        } catch (IOException e) {
-            logger.fatal(() -> "The file " + DATABASE_PROPERTIES + " was not found.", e);
-            throw new RuntimeException("The file " + DATABASE_PROPERTIES + " was not found.", e);
         } catch (ClassNotFoundException e) {
             logger.fatal(() -> "Driver " + databaseDriver + " was not found.", e);
             throw new RuntimeException("Driver " + databaseDriver + " was not found.", e);

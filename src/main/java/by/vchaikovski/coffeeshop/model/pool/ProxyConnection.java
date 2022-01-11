@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.pool;
+package by.vchaikovski.coffeeshop.model.pool;
 
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import org.apache.logging.log4j.LogManager;

@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.pool;
+package by.vchaikovski.coffeeshop.model.pool;
 
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import org.apache.logging.log4j.LogManager;
@@ -18,8 +18,8 @@ public class ConnectionPool {
     private static final ReentrantLock singletonLock = new ReentrantLock();
     private static final AtomicBoolean isCreated = new AtomicBoolean(false);
     private static ConnectionPool instance;
-    private BlockingQueue<ProxyConnection> freeConnections;
-    private BlockingQueue<ProxyConnection> givenConnection;
+    private final BlockingQueue<ProxyConnection> freeConnections;
+    private final BlockingQueue<ProxyConnection> givenConnection;
 
     private ConnectionPool() {
         freeConnections = new LinkedBlockingQueue<>(POOL_SIZE);
@@ -29,7 +29,7 @@ public class ConnectionPool {
             ProxyConnection proxyConnection = new ProxyConnection(connection);
             freeConnections.offer(proxyConnection);
         }
-        if(freeConnections.isEmpty()) {
+        if (freeConnections.isEmpty()) {
             logger.fatal("No connections were created");
             throw new RuntimeException("No connections were created");
         }
@@ -66,22 +66,21 @@ public class ConnectionPool {
         if (connection instanceof ProxyConnection) {
             givenConnection.remove(connection);
             freeConnections.offer((ProxyConnection) connection);
+            restoreConnectionsNumber();                               //TODO think, does it need?
         } else {
             logger.error(() -> "Unknown connection: " + connection);
             throw new ConnectionPoolException("Unknown connection: " + connection);
         }
     }
 
-    public void destroyPool() throws ConnectionPoolException {
+    public void destroyPool() {
         for (int i = 0; i < POOL_SIZE; i++) {
             try {
                 freeConnections.take().reallyClose();
             } catch (InterruptedException e) {
                 logger.error("Exception from destroyPool method", e);
-                throw new ConnectionPoolException("Exception from destroyPool", e);
             } catch (SQLException e) {
                 logger.error("Exception from destroyPool method", e);
-                throw new ConnectionPoolException("Exception from destroyPool", e);
             }
         }
         deregisterDrivers();
@@ -90,7 +89,7 @@ public class ConnectionPool {
     public boolean restoreConnectionsNumber() {  //TODO check condition when connection can't be created
         boolean isRestored = false;
         int connectionsNumber = freeConnections.size() + givenConnection.size();
-        if(connectionsNumber < POOL_SIZE && connectionsNumber > 0) {
+        if (connectionsNumber < POOL_SIZE && connectionsNumber > 0) {
             while (connectionsNumber < POOL_SIZE) {
                 Connection connection = ConnectionFactory.getInstance().getConnection();
                 ProxyConnection proxyConnection = new ProxyConnection(connection);
