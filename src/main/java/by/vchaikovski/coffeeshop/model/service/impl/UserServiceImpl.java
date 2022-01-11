@@ -24,10 +24,10 @@ import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
 public class UserServiceImpl implements UserService {
     private static final Logger logger = LogManager.getLogger();
     private static UserServiceImpl instance;
-    private static final UserDaoImpl USER_DAO = DaoProvider.getInstance().getUserDao();
-    private static final DataValidator VALIDATOR = DataValidatorImpl.getInstance();
+    private final UserDaoImpl userDao;
 
     private UserServiceImpl() {
+        userDao = DaoProvider.getInstance().getUserDao();
     }
 
     public static UserServiceImpl getInstance() {
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     public List<User> findAllUsers() throws ServiceException {
         List<User> users;
         try {
-            users = USER_DAO.findAll();
+            users = userDao.findAll();
         } catch (DaoException e) {
             String message = "Impossible find all users.";
             logger.error(message, e);
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findUserById(long id) throws ServiceException {
         Optional<User> optionalUser;
         try {
-            optionalUser = USER_DAO.findById(id);
+            optionalUser = userDao.findById(id);
         } catch (DaoException e) {
             String message = "User can't be found by id " + id;
             logger.error(message, e);
@@ -65,9 +65,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findUserByLogin(String login) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         Optional<User> optionalUser;
         try {
-            optionalUser = VALIDATOR.isLoginValid(login) ? USER_DAO.findByLogin(login) : Optional.empty();
+            optionalUser = validator.isLoginValid(login) ? userDao.findByLogin(login) : Optional.empty();
         } catch (DaoException e) {
             String message = "User can't be found by login " + login;
             logger.error(message, e);
@@ -78,12 +79,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findUserByLoginAndPassword(String login, String password) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         Optional<User> optionalUser = Optional.empty();
-        if (VALIDATOR.isLoginValid(login) && VALIDATOR.isPasswordValid(password)) {
+        if (validator.isLoginValid(login) && validator.isPasswordValid(password)) {
             try {
                 PasswordEncryptor encryptor = PasswordEncryptor.getInstance();
                 String encryptedPassword = encryptor.encryptPassword(password);
-                optionalUser = USER_DAO.findByLoginAndPassword(login, encryptedPassword);
+                optionalUser = userDao.findByLoginAndPassword(login, encryptedPassword);
             } catch (DaoException e) {
                 String message = "User can't be found by login and password";
                 logger.error(message, e);
@@ -95,9 +97,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findUserByFirstName(String firstName) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         List<User> users;
         try {
-            users = VALIDATOR.isNameValid(firstName) ? USER_DAO.findByFirstName(firstName) : new ArrayList<>();
+            users = validator.isNameValid(firstName) ? userDao.findByFirstName(firstName) : new ArrayList<>();
         } catch (DaoException e) {
             String message = "Users can't be found by firstName " + firstName;
             logger.error(message, e);
@@ -108,9 +111,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findUserByLastName(String lastName) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         List<User> users;
         try {
-            users = VALIDATOR.isNameValid(lastName) ? USER_DAO.findByLastName(lastName) : new ArrayList<>();
+            users = validator.isNameValid(lastName) ? userDao.findByLastName(lastName) : new ArrayList<>();
         } catch (DaoException e) {
             String message = "Users can't be found by lastName " + lastName;
             logger.error(message, e);
@@ -121,10 +125,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findUserByFirstAndLastName(String firstName, String lastName) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         List<User> users;
         try {
-            users = VALIDATOR.isNameValid(firstName) && VALIDATOR.isNameValid(lastName)
-                    ? USER_DAO.findByFirstAndLastName(firstName, lastName)
+            users = validator.isNameValid(firstName) && validator.isNameValid(lastName)
+                    ? userDao.findByFirstAndLastName(firstName, lastName)
                     : new ArrayList<>();
         } catch (DaoException e) {
             String message = "Users can't be found by  firstName " + firstName + " and lastName " + lastName;
@@ -136,9 +141,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findUserByEmail(String email) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         Optional<User> optionalUser;
         try {
-            optionalUser = VALIDATOR.isEmailValid(email) ? USER_DAO.findByEmail(email) : Optional.empty();
+            optionalUser = validator.isEmailValid(email) ? userDao.findByEmail(email) : Optional.empty();
         } catch (DaoException e) {
             String message = "User can't be found by email " + email;
             logger.error(message, e);
@@ -149,10 +155,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findUserByPhoneNumber(String phoneNumber) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         Optional<User> optionalUser;
         try {
-            optionalUser = VALIDATOR.isPhoneNumberValid(phoneNumber)
-                    ? USER_DAO.findByPhoneNumber(phoneNumber)
+            optionalUser = validator.isPhoneNumberValid(phoneNumber)
+                    ? userDao.findByPhoneNumber(phoneNumber)
                     : Optional.empty();
         } catch (DaoException e) {
             String message = "User can't be found by phoneNumber " + phoneNumber;
@@ -166,7 +173,7 @@ public class UserServiceImpl implements UserService {
     public List<User> findUsersByRole(User.Role userRole) throws ServiceException {
         List<User> users;
         try {
-            users = userRole != null ? USER_DAO.findByRole(userRole) : new ArrayList<>();
+            users = userRole != null ? userDao.findByRole(userRole) : new ArrayList<>();
         } catch (DaoException e) {
             String message = "User can't be found by role " + userRole.name();
             logger.error(message, e);
@@ -179,7 +186,7 @@ public class UserServiceImpl implements UserService {
     public List<User> findUsersByStatus(User.Status userStatus) throws ServiceException {
         List<User> users;
         try {
-            users = userStatus != null ? USER_DAO.findByStatus(userStatus) : new ArrayList<>();
+            users = userStatus != null ? userDao.findByStatus(userStatus) : new ArrayList<>();
         } catch (DaoException e) {
             String message = "User can't be found by status " + userStatus.name();
             logger.error(message, e);
@@ -192,7 +199,7 @@ public class UserServiceImpl implements UserService {
     public List<User> findUsersByDiscountType(Discount.DiscountType discountType) throws ServiceException {
         List<User> users;
         try {
-            users = discountType != null ? USER_DAO.findByDiscount(discountType) : new ArrayList<>();
+            users = discountType != null ? userDao.findByDiscount(discountType) : new ArrayList<>();
         } catch (DaoException e) {
             String message = "User can't be found by discountType " + discountType.name();
             logger.error(message, e);
@@ -203,11 +210,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findUsersByDiscountRate(String discountRate) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         List<User> users = new ArrayList<>();
-        if (VALIDATOR.isDiscountRateValid(discountRate)) {
+        if (validator.isDiscountRateValid(discountRate)) {
             int rate = Integer.parseInt(discountRate);
             try {
-                users = USER_DAO.findByDiscount(rate);
+                users = userDao.findByDiscount(rate);
             } catch (DaoException e) {
                 String message = "User can't be found by discountRate " + discountRate;
                 logger.error(message, e);
@@ -219,11 +227,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updateUserLogin(long id, Map<String, String> userParameters) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         String login = userParameters.get(LOGIN);
-        if (VALIDATOR.isLoginValid(login)) {
+        if (validator.isLoginValid(login)) {
             try {
-                Optional<User> userWithSameLogin = USER_DAO.findByLogin(login);
-                return userWithSameLogin.isEmpty() && USER_DAO.updateUserLogin(id, login);
+                Optional<User> userWithSameLogin = userDao.findByLogin(login);
+                return userWithSameLogin.isEmpty() && userDao.updateUserLogin(id, login);
             } catch (DaoException e) {
                 String message = "User can't be updated by login.";
                 logger.error(message, e);
@@ -235,24 +244,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updateUserPassword(long id, Map<String, String> userParameters) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         String oldPassword = userParameters.get(OLD_PASSWORD);
-        if(!VALIDATOR.isPasswordValid(oldPassword)) {
+        if (!validator.isPasswordValid(oldPassword)) {
             userParameters.remove(OLD_PASSWORD);
             return false;
         }
         try {
             PasswordEncryptor encryptor = PasswordEncryptor.getInstance();
             String encryptedOldPass = encryptor.encryptPassword(oldPassword);
-            Optional<User> user = USER_DAO.findByIdAndPassword(id, encryptedOldPass);
+            Optional<User> user = userDao.findByIdAndPassword(id, encryptedOldPass);
             String newPassword = userParameters.get(NEW_PASSWORD);
-            if (user.isEmpty() || !VALIDATOR.isPasswordValid(newPassword)) {
+            if (user.isEmpty() || !validator.isPasswordValid(newPassword)) {
                 userParameters.remove(OLD_PASSWORD);
                 userParameters.remove(NEW_PASSWORD);
                 logger.debug("Password is wrong or not correct");
                 return false;
             }
             String encryptedNewPass = encryptor.encryptPassword(newPassword);
-            return USER_DAO.updateUserPassword(id, encryptedNewPass);
+            return userDao.updateUserPassword(id, encryptedNewPass);
         } catch (DaoException e) {
             String message = "User can't be updated by password.";
             logger.error(message, e);
@@ -262,8 +272,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updateUserFirstName(long id, String firstName) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         try {
-            return VALIDATOR.isNameValid(firstName) && USER_DAO.updateUserFirstName(id, firstName);
+            return validator.isNameValid(firstName) && userDao.updateUserFirstName(id, firstName);
         } catch (DaoException e) {
             String message = "User can't be updated by firstName.";
             logger.error(message, e);
@@ -273,8 +284,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updateUserLastName(long id, String lastName) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         try {
-            return VALIDATOR.isNameValid(lastName) && USER_DAO.updateUserFirstName(id, lastName);
+            return validator.isNameValid(lastName) && userDao.updateUserFirstName(id, lastName);
         } catch (DaoException e) {
             String message = "User can't be updated by lastName.";
             logger.error(message, e);
@@ -284,10 +296,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updateUserEmail(long id, Map<String, String> userParameters) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         String email = userParameters.get(EMAIL);
         try {
-            Optional<User> user = USER_DAO.findByEmail(email);
-            return user.isEmpty() && VALIDATOR.isEmailValid(email) && USER_DAO.updateUserEmail(id, email);
+            Optional<User> user = userDao.findByEmail(email);
+            return user.isEmpty() && validator.isEmailValid(email) && userDao.updateUserEmail(id, email);
         } catch (DaoException e) {
             String message = "User can't be updated by email.";
             logger.error(message, e);
@@ -297,11 +310,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updateUserPhoneNumber(long id, Map<String, String> userParameters) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         String phoneNumber = userParameters.get(PHONE_NUMBER);
         try {
-            Optional<User> user = USER_DAO.findByPhoneNumber(phoneNumber);
-            return user.isEmpty() && VALIDATOR.isPhoneNumberValid(phoneNumber) &&
-                    USER_DAO.updateUserPhoneNumber(id, phoneNumber);
+            Optional<User> user = userDao.findByPhoneNumber(phoneNumber);
+            return user.isEmpty() && validator.isPhoneNumberValid(phoneNumber) &&
+                    userDao.updateUserPhoneNumber(id, phoneNumber);
         } catch (DaoException e) {
             String message = "User can't be updated by phoneNumber.";
             logger.error(message, e);
@@ -312,7 +326,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean updateUserRole(long id, User.Role role) throws ServiceException {
         try {
-            return USER_DAO.updateUserRole(id, role);
+            return userDao.updateUserRole(id, role);
         } catch (DaoException e) {
             String message = "User can't be updated by role.";
             logger.error(message, e);
@@ -323,7 +337,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean updateUserStatus(long id, User.Status status) throws ServiceException {
         try {
-            return USER_DAO.updateUserStatus(id, status);
+            return userDao.updateUserStatus(id, status);
         } catch (DaoException e) {
             String message = "User can't be updated by status.";
             logger.error(message, e);
@@ -333,6 +347,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean createUser(Map<String, String> userParameters, String password) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         String firstName = userParameters.get(FIRST_NAME);
         String lastName = userParameters.get(LAST_NAME);
         String login = userParameters.get(LOGIN);
@@ -342,21 +357,23 @@ public class UserServiceImpl implements UserService {
         String status = userParameters.get(USER_STATUS);
         String discountType = userParameters.get(DISCOUNT_TYPE);
         String discountRate = userParameters.get(DISCOUNT_RATE);
-        boolean loginCheck = !VALIDATOR.isLoginValid(login) && userParameters.remove(LOGIN, login);
-        boolean firstNameCheck = !VALIDATOR.isNameValid(firstName) &&
+        boolean loginCheck = !validator.isLoginValid(login) && userParameters.remove(LOGIN, login);
+        boolean firstNameCheck = !validator.isNameValid(firstName) &&
                 userParameters.remove(FIRST_NAME, firstName);
-        boolean lastNameCheck = !VALIDATOR.isNameValid(lastName) &&
+        boolean lastNameCheck = !validator.isNameValid(lastName) &&
                 userParameters.remove(LAST_NAME, lastName);
-        boolean emailCheck = !VALIDATOR.isEmailValid(email) && userParameters.remove(EMAIL, email);
-        boolean phoneNumberCheck = !VALIDATOR.isPhoneNumberValid(phoneNumber) &&
+        boolean emailCheck = !validator.isEmailValid(email) && userParameters.remove(EMAIL, email);
+        boolean phoneNumberCheck = !validator.isPhoneNumberValid(phoneNumber) &&
                 userParameters.remove(PHONE_NUMBER, phoneNumber);
-        boolean passwordCheck = VALIDATOR.isPasswordValid(password);
-        userParameters.put(PASSWORD_RESULT_CHECK, passwordCheck ? TRUE : FALSE);
+        boolean passwordCheck = validator.isPasswordValid(password);
+        userParameters.put(PASSWORD_RESULT_CHECK, String.valueOf(passwordCheck));
         if (!loginCheck && !firstNameCheck && !lastNameCheck && !emailCheck && !phoneNumberCheck && passwordCheck) {
             String encryptedPassword = PasswordEncryptor.getInstance().encryptPassword(password);
             try {
-                User.Status userStatus = status != null ? User.Status.valueOf(status.toUpperCase()) : null;
-                User.Role userRole = role != null ? User.Role.valueOf(role.toUpperCase()) : null;
+                User.Status userStatus = validator.isEnumContains(status, User.Status.class)
+                        ? User.Status.valueOf(status.toUpperCase()) : null;
+                User.Role userRole = validator.isEnumContains(role, User.Role.class)
+                        ? User.Role.valueOf(role.toUpperCase()) : null;
                 long discountId = findDiscountId(discountType, discountRate);
                 User user = new User.UserBuilder()
                         .setLogin(login)
@@ -367,10 +384,8 @@ public class UserServiceImpl implements UserService {
                         .setRole(userRole)
                         .setStatus(userStatus)
                         .build();
-                long userId = USER_DAO.create(user, encryptedPassword);
-                return userId > 0 && USER_DAO.updateUserDiscountId(userId, discountId);
-            } catch (IllegalArgumentException e) {
-                logger.warn(() -> "Unknown role=" + role + " or status=" + status, e);
+                long userId = userDao.create(user, encryptedPassword);
+                return userId > 0 && userDao.updateUserDiscountId(userId, discountId);
             } catch (DaoException e) {
                 String message = "User can't be inserted in data base.";
                 logger.error(message, e);
@@ -383,7 +398,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean deleteUserById(long id) throws ServiceException {
         try {
-            return USER_DAO.deleteById(id);
+            return userDao.deleteById(id);
         } catch (DaoException e) {
             String message = "User can't be deleted by id.";
             logger.error(message, e);
@@ -392,8 +407,9 @@ public class UserServiceImpl implements UserService {
     }
 
     private long findDiscountId(String discountType, String discountRate) throws DaoException {
+        DataValidator validator = DataValidatorImpl.getInstance();
         long discountId = 0;
-        if (VALIDATOR.isDiscountRateValid(discountRate) && discountType != null) {
+        if (validator.isDiscountRateValid(discountRate) && discountType != null) {
             int rate = Integer.parseInt(discountRate);
             try {
                 DiscountDao discountDao = DaoProvider.getInstance().getDiscountDao();

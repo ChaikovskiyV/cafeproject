@@ -22,5 +22,5 @@ public interface BankCardService {
 
     boolean topUpCard(long id, String amount) throws ServiceException;
 
-    boolean withdrawMoney(long id, String amount) throws ServiceException;
+    boolean withdrawMoneyCard(long id, String amount) throws ServiceException;
 }
