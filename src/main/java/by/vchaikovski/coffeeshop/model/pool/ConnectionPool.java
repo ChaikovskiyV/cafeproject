@@ -66,15 +66,14 @@ public class ConnectionPool {
         if (connection instanceof ProxyConnection) {
             givenConnection.remove(connection);
             freeConnections.offer((ProxyConnection) connection);
-            restoreConnectionsNumber();                               //TODO think, does it need?
         } else {
             logger.error(() -> "Unknown connection: " + connection);
             throw new ConnectionPoolException("Unknown connection: " + connection);
         }
     }
 
-    public void destroyPool() {
-        for (int i = 0; i < POOL_SIZE; i++) {
+    public void destroyPool() {                          //TODO choose the variant of this method
+    /*    for (int i = 0; i < POOL_SIZE; i++) {
             try {
                 freeConnections.take().reallyClose();
             } catch (InterruptedException e) {
@@ -82,23 +81,20 @@ public class ConnectionPool {
             } catch (SQLException e) {
                 logger.error("Exception from destroyPool method", e);
             }
+        }*/
+        while (!freeConnections.isEmpty() || !givenConnection.isEmpty()) {
+            try {
+                if (!freeConnections.isEmpty()) {
+                    freeConnections.poll().reallyClose();
+                }
+                if (!givenConnection.isEmpty()) {
+                    givenConnection.poll().reallyClose();
+                }
+            } catch (SQLException e) {
+                logger.error("Exception from destroyPool method", e);
+            }
         }
         deregisterDrivers();
-    }
-
-    public boolean restoreConnectionsNumber() {  //TODO check condition when connection can't be created
-        boolean isRestored = false;
-        int connectionsNumber = freeConnections.size() + givenConnection.size();
-        if (connectionsNumber < POOL_SIZE && connectionsNumber > 0) {
-            while (connectionsNumber < POOL_SIZE) {
-                Connection connection = ConnectionFactory.getInstance().getConnection();
-                ProxyConnection proxyConnection = new ProxyConnection(connection);
-                freeConnections.offer(proxyConnection);
-                connectionsNumber = freeConnections.size() + givenConnection.size();
-            }
-            isRestored = true;
-        }
-        return isRestored;
     }
 
     private void deregisterDrivers() {
