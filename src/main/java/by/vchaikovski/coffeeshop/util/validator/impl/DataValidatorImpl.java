@@ -15,7 +15,7 @@ public class DataValidatorImpl implements DataValidator {
     private static final String HOUSE_NUMBER_REGEX = "[1-9]\\d*\\p{Alpha}?";
     private static final String CARD_NUMBER_REGEX = "\\d{16}";
     private static final String DISCOUNT_RATE_REGEX = "[1-9]\\d?";
-    private static final String DATE_REGEX = "(\\d{2}|\\d{4})[-\\s]\\d{2}[-\\s]\\d{2}\\s\\d{2}:\\d{2}:?(?<=:)\\d{2}";
+    private static final String DATE_REGEX = "(\\d{2}|\\d{4})[-\\s]\\d{2}([-\\s]\\d{2})?(\\s\\d{2}:\\d{2}(:\\d{2})?)?";
 
     private static DataValidatorImpl instance;
 
