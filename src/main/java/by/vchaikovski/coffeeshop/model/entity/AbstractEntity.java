@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.entity;
+package by.vchaikovski.coffeeshop.model.entity;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

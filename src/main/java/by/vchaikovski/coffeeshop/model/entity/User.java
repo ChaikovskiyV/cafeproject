@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.entity;
+package by.vchaikovski.coffeeshop.model.entity;
 
 public class User extends AbstractEntity {
     public enum Role {ADMINISTRATOR, VISITOR, COURIER, BARISTA}
@@ -6,7 +6,6 @@ public class User extends AbstractEntity {
     public enum Status {BANNED, UNBANNED}
 
     private String login;
-    private String password;
     private String firstName;
     private String lastName;
     private String email;
@@ -23,12 +22,11 @@ public class User extends AbstractEntity {
         }
         super.setId(builder.id);
         login = builder.login;
-        password = builder.password;
         firstName = builder.firstName;
         lastName = builder.lastName;
         email = builder.email;
         phoneNumber = builder.phoneNumber;
-        role = builder.role;
+        role = builder.role != null ? builder.role : Role.VISITOR;
         status = builder.status != null ? builder.status : Status.UNBANNED;
         discount = builder.discount;
     }
@@ -39,14 +37,6 @@ public class User extends AbstractEntity {
 
     public void setLogin(String login) {
         this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getFirstName() {
@@ -111,7 +101,6 @@ public class User extends AbstractEntity {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return super.equals(user) && (login != null ? login.equals(user.login) : user.login == null) &&
-                (password != null ? password.equals(user.password) : user.password == null) &&
                 (firstName != null ? firstName.equals(user.firstName) : user.firstName == null) &&
                 (lastName != null ? lastName.equals(user.lastName) : user.lastName == null) &&
                 (email != null ? email.equalsIgnoreCase(user.email) : user.email == null) &&
@@ -126,7 +115,6 @@ public class User extends AbstractEntity {
         int result = 1;
         result = result * first + super.hashCode();
         result = result * first + (login != null ? login.hashCode() : 0);
-        result = result * first + (password != null ? password.hashCode() : 0);
         result = result * first + (firstName != null ? firstName.hashCode() : 0);
         result = result * first + (lastName != null ? lastName.hashCode() : 0);
         result = result * first + (email != null ? email.hashCode() : 0);
@@ -147,8 +135,6 @@ public class User extends AbstractEntity {
                 .append(lastName)
                 .append(", login='")
                 .append(login)
-                .append(", password='")
-                .append("******")
                 .append(", email='")
                 .append(email)
                 .append(", phoneNumber='")
@@ -166,7 +152,6 @@ public class User extends AbstractEntity {
     public static class UserBuilder {
         private long id;
         private String login;
-        private String password;
         private String firstName;
         private String lastName;
         private String email;
@@ -182,11 +167,6 @@ public class User extends AbstractEntity {
 
         public UserBuilder setLogin(String login) {
             this.login = login;
-            return this;
-        }
-
-        public UserBuilder setPassword(String password) {
-            this.password = password;
             return this;
         }
 
@@ -226,8 +206,8 @@ public class User extends AbstractEntity {
         }
 
         public boolean isValid() {
-            return login != null && password != null && firstName != null && lastName != null &&
-                    email != null && phoneNumber != null && role != null;
+            return login != null && firstName != null && lastName != null &&
+                    email != null && phoneNumber != null;
         }
 
         public User build() {

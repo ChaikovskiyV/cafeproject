@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.entity;
+package by.vchaikovski.coffeeshop.model.entity;
 
 public class Discount extends AbstractEntity {
     public enum DiscountType {ZERO, STAFF, PERSONAL}

@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.entity;
+package by.vchaikovski.coffeeshop.model.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
