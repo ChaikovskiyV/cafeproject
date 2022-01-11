@@ -1,7 +1,7 @@
-package by.vchaikovski.coffeeshop.dao.mapper.impl;
+package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.entity.Menu;
+import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeeshop.model.entity.Menu;
 import by.vchaikovski.coffeeshop.exception.DaoException;
 
 import javax.swing.*;
@@ -12,9 +12,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-import static by.vchaikovski.coffeeshop.dao.ColumnTable.*;
+import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
 
 public class MenuMapperImpl implements BaseMapper<Menu> {
+    private static final MenuMapperImpl instance = new MenuMapperImpl();
+
+    private MenuMapperImpl() {
+    }
+
+    public static MenuMapperImpl getInstance() {
+        return instance;
+    }
     @Override
     public Menu createEntity(ResultSet resultSet) throws DaoException {
         Menu menu;

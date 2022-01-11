@@ -1,15 +1,24 @@
-package by.vchaikovski.coffeeshop.dao.mapper.impl;
+package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.entity.AddressDelivery;
 import by.vchaikovski.coffeeshop.exception.DaoException;
+import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeeshop.model.entity.AddressDelivery;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static by.vchaikovski.coffeeshop.dao.ColumnTable.*;
+import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
 
 public class AddressDeliveryMapperImpl implements BaseMapper<AddressDelivery> {
+    private static final AddressDeliveryMapperImpl instance = new AddressDeliveryMapperImpl();
+
+    private AddressDeliveryMapperImpl() {
+    }
+
+    public static AddressDeliveryMapperImpl getInstance() {
+        return instance;
+    }
+
     @Override
     public AddressDelivery createEntity(ResultSet resultSet) throws DaoException {
         AddressDelivery addressDelivery;

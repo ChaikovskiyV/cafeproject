@@ -1,17 +1,25 @@
-package by.vchaikovski.coffeeshop.dao.mapper.impl;
+package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.entity.Bill;
 import by.vchaikovski.coffeeshop.exception.DaoException;
+import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeeshop.model.entity.Bill;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-import static by.vchaikovski.coffeeshop.dao.ColumnTable.*;
+import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
 
 public class BillMapperImpl implements BaseMapper<Bill> {
+    private static final BillMapperImpl instance = new BillMapperImpl();
+
+    private BillMapperImpl() {
+    }
+
+    public static BillMapperImpl getInstance() {
+        return instance;
+    }
 
     public Bill createEntity(ResultSet resultSet) throws DaoException {
         Bill bill;

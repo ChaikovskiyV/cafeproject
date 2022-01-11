@@ -1,18 +1,29 @@
-package by.vchaikovski.coffeeshop.dao.mapper.impl;
+package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.entity.*;
 import by.vchaikovski.coffeeshop.exception.DaoException;
+import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeeshop.model.entity.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-import static by.vchaikovski.coffeeshop.dao.ColumnTable.*;
+import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
 
 public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
+    private static final FoodOrderMapperImpl instance = new FoodOrderMapperImpl();
+
+    private FoodOrderMapperImpl() {
+    }
+
+    public static FoodOrderMapperImpl getInstance() {
+        return instance;
+    }
+
     @Override
     public FoodOrder createEntity(ResultSet resultSet) throws DaoException {
+        MapperProvider mapperProvider = MapperProvider.getInstance();
         FoodOrder order;
         try {
             long id = resultSet.getLong(ORDER_ID);
@@ -21,10 +32,10 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
             String comment = resultSet.getString(ORDER_COMMENT);
             FoodOrder.OrderEvaluation evaluation = FoodOrder.OrderEvaluation
                     .valueOf(resultSet.getString(ORDER_EVALUATION).toUpperCase());
-            UserMapperImpl userMapper = new UserMapperImpl();
-            BillMapperImpl billMapper = new BillMapperImpl();
-            DeliveryMapperImpl deliveryMapper = new DeliveryMapperImpl();
-            OrderCartMapperImpl cartMapper = new OrderCartMapperImpl();
+            UserMapperImpl userMapper = mapperProvider.getUserMapper();
+            BillMapperImpl billMapper = mapperProvider.getBillMapper();
+            DeliveryMapperImpl deliveryMapper = mapperProvider.getDeliveryMapper();
+            OrderCartMapperImpl cartMapper = mapperProvider.getOrderCardMapper();
             User user = userMapper.createEntity(resultSet);
             Bill bill = billMapper.createEntity(resultSet);
             Delivery delivery = deliveryMapper.createEntity(resultSet);
