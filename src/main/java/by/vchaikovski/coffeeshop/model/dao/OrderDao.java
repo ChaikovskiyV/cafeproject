@@ -1,7 +1,7 @@
-package by.vchaikovski.coffeeshop.dao;
+package by.vchaikovski.coffeeshop.model.dao;
 
-import by.vchaikovski.coffeeshop.entity.FoodOrder;
-import by.vchaikovski.coffeeshop.entity.OrderCart;
+import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
+import by.vchaikovski.coffeeshop.model.entity.OrderCart;
 import by.vchaikovski.coffeeshop.exception.DaoException;
 
 import java.time.LocalDateTime;

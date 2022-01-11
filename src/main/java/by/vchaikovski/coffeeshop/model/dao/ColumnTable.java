@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.dao;
+package by.vchaikovski.coffeeshop.model.dao;
 
 public enum ColumnTable {
     ;

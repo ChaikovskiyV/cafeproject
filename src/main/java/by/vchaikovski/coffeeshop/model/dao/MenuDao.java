@@ -1,6 +1,6 @@
-package by.vchaikovski.coffeeshop.dao;
+package by.vchaikovski.coffeeshop.model.dao;
 
-import by.vchaikovski.coffeeshop.entity.Menu;
+import by.vchaikovski.coffeeshop.model.entity.Menu;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

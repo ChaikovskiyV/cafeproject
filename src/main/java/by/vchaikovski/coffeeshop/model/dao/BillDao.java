@@ -1,6 +1,6 @@
-package by.vchaikovski.coffeeshop.dao;
+package by.vchaikovski.coffeeshop.model.dao;
 
-import by.vchaikovski.coffeeshop.entity.Bill;
+import by.vchaikovski.coffeeshop.model.entity.Bill;
 import by.vchaikovski.coffeeshop.exception.DaoException;
 
 import java.math.BigDecimal;

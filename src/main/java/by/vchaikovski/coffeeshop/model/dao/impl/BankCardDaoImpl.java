@@ -1,28 +1,38 @@
-package by.vchaikovski.coffeeshop.dao.impl;
+package by.vchaikovski.coffeeshop.model.dao.impl;
 
-import by.vchaikovski.coffeeshop.dao.BankCardDao;
-import by.vchaikovski.coffeeshop.dao.mapper.impl.BankCardMapperImpl;
-import by.vchaikovski.coffeeshop.entity.BankCard;
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.pool.ConnectionPool;
+import by.vchaikovski.coffeeshop.model.dao.BankCardDao;
+import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeeshop.model.entity.BankCard;
+import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class BankCardDaoImpl implements BankCardDao {
+    private static final BankCardDaoImpl instance = new BankCardDaoImpl();
+    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String UPDATE_MESSAGE = "The query \"update bankCard with id=";
-    private static final String FIND_ALL_CARDS = "SELECT card_id, number, validity_period, amount FROM cards";
+    private static final String FIND_ALL_CARDS = "SELECT card_id, number, expiration_date, amount FROM cards";
     private static final String FIND_CARD_BY_ID = " WHERE id=";
     private static final String FIND_CARD_BY_NUMBER = " WHERE number=?";
+    private static final String FIND_CARD_BY_NUMBER_AND_EXPIRATION_DATE = " WHERE number=? AND expiration_date=?";
     private static final String CREATE_CARD = "INSERT INTO cards(number, expiration_date, amount) VALUES (?, ?, ?)";
     private static final String UPDATE_CARD_AMOUNT = "UPDATE cards SET amount=? WHERE card_id=?";
     private static final String DELETE_CARD_BY_ID = "DELETE FROM cards WHERE id=";
 
+    private BankCardDaoImpl() {
+    }
+
+    public static BankCardDaoImpl getInstance() {
+        return instance;
+    }
 
     @Override
     public List<BankCard> findAll() throws DaoException {
@@ -31,7 +41,7 @@ public class BankCardDaoImpl implements BankCardDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_CARDS)) {
             while (resultSet.next()) {
-                BankCard card = new BankCardMapperImpl().createEntity(resultSet);
+                BankCard card = MAPPER_PROVIDER.getBankCardMapper().createEntity(resultSet);
                 cards.add(card);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -49,7 +59,7 @@ public class BankCardDaoImpl implements BankCardDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_CARDS + FIND_CARD_BY_ID + id)) {
             if (resultSet.next()) {
-                card = new BankCardMapperImpl().createEntity(resultSet);
+                card = MAPPER_PROVIDER.getBankCardMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find bankCard by id=" + id + FAILED_MESSAGE;
@@ -62,20 +72,39 @@ public class BankCardDaoImpl implements BankCardDao {
     @Override
     public Optional<BankCard> findByCardNumber(String cardNumber) throws DaoException {
         BankCard card = null;
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL_CARDS + FIND_CARD_BY_NUMBER)) {
             statement.setString(FIRST_PARAMETER_INDEX, cardNumber);
-            resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                card = new BankCardMapperImpl().createEntity(resultSet);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    card = MAPPER_PROVIDER.getBankCardMapper().createEntity(resultSet);
+                }
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find bankCard by cardNumber=" + cardNumber + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
+        }
+        return Optional.ofNullable(card);
+    }
+
+    @Override
+    public Optional<BankCard> findByCardNumberAndExpirationDate(String cardNumber, LocalDate expirationDate) throws DaoException {
+        BankCard card = null;
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_CARDS + FIND_CARD_BY_NUMBER_AND_EXPIRATION_DATE)) {
+            statement.setString(FIRST_PARAMETER_INDEX, cardNumber);
+            statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(expirationDate));
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    card = MAPPER_PROVIDER.getBankCardMapper().createEntity(resultSet);
+                }
+            }
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"find bankCard by expiration date=" + expirationDate +
+                    " and card number=" + cardNumber + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
         }
         return Optional.ofNullable(card);
     }
@@ -104,24 +133,22 @@ public class BankCardDaoImpl implements BankCardDao {
     @Override
     public long create(BankCard bankCard) throws DaoException {
         long cardId = 0;
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_CARD, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(FIRST_PARAMETER_INDEX, bankCard.getCardNumber());
             statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(bankCard.getExpirationDate()));
             statement.setBigDecimal(THIRD_PARAMETER_INDEX, bankCard.getAmount());
             statement.executeUpdate();
-            resultSet = statement.getGeneratedKeys();
-            if (resultSet.next()) {
-                cardId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    cardId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+                }
             }
             return cardId;
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"create bankCard " + bankCard + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
     }
 

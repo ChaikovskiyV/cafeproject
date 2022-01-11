@@ -1,7 +1,7 @@
-package by.vchaikovski.coffeeshop.dao;
+package by.vchaikovski.coffeeshop.model.dao;
 
-import by.vchaikovski.coffeeshop.entity.Discount;
-import by.vchaikovski.coffeeshop.entity.User;
+import by.vchaikovski.coffeeshop.model.entity.Discount;
+import by.vchaikovski.coffeeshop.model.entity.User;
 import by.vchaikovski.coffeeshop.exception.DaoException;
 
 import java.util.List;
@@ -17,6 +17,8 @@ public interface UserDao extends BaseDao<User> {
     List<User> findByFirstName(String firstName) throws DaoException;
 
     List<User> findByLastName(String lastName) throws DaoException;
+
+    List<User> findByFirstAndLastName(String firstName, String lastName) throws DaoException;
 
     Optional<User> findByEmail(String email) throws DaoException;
 
@@ -45,4 +47,8 @@ public interface UserDao extends BaseDao<User> {
     boolean updateUserRole(long id, User.Role role) throws DaoException;
 
     boolean updateUserStatus(long id, User.Status status) throws DaoException;
+
+    boolean updateUserDiscountId(long userId, long discountId) throws DaoException;
+
+    long create(User user, String password) throws DaoException;
 }

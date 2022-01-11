@@ -1,12 +1,12 @@
-package by.vchaikovski.coffeeshop.dao.impl;
+package by.vchaikovski.coffeeshop.model.dao.impl;
 
-import by.vchaikovski.coffeeshop.dao.UserDao;
-import by.vchaikovski.coffeeshop.dao.mapper.impl.UserMapperImpl;
-import by.vchaikovski.coffeeshop.entity.Discount;
-import by.vchaikovski.coffeeshop.entity.User;
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.pool.ConnectionPool;
+import by.vchaikovski.coffeeshop.model.dao.UserDao;
+import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeeshop.model.entity.Discount;
+import by.vchaikovski.coffeeshop.model.entity.User;
+import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
+    private static final UserDaoImpl instance = new UserDaoImpl();
+    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String UPDATE_MESSAGE = "The query \"update user with id=";
     private static final String FIND_ALL_USERS = "SELECT user_id, login, first_name, last_name, email, phone_number, role, " +
@@ -25,6 +27,7 @@ public class UserDaoImpl implements UserDao {
     private static final String FIND_USER_BY_LOGIN_AND_PASSWORD = " WHERE login=? AND password=?";
     private static final String FIND_USER_BY_FIRST_NAME = " WHERE first_name=?";
     private static final String FIND_USER_BY_LAST_NAME = " WHERE last_name=?";
+    private static final String FIND_USER_BY_FIRST_AND_LAST_NAME = " WHERE first_name=? AND last_name=?";
     private static final String FIND_USER_BY_EMAIL = " WHERE email=?";
     private static final String FIND_USER_BY_PHONE_NUMBER = " WHERE phone_number=?";
     private static final String FIND_USER_BY_ROLE = " WHERE role=?";
@@ -41,7 +44,15 @@ public class UserDaoImpl implements UserDao {
     private static final String UPDATE_USER_PHONE_NUMBER = "UPDATE users SET phone_number=? WHERE user_id=?";
     private static final String UPDATE_USER_ROLE = "UPDATE users SET role=? WHERE user_id=?";
     private static final String UPDATE_USER_STATUS = "UPDATE users SET status=? WHERE user_id=?";
+    private static final String UPDATE_USER_DISCOUNT_ID = "UPDATE users SET fk_discount_id=? WHERE user_id=?";
     private static final String DELETE_USER_BY_ID = "DELETE FROM users WHERE user_id=";
+
+    private UserDaoImpl() {
+    }
+
+    public static UserDaoImpl getInstance() {
+        return instance;
+    }
 
     @Override
     public List<User> findAll() throws DaoException {
@@ -51,7 +62,7 @@ public class UserDaoImpl implements UserDao {
              ResultSet resultSet = statement.executeQuery()) {
             users = new ArrayList<>();
             while (resultSet.next()) {
-                User user = new UserMapperImpl().createEntity(resultSet);
+                User user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
                 users.add(user);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -69,7 +80,7 @@ public class UserDaoImpl implements UserDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_USERS + FIND_USER_BY_ID + id)) {
             if (resultSet.next()) {
-                user = new UserMapperImpl().createEntity(resultSet);
+                user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find user by id=" + id + FAILED_MESSAGE;
@@ -82,20 +93,18 @@ public class UserDaoImpl implements UserDao {
     @Override
     public Optional<User> findByLogin(String login) throws DaoException {
         User user = null;
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL_USERS + FIND_USER_BY_LOGIN)) {
             statement.setString(FIRST_PARAMETER_INDEX, login);
-            resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                user = new UserMapperImpl().createEntity(resultSet);
+            try(ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
+                }
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find user by login=" + login + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
         return Optional.ofNullable(user);
     }
@@ -103,21 +112,19 @@ public class UserDaoImpl implements UserDao {
     @Override
     public Optional<User> findByIdAndPassword(long id, String password) throws DaoException {
         User user = null;
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL_USERS + FIND_USER_BY_ID_AND_PASSWORD)) {
             statement.setLong(FIRST_PARAMETER_INDEX, id);
             statement.setString(SECOND_PARAMETER_INDEX, password);
-            resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                user = new UserMapperImpl().createEntity(resultSet);
+            try(ResultSet  resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
+                }
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find user by password and id=" + id + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
         return Optional.ofNullable(user);
     }
@@ -132,7 +139,7 @@ public class UserDaoImpl implements UserDao {
             statement.setString(SECOND_PARAMETER_INDEX, password);
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                user = new UserMapperImpl().createEntity(resultSet);
+                user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find user by password and login=" + login + FAILED_MESSAGE;
@@ -154,7 +161,7 @@ public class UserDaoImpl implements UserDao {
             resultSet = statement.executeQuery();
             users = new ArrayList<>();
             while (resultSet.next()) {
-                User user = new UserMapperImpl().createEntity(resultSet);
+                User user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
                 users.add(user);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -177,7 +184,31 @@ public class UserDaoImpl implements UserDao {
             resultSet = statement.executeQuery();
             users = new ArrayList<>();
             while (resultSet.next()) {
-                User user = new UserMapperImpl().createEntity(resultSet);
+                User user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
+                users.add(user);
+            }
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"find user by lastName=" + lastName + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        } finally {
+            close(resultSet);
+        }
+        return users;
+    }
+
+    @Override
+    public List<User> findByFirstAndLastName(String firstName, String lastName) throws DaoException {
+        List<User> users;
+        ResultSet resultSet = null;
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_USERS + FIND_USER_BY_FIRST_AND_LAST_NAME)) {
+            statement.setString(FIRST_PARAMETER_INDEX, firstName);
+            statement.setString(SECOND_PARAMETER_INDEX, lastName);
+            resultSet = statement.executeQuery();
+            users = new ArrayList<>();
+            while (resultSet.next()) {
+                User user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
                 users.add(user);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -199,7 +230,7 @@ public class UserDaoImpl implements UserDao {
             statement.setString(FIRST_PARAMETER_INDEX, email);
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                user = new UserMapperImpl().createEntity(resultSet);
+                user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find user by email=" + email + FAILED_MESSAGE;
@@ -220,7 +251,7 @@ public class UserDaoImpl implements UserDao {
             statement.setString(FIRST_PARAMETER_INDEX, phoneNumber);
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                user = new UserMapperImpl().createEntity(resultSet);
+                user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find user by phoneNumber=" + phoneNumber + FAILED_MESSAGE;
@@ -242,7 +273,7 @@ public class UserDaoImpl implements UserDao {
             resultSet = statement.executeQuery();
             users = new ArrayList<>();
             while (resultSet.next()) {
-                User user = new UserMapperImpl().createEntity(resultSet);
+                User user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
                 users.add(user);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -265,7 +296,7 @@ public class UserDaoImpl implements UserDao {
             resultSet = statement.executeQuery();
             users = new ArrayList<>();
             while (resultSet.next()) {
-                User user = new UserMapperImpl().createEntity(resultSet);
+                User user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
                 users.add(user);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -288,7 +319,7 @@ public class UserDaoImpl implements UserDao {
             resultSet = statement.executeQuery();
             users = new ArrayList<>();
             while (resultSet.next()) {
-                User user = new UserMapperImpl().createEntity(resultSet);
+                User user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
                 users.add(user);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -309,7 +340,7 @@ public class UserDaoImpl implements UserDao {
              ResultSet resultSet = statement.executeQuery(FIND_ALL_USERS + FIND_USER_BY_DISCOUNT_RATE + rate)) {
             users = new ArrayList<>();
             while (resultSet.next()) {
-                User user = new UserMapperImpl().createEntity(resultSet);
+                User user = MAPPER_PROVIDER.getUserMapper().createEntity(resultSet);
                 users.add(user);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -454,12 +485,32 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public long create(User user) throws DaoException { //TODO add fk_discount_id
-        ResultSet resultSet = null;
+    public boolean updateUserDiscountId(long userId, long discountId) throws DaoException {
+        int rowsNumber;
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_USER_DISCOUNT_ID)) {
+            statement.setLong(FIRST_PARAMETER_INDEX, discountId);
+            statement.setLong(SECOND_PARAMETER_INDEX, userId);
+            rowsNumber = statement.executeUpdate();
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = UPDATE_MESSAGE + userId + " by discount id=" + discountId + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        }
+        return rowsNumber != 0;
+    }
+
+    @Override
+    public long create(User user) {
+        throw new UnsupportedOperationException("The create(User user) method is unsupported.");
+    }
+
+    @Override
+    public long create(User user, String password) throws DaoException {
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_NEW_USER, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(FIRST_PARAMETER_INDEX, user.getLogin());
-            statement.setString(SECOND_PARAMETER_INDEX, user.getPassword());
+            statement.setString(SECOND_PARAMETER_INDEX, password);
             statement.setString(THIRD_PARAMETER_INDEX, user.getFirstName());
             statement.setString(FOURTH_PARAMETER_INDEX, user.getLastName());
             statement.setString(FIFTH_PARAMETER_INDEX, user.getEmail());
@@ -467,18 +518,17 @@ public class UserDaoImpl implements UserDao {
             statement.setString(SEVENTH_PARAMETER_INDEX, user.getRole().name());
             statement.setString(EIGHTH_PARAMETER_INDEX, user.getStatus().name());
             statement.executeUpdate();
-            resultSet = statement.getGeneratedKeys();
             long userId = 0;
-            if (resultSet.next()) {
-                userId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    userId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+                }
             }
             return userId;
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"create user " + user + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
     }
 

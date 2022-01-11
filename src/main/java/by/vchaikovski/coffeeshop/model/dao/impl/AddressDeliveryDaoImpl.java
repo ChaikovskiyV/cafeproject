@@ -1,11 +1,11 @@
-package by.vchaikovski.coffeeshop.dao.impl;
+package by.vchaikovski.coffeeshop.model.dao.impl;
 
-import by.vchaikovski.coffeeshop.dao.AddressDeliverDao;
-import by.vchaikovski.coffeeshop.dao.mapper.impl.AddressDeliveryMapperImpl;
-import by.vchaikovski.coffeeshop.entity.AddressDelivery;
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.pool.ConnectionPool;
+import by.vchaikovski.coffeeshop.model.dao.AddressDeliverDao;
+import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeeshop.model.entity.AddressDelivery;
+import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class AddressDeliveryDaoImpl implements AddressDeliverDao {
+    private static final AddressDeliveryDaoImpl instance = new AddressDeliveryDaoImpl();
+    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String UPDATE_MESSAGE = "The query \"update addressDelivery with id=";
     private static final String FIND_ALL = "SELECT address_id, street_name, house_number, building_number, " +
@@ -27,6 +29,12 @@ public class AddressDeliveryDaoImpl implements AddressDeliverDao {
             "VALUES (?, ?, ?, ?)";
     private static final String DELETE_ADDRESS_BY_ID = "DELETE FROM address WHERE id=";
 
+    private AddressDeliveryDaoImpl() {
+    }
+
+    public static AddressDeliveryDaoImpl getInstance() {
+        return instance;
+    }
 
     @Override
     public List<AddressDelivery> findAll() throws DaoException {
@@ -35,7 +43,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliverDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL)) {
             while (resultSet.next()) {
-                AddressDelivery addressDelivery = new AddressDeliveryMapperImpl().createEntity(resultSet);
+                AddressDelivery addressDelivery = MAPPER_PROVIDER.getAddressDeliveryMapper().createEntity(resultSet);
                 addressDeliveries.add(addressDelivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -54,7 +62,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliverDao {
              ResultSet resultSet = statement.executeQuery(FIND_ALL + FIND_ADDRESS_BY_ID + id)) {
 
             if (resultSet.next()) {
-                addressDelivery = new AddressDeliveryMapperImpl().createEntity(resultSet);
+                addressDelivery = MAPPER_PROVIDER.getAddressDeliveryMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find delivery by id=" + id + FAILED_MESSAGE;
@@ -67,21 +75,19 @@ public class AddressDeliveryDaoImpl implements AddressDeliverDao {
     @Override
     public List<AddressDelivery> findByStreetName(String streetName) throws DaoException {
         List<AddressDelivery> addressDeliveries = new ArrayList<>();
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL + FIND_ADDRESS_BY_STREET_NAME)) {
             statement.setString(FIRST_PARAMETER_INDEX, streetName);
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                AddressDelivery addressDelivery = new AddressDeliveryMapperImpl().createEntity(resultSet);
-                addressDeliveries.add(addressDelivery);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    AddressDelivery addressDelivery = MAPPER_PROVIDER.getAddressDeliveryMapper().createEntity(resultSet);
+                    addressDeliveries.add(addressDelivery);
+                }
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find delivery by streetName=" + streetName + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
         return addressDeliveries;
     }
@@ -157,7 +163,6 @@ public class AddressDeliveryDaoImpl implements AddressDeliverDao {
 
     @Override
     public long create(AddressDelivery addressDelivery) throws DaoException {
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_ADDRESS, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(FIRST_PARAMETER_INDEX, addressDelivery.getStreetName());
@@ -165,18 +170,17 @@ public class AddressDeliveryDaoImpl implements AddressDeliverDao {
             statement.setInt(THIRD_PARAMETER_INDEX, addressDelivery.getBuildingNumber());
             statement.setInt(FOURTH_PARAMETER_INDEX, addressDelivery.getFlatNumber());
             statement.executeUpdate();
-            resultSet = statement.getGeneratedKeys();
-            long addressId = 0;
-            if (resultSet.next()) {
-                addressId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                long addressId = 0;
+                if (resultSet.next()) {
+                    addressId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+                }
+                return addressId;
             }
-            return addressId;
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"create addressDelivery " + addressDelivery + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
     }
 

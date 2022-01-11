@@ -1,7 +1,6 @@
-package by.vchaikovski.coffeeshop.dao;
+package by.vchaikovski.coffeeshop.model.dao;
 
-import by.vchaikovski.coffeeshop.entity.AddressDelivery;
-import by.vchaikovski.coffeeshop.entity.Delivery;
+import by.vchaikovski.coffeeshop.model.entity.Delivery;
 import by.vchaikovski.coffeeshop.exception.DaoException;
 
 import java.time.LocalDateTime;

@@ -1,11 +1,11 @@
-package by.vchaikovski.coffeeshop.dao.impl;
+package by.vchaikovski.coffeeshop.model.dao.impl;
 
-import by.vchaikovski.coffeeshop.dao.BillDao;
-import by.vchaikovski.coffeeshop.dao.mapper.impl.BillMapperImpl;
-import by.vchaikovski.coffeeshop.entity.Bill;
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.pool.ConnectionPool;
+import by.vchaikovski.coffeeshop.model.dao.BillDao;
+import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeeshop.model.entity.Bill;
+import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class BillDaoImpl implements BillDao {
+    private static final BillDaoImpl instance = new BillDaoImpl();
+    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
     private static final String UPDATE_MESSAGE = "The query \"update bill with id=";
     private static final String FIND_ALL_BILLS = "SELECT bill_id, total_price, bill_status, payment_date FROM bills";
     private static final String FIND_BILL_BY_ID = " WHERE bill_id=";
@@ -29,6 +31,13 @@ public class BillDaoImpl implements BillDao {
     private static final String CREATE_BILL = "INSERT INTO bills(total_price, bill_status, payment_date) VALUES (?, ?, ?)";
     private static final String DELETE_BILL_BY_ID = "DELETE FROM bills WHERE id=";
 
+    private BillDaoImpl() {
+    }
+
+    public static BillDaoImpl getInstance() {
+        return instance;
+    }
+
     @Override
     public List<Bill> findAll() throws DaoException {
         List<Bill> bills = new ArrayList<>();
@@ -36,7 +45,7 @@ public class BillDaoImpl implements BillDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_BILLS)) {
             while (resultSet.next()) {
-                Bill bill = new BillMapperImpl().createEntity(resultSet);
+                Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
                 bills.add(bill);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -54,7 +63,7 @@ public class BillDaoImpl implements BillDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_BILLS + FIND_BILL_BY_ID + id)) {
             if (resultSet.next()) {
-                bill = new BillMapperImpl().createEntity(resultSet);
+                bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find a bill by id=" + id + FAILED_MESSAGE;
@@ -67,21 +76,19 @@ public class BillDaoImpl implements BillDao {
     @Override
     public List<Bill> findByStatus(Bill.BillStatus billStatus) throws DaoException {
         List<Bill> bills = new ArrayList<>();
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL_BILLS + FIND_BILL_BY_STATUS)) {
             statement.setString(FIRST_PARAMETER_INDEX, billStatus.name());
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Bill bill = new BillMapperImpl().createEntity(resultSet);
-                bills.add(bill);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                    bills.add(bill);
+                }
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find bills by status=" + billStatus + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
         return bills;
     }
@@ -89,22 +96,20 @@ public class BillDaoImpl implements BillDao {
     @Override
     public List<Bill> findByPaymentDate(LocalDateTime paymentDate) throws DaoException {
         List<Bill> bills = new ArrayList<>();
-        ResultSet resultSet = null;
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL_BILLS + FIND_BILL_BY_PAYMENT_DATE)) {
             statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(paymentDate.format(timeFormatter)));
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Bill bill = new BillMapperImpl().createEntity(resultSet);
-                bills.add(bill);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                    bills.add(bill);
+                }
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find bills by paymentDate=" + paymentDate.format(timeFormatter) + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
         return bills;
     }
@@ -112,24 +117,22 @@ public class BillDaoImpl implements BillDao {
     @Override
     public List<Bill> findByPaymentDate(LocalDateTime startPeriod, LocalDateTime endPeriod) throws DaoException {
         List<Bill> bills = new ArrayList<>();
-        ResultSet resultSet = null;
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL_BILLS + FIND_BILL_BY_PAYMENT_PERIOD)) {
             statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(startPeriod.format(timeFormatter)));
             statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(endPeriod.format(timeFormatter)));
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Bill bill = new BillMapperImpl().createEntity(resultSet);
-                bills.add(bill);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                    bills.add(bill);
+                }
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find bills by paymentPeriod from " + startPeriod.format(timeFormatter) +
                     " to " + endPeriod.format(timeFormatter) + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
         return bills;
     }
@@ -137,22 +140,20 @@ public class BillDaoImpl implements BillDao {
     @Override
     public List<Bill> findBillByPrice(BigDecimal minPrice, BigDecimal maxPrice) throws DaoException {
         List<Bill> bills = new ArrayList<>();
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL_BILLS + FIND_BILL_BY_PRICE)) {
             statement.setBigDecimal(FIRST_PARAMETER_INDEX, minPrice);
             statement.setBigDecimal(SECOND_PARAMETER_INDEX, maxPrice);
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Bill bill = new BillMapperImpl().createEntity(resultSet);
-                bills.add(bill);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                    bills.add(bill);
+                }
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find bills by price from " + minPrice + " to " + maxPrice + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
         return bills;
     }
@@ -213,25 +214,23 @@ public class BillDaoImpl implements BillDao {
 
     @Override
     public long create(Bill bill) throws DaoException {
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_BILL, Statement.RETURN_GENERATED_KEYS)) {
             statement.setBigDecimal(FIRST_PARAMETER_INDEX, bill.getTotalPrice());
             statement.setString(SECOND_PARAMETER_INDEX, bill.getStatus().name());
             statement.setDate(THIRD_PARAMETER_INDEX, Date.valueOf(bill.getPaymentDate().toLocalDate()));
             statement.executeUpdate();
-            resultSet = statement.getGeneratedKeys();
-            long billId = 0;
-            if (resultSet.next()) {
-                billId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                long billId = 0;
+                if (resultSet.next()) {
+                    billId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+                }
+                return billId;
             }
-            return billId;
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"create bill " + bill + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
     }
 

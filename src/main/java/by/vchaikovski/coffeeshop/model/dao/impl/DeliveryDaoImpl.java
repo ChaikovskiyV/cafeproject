@@ -1,11 +1,11 @@
-package by.vchaikovski.coffeeshop.dao.impl;
+package by.vchaikovski.coffeeshop.model.dao.impl;
 
-import by.vchaikovski.coffeeshop.dao.DeliveryDao;
-import by.vchaikovski.coffeeshop.dao.mapper.impl.DeliveryMapperImpl;
-import by.vchaikovski.coffeeshop.entity.Delivery;
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.pool.ConnectionPool;
+import by.vchaikovski.coffeeshop.model.dao.DeliveryDao;
+import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeeshop.model.entity.Delivery;
+import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class DeliveryDaoImpl implements DeliveryDao {
+    private static final DeliveryDaoImpl instance = new DeliveryDaoImpl();
+    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String FIND_ALL_DELIVERIES = "SELECT delivery_id, delivery_type, delivery_time FROM deliveries" +
@@ -29,6 +31,13 @@ public class DeliveryDaoImpl implements DeliveryDao {
     private static final String CREATE_DELIVERY = "INSERT INTO deliveries(delivery_type, delivery_time, fk_address_id) VALUES (?, ?, ?)";
     private static final String DELETE_DELIVERY_BY_ID = "DELETE FROM bills WHERE id=";
 
+    private DeliveryDaoImpl() {
+    }
+
+    public static DeliveryDaoImpl getInstance() {
+        return instance;
+    }
+
     @Override
     public List<Delivery> findAll() throws DaoException {
         List<Delivery> deliveries = new ArrayList<>();
@@ -36,7 +45,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES)) {
             while (resultSet.next()) {
-                Delivery delivery = new DeliveryMapperImpl().createEntity(resultSet);
+                Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
                 deliveries.add(delivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -54,7 +63,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES + FIND_DELIVERY_BY_ID + id)) {
             if (resultSet.next()) {
-                delivery = new DeliveryMapperImpl().createEntity(resultSet);
+                delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find all deliveries\" is failed. DataBase connection error.";
@@ -71,7 +80,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES + FIND_DELIVERY_BY_TYPE + deliveryType)) {
             while (resultSet.next()) {
-                Delivery delivery = new DeliveryMapperImpl().createEntity(resultSet);
+                Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
                 deliveries.add(delivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -89,7 +98,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES + FIND_DELIVERY_BY_ADDRESS + addressDeliveryId)) {
             while (resultSet.next()) {
-                Delivery delivery = new DeliveryMapperImpl().createEntity(resultSet);
+                Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
                 deliveries.add(delivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -108,7 +117,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES + FIND_DELIVERY_BY_DATE + timeDelivery.format(formatter))) {
             while (resultSet.next()) {
-                Delivery delivery = new DeliveryMapperImpl().createEntity(resultSet);
+                Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
                 deliveries.add(delivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -123,23 +132,21 @@ public class DeliveryDaoImpl implements DeliveryDao {
     public List<Delivery> findByDateDelivery(LocalDateTime startPeriod, LocalDateTime endPeriod) throws DaoException {
         List<Delivery> deliveries = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-        ResultSet resultSet = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(FIND_ALL_DELIVERIES + FIND_DELIVERY_BY_PERIOD)) {
             statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(startPeriod.format(formatter)));
             statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(endPeriod.format(formatter)));
-            resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Delivery delivery = new DeliveryMapperImpl().createEntity(resultSet);
-                deliveries.add(delivery);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
+                    deliveries.add(delivery);
+                }
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find deliveries by delivery period from " + startPeriod.format(formatter) +
                     " to " + endPeriod.format(formatter) + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
         return deliveries;
     }
@@ -186,32 +193,30 @@ public class DeliveryDaoImpl implements DeliveryDao {
 
     @Override
     public long create(Delivery delivery) throws DaoException {
-        ResultSet resultSet = null;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_DELIVERY, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(FIRST_PARAMETER_INDEX, delivery.getDeliveryType().name());
             statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(delivery.getDeliveryTime().format(formatter)));
             if (delivery.getAddress() != null) {
-                AddressDeliveryDaoImpl addressDao = new AddressDeliveryDaoImpl();
+                AddressDeliveryDaoImpl addressDao = AddressDeliveryDaoImpl.getInstance();
                 long addressId = addressDao.create(delivery.getAddress());
                 statement.setLong(THIRD_PARAMETER_INDEX, addressId);
             } else {
                 statement.setLong(THIRD_PARAMETER_INDEX, 0);
             }
             statement.executeUpdate();
-            resultSet = statement.getGeneratedKeys();
-            long billId = 0;
-            if (resultSet.next()) {
-                billId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+            try (ResultSet resultSet = statement.getGeneratedKeys()) {
+                long billId = 0;
+                if (resultSet.next()) {
+                    billId = resultSet.getLong(FIRST_PARAMETER_INDEX);
+                }
+                return billId;
             }
-            return billId;
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"insert delivery=" + delivery + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            close(resultSet);
         }
     }
 
