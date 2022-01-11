@@ -1,10 +1,13 @@
 package by.vchaikovski.coffeeshop.util.validator.impl;
 
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDateTime;
 
 public class DataValidatorImpl implements DataValidator {
+    private static final Logger logger = LogManager.getLogger();
     private static final String LOGIN_REGEX = "\\p{Alpha}\\w{5,19}";
     private static final String PASSWORD_REGEX = "\\w{6,20}";
     private static final String USER_NAME_REGEX = "(.{4,20})(([a-zA-Z]+[-\\s]?[a-zA-Z]+)|([а-яА-Я]+[-\\s]?[а-яА-Я]+))";
@@ -87,5 +90,19 @@ public class DataValidatorImpl implements DataValidator {
     @Override
     public boolean isPhoneNumberValid(String phoneNumber) {
         return phoneNumber != null && phoneNumber.strip().matches(PHONE_NUMBER_REGEX);
+    }
+
+    @Override
+    public <T extends Enum<T>> boolean isEnumContains(String value, Class<T> enumClass) {
+        boolean result = false;
+        if(value != null) {
+            try {
+                T.valueOf(enumClass, value.strip().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                logger.warn(() -> enumClass.getName() + " doesn't contain " + value, e);
+                result = true;
+            }
+        }
+        return result;
     }
 }

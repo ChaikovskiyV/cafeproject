@@ -1,5 +1,6 @@
 package by.vchaikovski.coffeeshop.util.validator;
 
+import by.vchaikovski.coffeeshop.model.entity.User;
 import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,6 +34,8 @@ class DataValidatorImplTest {
     private static String streetNameEn;
     private static String streetNameRus;
     private static String wrongString;
+    private static String enumString;
+    private static Class<User.Role> enumRole;
     private static boolean result;
 
     @BeforeAll
@@ -55,6 +58,8 @@ class DataValidatorImplTest {
         phoneNumber = "+375339681599";
         streetNameEn = "Gikalo street";
         streetNameRus = "Наполеона Орды";
+        enumString = "barista";
+        enumRole = User.Role.class;
     }
 
     @AfterAll
@@ -275,6 +280,19 @@ class DataValidatorImplTest {
     public void ifPhoneNumberNull() {
         wrongString = null;
         result = validator.isPhoneNumberValid(wrongString);
+        assertFalse(result);
+    }
+
+    @Test
+    public void isEnumContains() {
+        result = validator.isEnumContains(enumString, enumRole);
+        assertTrue(result);
+    }
+
+    @Test
+    public void ifEnumNotContainValue() {
+        wrongString = "driver";
+        result = validator.isEnumContains(wrongString, enumRole);
         assertFalse(result);
     }
 }

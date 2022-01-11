@@ -26,4 +26,6 @@ public interface DataValidator {
     boolean isDiscountRateValid(String discountRate);
 
     boolean isPhoneNumberValid(String phoneNumber);
+
+    <T extends Enum<T>> boolean isEnumContains(String value, Class<T> enumClass);
 }
