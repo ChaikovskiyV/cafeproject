@@ -18,11 +18,11 @@ public class ServiceProvider {
         return instance;
     }
 
-    public static UserService getUserService() {
+    public UserService getUserService() {
         return userService;
     }
 
-    public static BankCardService getBankCardService() {
+    public BankCardService getBankCardService() {
         return bankCardService;
     }
 }

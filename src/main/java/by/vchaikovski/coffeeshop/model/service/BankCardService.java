@@ -14,9 +14,9 @@ public interface BankCardService {
 
     Optional<BankCard> findCardByNumber(String cardNumber) throws ServiceException;
 
-    Optional<BankCard> findCardByNumberAndExpirationDate(String number, String date) throws ServiceException;
+    Optional<BankCard> findCardByNumberAndDate(String number, String date) throws ServiceException;
 
-    boolean createBankCard(Map<String, String> cardParameters) throws ServiceException;
+    long createBankCard(Map<String, String> cardParameters) throws ServiceException;
 
     boolean deleteBankCardById(long id) throws ServiceException;
 

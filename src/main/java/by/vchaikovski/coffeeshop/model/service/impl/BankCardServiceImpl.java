@@ -79,7 +79,7 @@ public class BankCardServiceImpl implements BankCardService {
     }
 
     @Override
-    public Optional<BankCard> findCardByNumberAndExpirationDate(String number, String date) throws ServiceException {
+    public Optional<BankCard> findCardByNumberAndDate(String number, String date) throws ServiceException {
         DataValidator validator = DataValidatorImpl.getInstance();
         Optional<BankCard> optionalCard = Optional.empty();
         if (validator.isCardNumberValid(number) && validator.isDateValid(date)) {
@@ -99,20 +99,27 @@ public class BankCardServiceImpl implements BankCardService {
     }
 
     @Override
-    public boolean createBankCard(Map<String, String> cardParameters) throws ServiceException {
+    public long createBankCard(Map<String, String> cardParameters) throws ServiceException {
+        long cardId = 0;
         DataValidator validator = DataValidatorImpl.getInstance();
         String cardNumber = cardParameters.get(CARD_NUMBER);
         String expirationDate = cardParameters.get(CARD_EXPIRATION_DATE);
         String cardAmount = cardParameters.get(CARD_AMOUNT);
-        long cardId = 0;
-        if (validator.isDateValid(expirationDate) && validator.isCardNumberValid(cardNumber) &&
-                validator.isNumberValid(cardAmount)) {
+        boolean numberValid = validator.isCardNumberValid(cardNumber);
+        boolean dateValid = validator.isDateValid(expirationDate);
+        boolean amountValid = validator.isNumberValid(cardAmount);
+        if (numberValid && dateValid && amountValid) {
+            LocalDate date = LocalDate.parse(expirationDate);
+            if (!validator.isDateLaterCurrently(date)) {
+                cardParameters.replace(CARD_EXPIRATION_DATE, DATE_EXPIRED);
+                return cardId;
+            }
             try {
                 Optional<BankCard> optionalCard = cardDao.findByCardNumber(cardNumber);
-                if (optionalCard.isPresent() && cardParameters.remove(CARD_NUMBER, cardNumber)) {
-                    return false;
+                if (optionalCard.isPresent()) {
+                    cardParameters.replace(CARD_NUMBER, NOT_UNIQUE_MEANING);
+                    return cardId;
                 }
-                LocalDate date = LocalDate.parse(expirationDate);
                 BigDecimal amount = new BigDecimal(cardAmount);
                 BankCard card = new BankCard.BankCardBuilder()
                         .setCardNumber(cardNumber)
@@ -125,8 +132,18 @@ public class BankCardServiceImpl implements BankCardService {
                 logger.error(message, e);
                 throw new ServiceException(message, e);
             }
+        } else {
+            if (!numberValid) {
+                cardParameters.replace(CARD_NUMBER, WRONG_MEANING);
+            }
+            if (!dateValid) {
+                cardParameters.replace(CARD_EXPIRATION_DATE, WRONG_MEANING);
+            }
+            if (!amountValid) {
+                cardParameters.replace(CARD_AMOUNT, WRONG_MEANING);
+            }
         }
-        return cardId > 0;
+        return cardId;
     }
 
     @Override
@@ -143,6 +160,7 @@ public class BankCardServiceImpl implements BankCardService {
     @Override
     public boolean topUpCard(long id, String amountStr) throws ServiceException {
         DataValidator validator = DataValidatorImpl.getInstance();
+        boolean result = false;
         if (validator.isNumberValid(amountStr)) {
             try {
                 Optional<BankCard> optionalCard = cardDao.findById(id);
@@ -150,15 +168,19 @@ public class BankCardServiceImpl implements BankCardService {
                     return false;
                 }
                 BigDecimal amount = new BigDecimal(amountStr);
-                BigDecimal oldAmount = optionalCard.get().getAmount();
-                return cardDao.updateBankCardAmount(id, oldAmount.add(amount));
+                BankCard card = optionalCard.get();
+                BigDecimal oldAmount = card.getAmount();
+                LocalDate expirationDate = card.getExpirationDate();
+
+                result = validator.isDateLaterCurrently(expirationDate) &&
+                        cardDao.updateBankCardAmount(id, oldAmount.add(amount));
             } catch (DaoException e) {
                 String message = "Bank card can't be top up.";
                 logger.error(message, e);
                 throw new ServiceException(message, e);
             }
         }
-        return false;
+        return result;
     }
 
     @Override
@@ -171,8 +193,11 @@ public class BankCardServiceImpl implements BankCardService {
                     return false;
                 }
                 BigDecimal amount = new BigDecimal(amountStr);
-                BigDecimal oldAmount = optionalCard.get().getAmount();
-                return oldAmount.compareTo(amount) >= 0 &&
+                BankCard card = optionalCard.get();
+                BigDecimal oldAmount = card.getAmount();
+                LocalDate expirationDate = card.getExpirationDate();
+
+                return validator.isDateLaterCurrently(expirationDate) && oldAmount.compareTo(amount) >= 0 &&
                         cardDao.updateBankCardAmount(id, oldAmount.subtract(amount));
             } catch (DaoException e) {
                 String message = "Impossible to withdraw money from bank card.";
