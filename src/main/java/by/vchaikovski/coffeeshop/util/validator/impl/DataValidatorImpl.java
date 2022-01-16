@@ -4,7 +4,7 @@ import by.vchaikovski.coffeeshop.util.validator.DataValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class DataValidatorImpl implements DataValidator {
     private static final Logger logger = LogManager.getLogger();
@@ -78,8 +78,8 @@ public class DataValidatorImpl implements DataValidator {
     }
 
     @Override
-    public boolean isDateLaterCurrently(LocalDateTime dateTime) {
-        return dateTime != null && dateTime.isAfter(LocalDateTime.now());
+    public boolean isDateLaterCurrently(LocalDate date) {
+        return date != null && date.isAfter(LocalDate.now());
     }
 
     @Override
@@ -95,12 +95,12 @@ public class DataValidatorImpl implements DataValidator {
     @Override
     public <T extends Enum<T>> boolean isEnumContains(String value, Class<T> enumClass) {
         boolean result = false;
-        if(value != null) {
+        if(value != null && enumClass != null) {
             try {
                 T.valueOf(enumClass, value.strip().toUpperCase());
+                result = true;
             } catch (IllegalArgumentException e) {
                 logger.warn(() -> enumClass.getName() + " doesn't contain " + value, e);
-                result = true;
             }
         }
         return result;

@@ -1,6 +1,6 @@
 package by.vchaikovski.coffeeshop.util.validator;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public interface DataValidator {
     boolean isLoginValid(String login);
@@ -21,7 +21,7 @@ public interface DataValidator {
 
     boolean isDateValid(String dateString);
 
-    boolean isDateLaterCurrently(LocalDateTime dateTime);
+    boolean isDateLaterCurrently(LocalDate date);
 
     boolean isDiscountRateValid(String discountRate);
 

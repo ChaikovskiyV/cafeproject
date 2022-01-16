@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DataValidatorImplTest {
     private static final Logger logger = LogManager.getLogger();
     private static DataValidatorImpl validator;
-    private static LocalDateTime dateTime;
-    private static LocalDateTime pastDateTime;
+    private static LocalDate date;
+    private static LocalDate pastDate;
     private static String login;
     private static String password;
     private static String cardNumber;
@@ -43,8 +43,8 @@ class DataValidatorImplTest {
         logger.info("Testing is starting...");
         validator = DataValidatorImpl.getInstance();
         long dayNumber = 1;
-        dateTime = LocalDateTime.now().plusDays(dayNumber);
-        pastDateTime = LocalDateTime.now().minusDays(dayNumber);
+        date = LocalDate.now().plusDays(dayNumber);
+        pastDate = LocalDate.now().minusDays(dayNumber);
         login = "Developer123";
         password = "D12jk96GH15";
         cardNumber = "1234567890123456";
@@ -240,13 +240,13 @@ class DataValidatorImplTest {
 
     @Test
     public void isDateLaterCurrently() {
-        result = validator.isDateLaterCurrently(dateTime);
+        result = validator.isDateLaterCurrently(date);
         assertTrue(result);
     }
 
     @Test
     public void ifDateNotLaterCurrently() {
-        result = validator.isDateLaterCurrently(pastDateTime);
+        result = validator.isDateLaterCurrently(pastDate);
         assertFalse(result);
     }
 
