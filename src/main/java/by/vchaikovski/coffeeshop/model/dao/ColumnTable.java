@@ -17,7 +17,7 @@ public enum ColumnTable {
     public static final String DISCOUNT_RATE = "rate";
     public static final String CARD_ID = "card_id";
     public static final String CARD_NUMBER = "number";
-    public static final String CARD_EXPIRATION_DATE = "expiration_date";
+    public static final String CARD_EXPIRATION_DATE = "card_expiration_date";
     public static final String CARD_AMOUNT = "amount";
     public static final String ORDER_ID = "order_id";
     public static final String ORDER_STATUS = "order_status";

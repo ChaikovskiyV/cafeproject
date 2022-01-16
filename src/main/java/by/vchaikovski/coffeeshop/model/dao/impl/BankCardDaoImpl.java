@@ -19,11 +19,11 @@ public class BankCardDaoImpl implements BankCardDao {
     private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String UPDATE_MESSAGE = "The query \"update bankCard with id=";
-    private static final String FIND_ALL_CARDS = "SELECT card_id, number, expiration_date, amount FROM cards";
+    private static final String FIND_ALL_CARDS = "SELECT card_id, number, card_expiration_date, amount FROM cards";
     private static final String FIND_CARD_BY_ID = " WHERE id=";
     private static final String FIND_CARD_BY_NUMBER = " WHERE number=?";
     private static final String FIND_CARD_BY_NUMBER_AND_EXPIRATION_DATE = " WHERE number=? AND expiration_date=?";
-    private static final String CREATE_CARD = "INSERT INTO cards(number, expiration_date, amount) VALUES (?, ?, ?)";
+    private static final String CREATE_CARD = "INSERT INTO cards(number, card_expiration_date, amount) VALUES (?, ?, ?)";
     private static final String UPDATE_CARD_AMOUNT = "UPDATE cards SET amount=? WHERE card_id=?";
     private static final String DELETE_CARD_BY_ID = "DELETE FROM cards WHERE id=";
 
