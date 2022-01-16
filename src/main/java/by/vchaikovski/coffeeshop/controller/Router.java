@@ -1,7 +1,5 @@
 package by.vchaikovski.coffeeshop.controller;
 
-import by.vchaikovski.coffeeshop.controller.command.PagePath;
-
 public class Router {
     public enum RouterType {
         FORWARD, REDIRECT
@@ -10,9 +8,9 @@ public class Router {
     private RouterType routerType;
     private String pagePath;
 
-    public Router() {
+    public Router(String pagePath) {
         routerType = RouterType.FORWARD;
-        pagePath = PagePath.INDEX_PAGE;
+        this.pagePath =pagePath;
     }
 
     public RouterType getRouterType() {

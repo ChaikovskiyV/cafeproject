@@ -13,6 +13,8 @@ public enum PagePath {
     public static final String LOGOUT_PAGE = "/jsp/logout.jsp";
     public static final String MAIN_PAGE = "/jsp/main.jsp";
     public static final String MENU_PAGE = "/jsp/menu.jsp";
+    public static final String REGISTRATION_CARD_PAGE = "/jsp/card/registration_card.jsp";
+    public static final String CARD_INFO_PAGE = "/jsp/card/card_info.jsp";
     /* visitors' pages */
     public static final String ORDER_CREATION_PAGE = "/jsp/order_creation.jsp";
     public static final String CART_PAGE = "/jsp/cart.jsp";
