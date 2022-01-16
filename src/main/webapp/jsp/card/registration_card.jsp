@@ -7,65 +7,69 @@
 </head>
 <body>
 <h3>Registration of bank card</h3>
-<br/>
+<hr><hr>
 <form action="controller" method="post">
     <input type="hidden" name="command" value="registration_new_card"/>
-    <c:if test="${requestScope.result == null}">
         Number of card:
         <br><br>
+    <c:if test="${requestScope.card_id == null or requestScope.card_id > 0}">
         <input type="text" name="card_number" value=""/>
+    </c:if>
+    <c:if test="${requestScope.card_id == 0}">
+        <c:if test="${requestScope.card_number_check == null}">
+            <input type="text" name="card_number" value="${requestScope.card_parameters.card_number}"/>
+        </c:if>
+        <c:if test="${requestScope.card_number_check != null}">
+            <input type="text" name="card_number" value=""/>
+            <br>
+            Card number is wrong
+        </c:if>
+    </c:if>
         <br><br>
         Expiration date of card:
         <br><br>
+    <c:if test="${requestScope.card_id == null or requestScope.card_id > 0}">
         <input type="date" name="card_expiration_date" value=""/>
+    </c:if>
+    <c:if test="${requestScope.card_id == 0}">
+        <c:if test="${requestScope.card_date_check == null}">
+            <input type="date" name="card_expiration_date" value="${requestScope.card_parameters.card_expiration_date}"/>
+        </c:if>
+        <c:if test="${requestScope.card_date_check != null}">
+            <input type="date" name="card_expiration_date" value=""/>
+            <br>
+            Card date is not correct
+        </c:if>
+    </c:if>
         <br><br>
         Amount:
         <br><br>
+    <c:if test="${requestScope.card_id == null or requestScope.card_id > 0}">
         <input type="text" name="card_amount" value=""/>
+    </c:if>
+    <c:if test="${requestScope.card_id == 0}">
+        <c:if test="${requestScope.card_amount_check == null}">
+            <input type="text" name="card_amount" value="${requestScope.card_parameters.card_amount}"/>
+        </c:if>
+        <c:if test="${requestScope.card_amount_check != null}">
+            <input type="text" name="card_amount" value=""/>
+            <br>
+            Card amount is not correct
+        </c:if>
+    </c:if>
         <br><br>
         <input type="submit" value="register card">
-    </c:if>
-    <c:if test="${requestScope.result == true}">
+    <c:if test="${requestScope.card_id > 0}">
         <br>
         <h3>Card was registered successfully!</h3>
         <br>
-        <a href='<c:url value="card_info.jsp"/>'>
-            <c:url value="card_info.jsp"/>
+        <a href='<c:url value="/jsp/card/card_info.jsp"/>'>
+            Go to card info
+        </a>
+        <a href='<c:url value="/jsp/main.jsp"/>'>
+            Back to main page
         </a>
     </c:if>
-    <c:if test="${requestScope.result == false}">
-
-    </c:if>
-
 </form>
-
-<c:if test = "${requestScope.result==true}">
-    <p>Card was registered successfully</p>
-    <br>
-   <a href='<c:url value="card_info.jsp"/>'>
-       <c:url value="card_info.jsp"/>
-   </a>
-</c:if>
-<c:if test="${requestScope.result==false}">
-    <c:if test="${requestScope.card_number_check != null}">
-        <p>Card number is wrong</p>
-    </c:if>
-    <c:if test="${requestScope.card_number_check == null}">
-        card_number="${param.card_number}"
-    </c:if>
-    <c:if test="${requestScope.card_date_check != null}">
-        <p>Card date is not correct</p>
-    </c:if>
-    <c:if test="${requestScope.card_date_check == null}">
-        card_expiration_date="${param.card_expiration_date}"
-    </c:if>
-    <c:if test="${requestScope.card_amount_check != null}">
-        <p>Card amount is not correct</p>
-    </c:if>
-    <c:if test="${requestScope.card_amount_check == null}">
-    card_amount="${param.card_amount}"
-</c:if>
-</c:if>
-
 </body>
 </html>
