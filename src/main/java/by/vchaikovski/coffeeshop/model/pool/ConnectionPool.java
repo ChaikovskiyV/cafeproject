@@ -30,8 +30,9 @@ public class ConnectionPool {
             freeConnections.offer(proxyConnection);
         }
         if (freeConnections.isEmpty()) {
-            logger.fatal("No connections were created");
-            throw new RuntimeException("No connections were created");
+            String message = "No connections were created";
+            logger.fatal(message);
+            throw new RuntimeException(message);
         }
     }
 
@@ -50,14 +51,15 @@ public class ConnectionPool {
         return instance;
     }
 
-    public ProxyConnection getConnection() throws ConnectionPoolException {
+    public Connection getConnection() throws ConnectionPoolException {
         ProxyConnection connection;
         try {
             connection = freeConnections.take();
             givenConnection.offer(connection);
         } catch (InterruptedException e) {
-            logger.error("Exception from getConnection", e);
-            throw new ConnectionPoolException("Exception from getConnection", e);
+            String message = "The getConnection method can't be completed";
+            logger.error(message, e);
+            throw new ConnectionPoolException(message, e);
         }
         return connection;
     }
@@ -67,21 +69,13 @@ public class ConnectionPool {
             givenConnection.remove(connection);
             freeConnections.offer((ProxyConnection) connection);
         } else {
-            logger.error(() -> "Unknown connection: " + connection);
-            throw new ConnectionPoolException("Unknown connection: " + connection);
+            String message = "Unknown connection: " + connection;
+            logger.error(message);
+            throw new ConnectionPoolException(message);
         }
     }
 
-    public void destroyPool() {                          //TODO choose the variant of this method
-    /*    for (int i = 0; i < POOL_SIZE; i++) {
-            try {
-                freeConnections.take().reallyClose();
-            } catch (InterruptedException e) {
-                logger.error("Exception from destroyPool method", e);
-            } catch (SQLException e) {
-                logger.error("Exception from destroyPool method", e);
-            }
-        }*/
+    public void destroyPool() {
         while (!freeConnections.isEmpty() || !givenConnection.isEmpty()) {
             try {
                 if (!freeConnections.isEmpty()) {
@@ -91,7 +85,18 @@ public class ConnectionPool {
                     givenConnection.poll().reallyClose();
                 }
             } catch (SQLException e) {
-                logger.error("Exception from destroyPool method", e);
+                logger.error("The destroyPool method can't be completed", e);
+            }
+        }
+        deregisterDrivers();
+    }
+
+    public void destroyPoolTake() {
+        for (int i = 0; i < POOL_SIZE; i++) {
+            try {
+                freeConnections.take().reallyClose();
+            } catch (InterruptedException | SQLException e) {
+                logger.error("The destroyPoolTake method can't be completed", e);
             }
         }
         deregisterDrivers();
@@ -102,7 +107,7 @@ public class ConnectionPool {
             try {
                 DriverManager.deregisterDriver(d);
             } catch (SQLException e) {
-                logger.error("Exception from destroyedDrivers", e);
+                logger.error("The  destroyedDrivers method can't be completed", e);
             }
         });
     }
