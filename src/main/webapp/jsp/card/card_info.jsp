@@ -7,42 +7,54 @@
 </head>
 <body>
 <h3>Bank card info</h3>
-<hr><hr>
-<c:if test="${requestScope.card_parameters == null}">
-    <form action="controller" method="post">
-        <input type="hidden" name="command" value="find_bank_card"/>
-        <input type="text" name="card_number" value=""/>
-        <input type="date" name="card_expiration_date" value=""/>
-        <input type="submit" value="Find card"/>
-    </form>
-    <c:if test="${requestScope.delete_result == true}">
-        <h3>Card was deleted successfully!</h3>
-    </c:if>
-</c:if>
-<c:if test="${requestScope.card_parameters != null}">
-<table>
-    <tr>
-        <th>Card number</th>
-        <th> Expiration date</th>
-        <th>Available amount</th>
-    </tr>
-    <tr>
-        <td><c:out value="${requestScope.card_parameters.card_number}"/> </td>
-        <td><c:out value="${requestScope.card_parameters.card_expiration_date}"/> </td>
-        <td><c:out value="${requestScope.card_parameters.card_amount}"/> </td>
-    </tr>
-</table>
-<hr><hr>
+<hr>
+<hr>
+<h5>To find card insert card number and expiration date:</h5>
 <form action="controller" method="post">
-    <input type="hidden" name="command" value="delete_bank_card">
-    <input type="button" value="Delete card"/>
+    <input type="hidden" name="command" value="find_bank_card"/>
+    <input type="text" required name="card_number" value="" pattern="\d{16}"/>
+    <input type="date" required name="card_expiration_date" value=""/>
+    <input type="submit" value="Find card"/>
 </form>
-    <c:if test="${requestScope.delete_result == false}">
-        <h3>It hasn't managed to delete this card. May be it has already been deleted.</h3>
-    </c:if>
+<c:if test="${requestScope.is_found == false}">
+    <h3>Card wasn't found.</h3>
+</c:if>
+<c:if test="${sessionScope.delete_result == true}">
+    <h3>Card was deleted successfully!</h3>
+</c:if>
+<c:if test="${sessionScope.card_id > 0}">
+    <table>
+        <tr>
+            <th>Card number</th>
+            <th> Expiration date</th>
+            <th>Available amount</th>
+        </tr>
+        <tr>
+            <td><c:out value="${sessionScope.card_parameters.card_number}"/></td>
+            <td><c:out value="${sessionScope.card_parameters.card_expiration_date}"/></td>
+            <td><c:out value="${sessionScope.card_parameters.card_amount}"/></td>
+        </tr>
+    </table>
+    <h5>Top up card balance</h5>
+    <form action="controller" method="post">
+        <input type="hidden" name="command" value="top_up_card_balance">
+        <input type="submit" value="Top up balance">
+        <input type="text" required name="amount" value="" pattern="\d{1,5}">
+    </form>
+    <form action="controller" method="post">
+        <input type="hidden" name="command" value="delete_bank_card">
+        <input type="submit" value="Delete card"/>
+    </form>
+</c:if>
+<c:if test="${sessionScope.delete_result == false}">
+    <h3>It hasn't managed to delete this card. May be it has already been deleted.</h3>
 </c:if>
 <a href='<c:url value="/jsp/main.jsp"/>'>
     Back to main page
+</a>
+<hr/>
+<a href='<c:url value="/jsp/card/registration_card.jsp"/>'>
+    Register new bank card
 </a>
 </body>
 </html>
