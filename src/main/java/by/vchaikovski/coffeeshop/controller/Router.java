@@ -10,7 +10,7 @@ public class Router {
 
     public Router(String pagePath) {
         routerType = RouterType.FORWARD;
-        this.pagePath =pagePath;
+        this.pagePath = pagePath;
     }
 
     public RouterType getRouterType() {

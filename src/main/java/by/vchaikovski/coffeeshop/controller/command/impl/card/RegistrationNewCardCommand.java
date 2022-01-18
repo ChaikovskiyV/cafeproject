@@ -24,6 +24,7 @@ public class RegistrationNewCardCommand implements BaseCommand {
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
         BankCardService cardService = ServiceProvider.getInstance().getBankCardService();
+        HttpSession session = request.getSession();
         String cardNumber = request.getParameter(CARD_NUMBER);
         String expirationDate = request.getParameter(CARD_EXPIRATION_DATE);
         String amount = request.getParameter(CARD_AMOUNT);
@@ -33,7 +34,7 @@ public class RegistrationNewCardCommand implements BaseCommand {
         cardParameters.put(CARD_AMOUNT, amount);
         try {
             long cardId = cardService.createBankCard(cardParameters);
-            request.setAttribute(CARD_ID, cardId);
+            session.setAttribute(CARD_ID, cardId);
             if (cardId == 0) {
                 request.setAttribute(CARD_PARAMETERS, cardParameters);
                 logger.debug("Card wasn't registered.");
@@ -54,15 +55,17 @@ public class RegistrationNewCardCommand implements BaseCommand {
                         default -> logger.info(() -> key + " is correct");
                     }
                 }
+            } else {
+                session.setAttribute(CARD_PARAMETERS, cardParameters);
             }
         } catch (ServiceException e) {
             String message = "Registration new bank card can't be executed.";
             logger.error(message, e);
             throw new CommandException(message, e);
         }
-        HttpSession session = request.getSession();
-        PageExtractor extractor = PageExtractor.getInstance();
-        session.setAttribute(CURRENT_PAGE, extractor.extractCurrentPage(request));
+        /*PageExtractor extractor = PageExtractor.getInstance();
+        String currantPage = extractor.extractCurrentPage(request);*/
+        session.setAttribute(CURRENT_PAGE, REGISTRATION_CARD_PAGE);
 
         return new Router(REGISTRATION_CARD_PAGE);
     }

@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class DataValidatorImpl implements DataValidator {
     private static final Logger logger = LogManager.getLogger();
@@ -13,12 +14,12 @@ public class DataValidatorImpl implements DataValidator {
     private static final String USER_NAME_REGEX = "(.{4,20})(([a-zA-Z]+[-\\s]?[a-zA-Z]+)|([а-яА-Я]+[-\\s]?[а-яА-Я]+))";
     private static final String EMAIL_REGEX = "(.{8,35})(\\w+[._-]?\\w+@\\p{Alpha}+\\.\\p{Alpha}+)";
     private static final String PHONE_NUMBER_REGEX = "\\+\\d{12}";
-    private static final String NUMBER_REGEX = "\\d+";
+    private static final String NUMBER_REGEX = "\\d{1,5}";
     private static final String STREET_NAME_REGEX = "(.{3,35})(([a-zA-Z]+[-\\s]?[a-zA-Z]+)|([а-яА-Я]+[-\\s]?[а-яА-Я]+))";
     private static final String HOUSE_NUMBER_REGEX = "[1-9]\\d*\\p{Alpha}?";
     private static final String CARD_NUMBER_REGEX = "\\d{16}";
     private static final String DISCOUNT_RATE_REGEX = "[1-9]\\d?";
-    private static final String DATE_REGEX = "(\\d{2}|\\d{4})[-\\s]\\d{2}([-\\s]\\d{2})?(\\s\\d{2}:\\d{2}(:\\d{2})?)?";
+    private static final String DATE_REGEX = "202[2-9]-((0[1-9])|(1[0-2]))-((0[1-9])|([12]\\d)|(3[01]))";
 
     private static DataValidatorImpl instance;
 
@@ -79,7 +80,7 @@ public class DataValidatorImpl implements DataValidator {
 
     @Override
     public boolean isDateLaterCurrently(LocalDate date) {
-        return date != null && date.isAfter(LocalDate.now());
+        return date.isAfter(LocalDate.now());
     }
 
     @Override

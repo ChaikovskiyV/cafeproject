@@ -1,6 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<c:set var="path" value="${pageContext.request.contextPath}"/>
+
 <html>
 <head>
     <title>Bank card info</title>
@@ -10,7 +12,7 @@
 <hr>
 <hr>
 <h5>To find card insert card number and expiration date:</h5>
-<form action="controller" method="post">
+<form action="${path}/controller" method="post">
     <input type="hidden" name="command" value="find_bank_card"/>
     <input type="text" required name="card_number" value="" pattern="\d{16}"/>
     <input type="date" required name="card_expiration_date" value=""/>
@@ -36,15 +38,21 @@
         </tr>
     </table>
     <h5>Top up card balance</h5>
-    <form action="controller" method="post">
+    <form action="${path}/controller" method="post">
         <input type="hidden" name="command" value="top_up_card_balance">
         <input type="submit" value="Top up balance">
         <input type="text" required name="amount" value="" pattern="\d{1,5}">
     </form>
-    <form action="controller" method="post">
+    <form action="${path}/controller" method="post">
         <input type="hidden" name="command" value="delete_bank_card">
         <input type="submit" value="Delete card"/>
     </form>
+    <c:if test="${requestScope.result == true}">
+        <h3>Card ${sessionScope.card_parameters.card_number} was top up successfully!</h3>
+    </c:if>
+    <c:if test="${requestScope.result == false}">
+        <h3>Sorry, but card ${sessionScope.card_parameters.card_number} wasn't top up!</h3>
+    </c:if>
 </c:if>
 <c:if test="${sessionScope.delete_result == false}">
     <h3>It hasn't managed to delete this card. May be it has already been deleted.</h3>
@@ -53,7 +61,7 @@
     Back to main page
 </a>
 <hr/>
-<a href='<c:url value="/jsp/card/registration_card.jsp"/>'>
+<a href='<c:url value="registration_card.jsp"/>'>
     Register new bank card
 </a>
 </body>

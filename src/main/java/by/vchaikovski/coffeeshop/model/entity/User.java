@@ -1,7 +1,7 @@
 package by.vchaikovski.coffeeshop.model.entity;
 
 public class User extends AbstractEntity {
-    public enum Role {ADMINISTRATOR, VISITOR, COURIER, BARISTA}
+    public enum Role {ADMIN, CLIENT, GUEST, BARISTA}
 
     public enum Status {BANNED, UNBANNED}
 
@@ -26,7 +26,7 @@ public class User extends AbstractEntity {
         lastName = builder.lastName;
         email = builder.email;
         phoneNumber = builder.phoneNumber;
-        role = builder.role != null ? builder.role : Role.VISITOR;
+        role = builder.role != null ? builder.role : Role.CLIENT;
         status = builder.status != null ? builder.status : Status.UNBANNED;
         discount = builder.discount;
     }

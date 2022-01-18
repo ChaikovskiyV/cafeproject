@@ -26,23 +26,31 @@ public class FindBankCardCommand implements BaseCommand {
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
         BankCardService cardService = ServiceProvider.getInstance().getBankCardService();
+        HttpSession session = request.getSession();
+        session.removeAttribute(CARD_PARAMETERS);
+        session.removeAttribute(CARD_ID);
         String cardNumber = request.getParameter(CARD_NUMBER);
         String expirationDate = request.getParameter(CARD_EXPIRATION_DATE);
-        Map<String, String> cardParameters = new HashMap<>();
-        cardParameters.put(CARD_NUMBER, cardNumber);
-        cardParameters.put(CARD_EXPIRATION_DATE, expirationDate);
-        request.setAttribute(CARD_PARAMETERS, cardParameters);
         try {
             Optional<BankCard> optionalCard = cardService.findCardByNumberAndDate(cardNumber, expirationDate);
-            request.setAttribute(RESULT, optionalCard.isEmpty());
+            request.setAttribute(IS_FOUND, optionalCard.isPresent());
+            optionalCard.ifPresent(bankCard -> {
+                session.setAttribute(CARD_ID, bankCard.getId());
+                Map<String, String> cardParameters = new HashMap<>();
+                cardParameters.put(CARD_NUMBER, bankCard.getCardNumber());
+                cardParameters.put(CARD_EXPIRATION_DATE, bankCard.getExpirationDate().toString());
+                cardParameters.put(CARD_AMOUNT, bankCard.getAmount().toString());
+                session.setAttribute(CARD_PARAMETERS, cardParameters);
+            });
         } catch (ServiceException e) {
-            String message = "Map search can't be completed";
+            String message = "Card search can't be completed";
             logger.error(message, e);
             throw new CommandException(message, e);
         }
-        HttpSession session = request.getSession();
-        PageExtractor extractor = PageExtractor.getInstance();
-        session.setAttribute(CURRENT_PAGE, extractor.extractCurrentPage(request));
+        /*PageExtractor extractor = PageExtractor.getInstance();
+        String currantPage = extractor.extractCurrentPage(request);*/
+        session.setAttribute(CURRENT_PAGE, CARD_INFO_PAGE);
+
         return new Router(CARD_INFO_PAGE);
     }
 }

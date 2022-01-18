@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -83,11 +82,9 @@ public class BankCardServiceImpl implements BankCardService {
         DataValidator validator = DataValidatorImpl.getInstance();
         Optional<BankCard> optionalCard = Optional.empty();
         if (validator.isCardNumberValid(number) && validator.isDateValid(date)) {
-            String format = "yyyy-MM";
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-            LocalDate expirationDate = LocalDate.parse(date, formatter);
+            LocalDate expirationDate = LocalDate.parse(date);
             try {
-                optionalCard = cardDao.findByCardNumberAndExpirationDate(number, expirationDate);
+                optionalCard = cardDao.findByCardNumberAndDate(number, expirationDate);
             } catch (DaoException e) {
                 String message = "Bank card can't be found by expiration date=" + expirationDate +
                         " and card number=" + number;

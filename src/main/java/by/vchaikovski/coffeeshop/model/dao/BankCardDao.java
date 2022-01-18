@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface BankCardDao extends BaseDao<BankCard> {
     Optional<BankCard> findByCardNumber(String cardNumber) throws DaoException;
 
-    Optional<BankCard> findByCardNumberAndExpirationDate(String cardNumber, LocalDate expirationDate) throws DaoException;
+    Optional<BankCard> findByCardNumberAndDate(String cardNumber, LocalDate expirationDate) throws DaoException;
 
     boolean updateBankCardAmount(long id, BigDecimal decimal) throws DaoException;
 }

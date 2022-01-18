@@ -41,6 +41,8 @@ public enum RequestParameter {
     public static final String GUEST = "guest";
     /* H */
     public static final String HOUSE_NUMBER = "house_number";
+    /* I */
+    public static final String IS_FOUND = "is_found";
     /* L */
     public static final String LOGIN = "login";
     public static final String LAST_NAME = "last_name";
@@ -49,7 +51,6 @@ public enum RequestParameter {
     /* N */
     public static final String NEW_PASSWORD = "new_password";
     public static final String NOT_UNIQUE_MEANING = "not_unique_meaning";
-
     /* O */
     public static final String OLD_PASSWORD = "old_password";
     public static final String ORDER_STATUS = "order_tatus";

@@ -34,6 +34,8 @@ public class Controller extends HttpServlet {
     }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("txt/html");
+
         String commandName = request.getParameter(COMMAND);
         DataValidator validator = DataValidatorImpl.getInstance();
         if (!validator.isEnumContains(commandName, CommandType.class)) {

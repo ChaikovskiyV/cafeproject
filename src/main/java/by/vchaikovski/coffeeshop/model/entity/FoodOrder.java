@@ -3,7 +3,7 @@ package by.vchaikovski.coffeeshop.model.entity;
 import java.time.LocalDateTime;
 
 public class FoodOrder extends AbstractEntity {
-    public enum OrderStatus {WAITING, ACCEPTED, REJECTED, READY, DELIVERED, COMPLETED}
+    public enum OrderStatus {WAITING, ACCEPTED, REJECTED, READY, COMPLETED}
 
     public enum OrderEvaluation {BAD, NICE, GREAT, BRILLIANT}
 

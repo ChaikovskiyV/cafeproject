@@ -3,18 +3,18 @@
 <%@ page isErrorPage="true" contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Error 500</title>
 </head>
 <body>
+<h3>Error 500</h3>
 
+Request from ${pageContext.errorData.requestURI} is failed<br/>
+Servlet name: ${pageContext.errorData.servletName}<br/>
+Status code: ${pageContext.errorData.statusCode}<br/>
+Exception: ${pageContext.exception}<br/>
+Message from exception: ${pageContext.exception.message}<br/>
+stack trace: ${pageContext.exception.stackTrace}<br/>
 
-Exception: ${param.exception} <br/>
-Message from exception: ${param.message} <br/>
-Stack trace:
-<c:forEach var="trace" items="${pageContext.exception.stackTrace}">
-    <c:out value="${trace}"/>
-</c:forEach>
-<hr>
-<a href="index.jsp">Back to main page</a>
+<a href='<c:url value="/index.jsp"/> '>Back to main page</a>
 </body>
 </html>
