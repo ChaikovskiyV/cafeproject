@@ -17,11 +17,6 @@ public class FoodOrder extends AbstractEntity {
     private long userId;
 
     public FoodOrder(FoodOrderBuilder builder) {
-        if (builder == null || !builder.isValid()) {
-            String message = "The builder " + builder + " is not valid.";
-            logger.error(message);
-            throw new IllegalArgumentException(message);
-        }
         super.setId(builder.id);
         status = builder.status != null ? builder.status : OrderStatus.WAITING;
         creationDate = builder.creationDate != null ? builder.creationDate : LocalDateTime.now();
@@ -203,10 +198,6 @@ public class FoodOrder extends AbstractEntity {
         public FoodOrderBuilder setUserId(long userId) {
             this.userId = userId;
             return this;
-        }
-
-        public boolean isValid() {
-            return cart != null && deliveryId != 0 && billId != 0 && userId != 0;
         }
 
         public FoodOrder build() {

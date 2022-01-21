@@ -15,11 +15,6 @@ public class User extends AbstractEntity {
     private long discountId;
 
     public User(UserBuilder builder) {
-        if (builder == null || !builder.isValid()) {
-            String message = "The builder " + builder + " is not valid.";
-            logger.error(message);
-            throw new IllegalArgumentException(message);
-        }
         super.setId(builder.id);
         login = builder.login;
         firstName = builder.firstName;
@@ -202,11 +197,6 @@ public class User extends AbstractEntity {
         public UserBuilder setDiscountId(long discountId) {
             this.discountId = discountId;
             return this;
-        }
-
-        public boolean isValid() {
-            return login != null && firstName != null && lastName != null &&
-                    email != null && phoneNumber != null;
         }
 
         public User build() {

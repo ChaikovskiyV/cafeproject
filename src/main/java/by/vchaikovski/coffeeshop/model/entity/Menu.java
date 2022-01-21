@@ -17,11 +17,6 @@ public class Menu extends AbstractEntity {
     private transient Image foodImage;
 
     public Menu(MenuBuilder builder) {
-        if (builder == null || !builder.isValid()) {
-            String message = "The builder " + builder + " is not valid.";
-            logger.error(message);
-            throw new IllegalArgumentException(message);
-        }
         super.setId(builder.id);
         name = builder.name;
         type = builder.type;
@@ -203,11 +198,6 @@ public class Menu extends AbstractEntity {
         public MenuBuilder setFoodImage(Image foodImage) {
             this.foodImage = foodImage;
             return this;
-        }
-
-        public boolean isValid() {
-            return name != null && type != null && price != null && productionDate != null &&
-                    expirationDate != null && quantityInStock > 0;
         }
 
         public Menu build() {
