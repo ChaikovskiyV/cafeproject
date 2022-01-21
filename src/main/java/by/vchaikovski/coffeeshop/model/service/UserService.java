@@ -51,7 +51,7 @@ public interface UserService {
 
     boolean updateUserStatus(long id, User.Status status) throws ServiceException;
 
-    boolean createUser(Map<String, String> userParameters, String password) throws ServiceException;
+    long createUser(Map<String, String> userParameters) throws ServiceException;
 
     boolean deleteUserById(long id) throws ServiceException;
 }

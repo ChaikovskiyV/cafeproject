@@ -7,7 +7,9 @@ import by.vchaikovski.coffeeshop.model.dao.impl.BankCardDaoImpl;
 import by.vchaikovski.coffeeshop.model.entity.BankCard;
 import by.vchaikovski.coffeeshop.model.service.BankCardService;
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
+import by.vchaikovski.coffeeshop.util.validator.FormValidator;
 import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -98,46 +100,29 @@ public class BankCardServiceImpl implements BankCardService {
     @Override
     public long createBankCard(Map<String, String> cardParameters) throws ServiceException {
         long cardId = 0;
-        DataValidator validator = DataValidatorImpl.getInstance();
-        String cardNumber = cardParameters.get(CARD_NUMBER);
-        String expirationDate = cardParameters.get(CARD_EXPIRATION_DATE);
-        String cardAmount = cardParameters.get(CARD_AMOUNT);
-        boolean numberValid = validator.isCardNumberValid(cardNumber);
-        boolean dateValid = validator.isDateValid(expirationDate);
-        boolean amountValid = validator.isNumberValid(cardAmount);
-        if (numberValid && dateValid && amountValid) {
-            LocalDate date = LocalDate.parse(expirationDate);
-            if (!validator.isDateLaterCurrently(date)) {
-                cardParameters.replace(CARD_EXPIRATION_DATE, DATE_EXPIRED);
-                return cardId;
-            }
+        FormValidator validator = FormValidatorImpl.getInstance();
+        if (validator.isCardParametersValid(cardParameters)) {
+            String cardNumber = cardParameters.get(CARD_NUMBER);
+            String expirationDate = cardParameters.get(CARD_EXPIRATION_DATE);
+            String cardAmount = cardParameters.get(CARD_AMOUNT);
             try {
                 Optional<BankCard> optionalCard = cardDao.findByCardNumber(cardNumber);
                 if (optionalCard.isPresent()) {
                     cardParameters.replace(CARD_NUMBER, NOT_UNIQUE_MEANING);
                     return cardId;
                 }
+                LocalDate date = LocalDate.parse(expirationDate);
+                if (date.isBefore(LocalDate.now())) {
+                    cardParameters.replace(CARD_EXPIRATION_DATE, DATE_EXPIRED);
+                    return cardId;
+                }
                 BigDecimal amount = new BigDecimal(cardAmount);
-                BankCard card = new BankCard.BankCardBuilder()
-                        .setCardNumber(cardNumber)
-                        .setExpirationDate(date)
-                        .setAmount(amount)
-                        .build();
+                BankCard card = new BankCard(cardNumber, date, amount);
                 cardId = cardDao.create(card);
             } catch (DaoException e) {
                 String message = "Bank card can't be added.";
                 logger.error(message, e);
                 throw new ServiceException(message, e);
-            }
-        } else {
-            if (!numberValid) {
-                cardParameters.replace(CARD_NUMBER, WRONG_MEANING);
-            }
-            if (!dateValid) {
-                cardParameters.replace(CARD_EXPIRATION_DATE, WRONG_MEANING);
-            }
-            if (!amountValid) {
-                cardParameters.replace(CARD_AMOUNT, WRONG_MEANING);
             }
         }
         return cardId;
@@ -168,7 +153,6 @@ public class BankCardServiceImpl implements BankCardService {
                 BankCard card = optionalCard.get();
                 BigDecimal oldAmount = card.getAmount();
                 LocalDate expirationDate = card.getExpirationDate();
-
                 result = validator.isDateLaterCurrently(expirationDate) &&
                         cardDao.updateBankCardAmount(id, oldAmount.add(amount));
             } catch (DaoException e) {

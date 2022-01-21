@@ -10,7 +10,9 @@ import by.vchaikovski.coffeeshop.model.entity.User;
 import by.vchaikovski.coffeeshop.model.service.UserService;
 import by.vchaikovski.coffeeshop.util.PasswordEncryptor;
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
+import by.vchaikovski.coffeeshop.util.validator.FormValidator;
 import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -346,53 +348,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean createUser(Map<String, String> userParameters, String password) throws ServiceException {
-        DataValidator validator = DataValidatorImpl.getInstance();
-        String firstName = userParameters.get(FIRST_NAME);
-        String lastName = userParameters.get(LAST_NAME);
-        String login = userParameters.get(LOGIN);
-        String email = userParameters.get(EMAIL);
-        String phoneNumber = userParameters.get(PHONE_NUMBER);
-        String role = userParameters.get(ROLE);
-        String status = userParameters.get(USER_STATUS);
-        String discountType = userParameters.get(DISCOUNT_TYPE);
-        String discountRate = userParameters.get(DISCOUNT_RATE);
-        boolean loginCheck = !validator.isLoginValid(login) && userParameters.remove(LOGIN, login);
-        boolean firstNameCheck = !validator.isNameValid(firstName) &&
-                userParameters.remove(FIRST_NAME, firstName);
-        boolean lastNameCheck = !validator.isNameValid(lastName) &&
-                userParameters.remove(LAST_NAME, lastName);
-        boolean emailCheck = !validator.isEmailValid(email) && userParameters.remove(EMAIL, email);
-        boolean phoneNumberCheck = !validator.isPhoneNumberValid(phoneNumber) &&
-                userParameters.remove(PHONE_NUMBER, phoneNumber);
-        boolean passwordCheck = validator.isPasswordValid(password);
-        userParameters.put(PASSWORD_RESULT_CHECK, String.valueOf(passwordCheck));
-        if (!loginCheck && !firstNameCheck && !lastNameCheck && !emailCheck && !phoneNumberCheck && passwordCheck) {
-            String encryptedPassword = PasswordEncryptor.getInstance().encryptPassword(password);
+    public long createUser(Map<String, String> userParameters) throws ServiceException {
+        long userId = 0;
+        FormValidator validator = FormValidatorImpl.getInstance();
+        if (validator.isUserParametersValid(userParameters)) {
             try {
-                User.Status userStatus = validator.isEnumContains(status, User.Status.class)
-                        ? User.Status.valueOf(status.toUpperCase()) : null;
-                User.Role userRole = validator.isEnumContains(role, User.Role.class)
-                        ? User.Role.valueOf(role.toUpperCase()) : null;
-                long discountId = findDiscountId(discountType, discountRate);
+                String firstName = userParameters.get(FIRST_NAME);
+                String lastName = userParameters.get(LAST_NAME);
+                String login = userParameters.get(LOGIN);
+                String email = userParameters.get(EMAIL);
+                String phoneNumber = userParameters.get(PHONE_NUMBER);
+                String password = userParameters.get(PASSWORD);
+                if (!isUnique(userParameters)) {
+                    return userId;
+                }
+                String encryptedPassword = PasswordEncryptor.getInstance().encryptPassword(password);
                 User user = new User.UserBuilder()
                         .setLogin(login)
                         .setFirstName(firstName)
                         .setLastName(lastName)
                         .setEmail(email)
                         .setPhoneNumber(phoneNumber)
-                        .setRole(userRole)
-                        .setStatus(userStatus)
                         .build();
-                long userId = userDao.create(user, encryptedPassword);
-                return userId > 0 && userDao.updateUserDiscountId(userId, discountId);
+                long discountId = findZeroDiscountId();
+                user.setDiscountId(discountId);
+                userId = userDao.create(user, encryptedPassword);
             } catch (DaoException e) {
                 String message = "User can't be inserted in data base.";
                 logger.error(message, e);
                 throw new ServiceException(message, e);
             }
         }
-        return false;
+        return userId;
     }
 
     @Override
@@ -406,39 +393,44 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private long findDiscountId(String discountType, String discountRate) throws DaoException {
-        DataValidator validator = DataValidatorImpl.getInstance();
-        long discountId = 0;
-        if (validator.isDiscountRateValid(discountRate) && discountType != null) {
-            int rate = Integer.parseInt(discountRate);
-            try {
-                DiscountDao discountDao = DaoProvider.getInstance().getDiscountDao();
-                Discount.DiscountType type = Discount.DiscountType.valueOf(discountType);
-                Optional<Discount> optionalDiscount = discountDao.findByTypeAndRate(type, rate);
-                if (optionalDiscount.isPresent()) {
-                    Discount discount = optionalDiscount.get();
-                    discountId = discount.getId();
-                } else {
-                    Discount discount = new Discount.DiscountBuilder().setRate(rate).setType(type).build();
-                    discountId = discountDao.create(discount);
-                }
-            } catch (IllegalArgumentException e) {
-                logger.warn(() -> "Unknown discount type: " + discountType, e);
-            }
+    private long findZeroDiscountId() throws DaoException {
+        long discountId;
+        int zeroRate = 0;
+        Discount zeroDiscount = new Discount(Discount.DiscountType.ZERO, zeroRate);
+        DiscountDao discountDao = DaoProvider.getInstance().getDiscountDao();
+        Optional<Discount> optionalDiscount = discountDao.findByTypeAndRate(Discount.DiscountType.ZERO, zeroRate);
+        if (optionalDiscount.isPresent()) {
+            discountId = optionalDiscount.get().getId();
         } else {
-            discountId = findZeroDiscountId();
+            discountId = discountDao.create(zeroDiscount);
         }
         return discountId;
     }
 
-    private long findZeroDiscountId() throws DaoException {
-        long zeroDiscountId;
-        Discount zeroDiscount = new Discount.DiscountBuilder().build();
-        DiscountDao discountDao = DaoProvider.getInstance().getDiscountDao();
-        Optional<Discount> optionalDiscount = discountDao
-                .findByTypeAndRate(zeroDiscount.getType(), zeroDiscount.getRate());
-        zeroDiscountId = optionalDiscount.isPresent() ? optionalDiscount.get().getId()
-                : discountDao.create(zeroDiscount);
-        return zeroDiscountId;
+    private boolean isUnique(Map<String, String> userParameters) {
+        boolean result = true;
+        try {
+            String login = userParameters.get(LOGIN);
+            String email = userParameters.get(EMAIL);
+            String phoneNumber = userParameters.get(PHONE_NUMBER);
+            boolean isUniqueLogin = userDao.findByLogin(login).isEmpty();
+            boolean isUniqueEmail = userDao.findByEmail(email).isEmpty();
+            boolean isUniquePhoneNumber = userDao.findByPhoneNumber(phoneNumber).isEmpty();
+            if (!isUniqueLogin) {
+                userParameters.replace(LOGIN, NOT_UNIQUE_MEANING);
+                result = false;
+            }
+            if (!isUniqueEmail) {
+                userParameters.replace(EMAIL, NOT_UNIQUE_MEANING);
+                result = false;
+            }
+            if (!isUniquePhoneNumber) {
+                userParameters.replace(PHONE_NUMBER, NOT_UNIQUE_MEANING);
+                result = false;
+            }
+        } catch (DaoException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }
