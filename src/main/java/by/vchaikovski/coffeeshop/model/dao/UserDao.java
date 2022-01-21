@@ -14,6 +14,8 @@ public interface UserDao extends BaseDao<User> {
 
     Optional<User> findByLoginAndPassword(String login, String password) throws DaoException;
 
+    Optional<User> findByEmailAndPassword(String email, String password) throws DaoException;
+
     List<User> findByFirstName(String firstName) throws DaoException;
 
     List<User> findByLastName(String lastName) throws DaoException;

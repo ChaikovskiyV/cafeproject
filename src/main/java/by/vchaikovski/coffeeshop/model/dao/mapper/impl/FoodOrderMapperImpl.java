@@ -3,7 +3,8 @@ package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
 import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
 import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
-import by.vchaikovski.coffeeshop.model.entity.*;
+import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
+import by.vchaikovski.coffeeshop.model.entity.OrderCart;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,22 +33,19 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
             String comment = resultSet.getString(ORDER_COMMENT);
             FoodOrder.OrderEvaluation evaluation = FoodOrder.OrderEvaluation
                     .valueOf(resultSet.getString(ORDER_EVALUATION).toUpperCase());
-            UserMapperImpl userMapper = mapperProvider.getUserMapper();
-            BillMapperImpl billMapper = mapperProvider.getBillMapper();
-            DeliveryMapperImpl deliveryMapper = mapperProvider.getDeliveryMapper();
+            long userId = resultSet.getLong(USER_ID);
+            long billId = resultSet.getLong(BILL_ID);
+            long deliveryId = resultSet.getLong(DELIVERY_ID);
             OrderCartMapperImpl cartMapper = mapperProvider.getOrderCardMapper();
-            User user = userMapper.createEntity(resultSet);
-            Bill bill = billMapper.createEntity(resultSet);
-            Delivery delivery = deliveryMapper.createEntity(resultSet);
             OrderCart cart = cartMapper.createEntity(resultSet);
             FoodOrder.FoodOrderBuilder orderBuilder = new FoodOrder.FoodOrderBuilder();
             order = orderBuilder.setId(id)
                     .setStatus(status)
                     .setCreationDate(creationDate)
                     .setComment(comment)
-                    .setUser(user)
-                    .setBill(bill)
-                    .setDelivery(delivery)
+                    .setUserId(userId)
+                    .setBillId(billId)
+                    .setDeliveryId(deliveryId)
                     .setEvaluation(evaluation)
                     .setCart(cart)
                     .build();

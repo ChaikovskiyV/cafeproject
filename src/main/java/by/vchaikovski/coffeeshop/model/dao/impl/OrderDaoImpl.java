@@ -2,7 +2,6 @@ package by.vchaikovski.coffeeshop.model.dao.impl;
 
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
 import by.vchaikovski.coffeeshop.model.dao.OrderDao;
 import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
 import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
@@ -269,19 +268,16 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public long create(FoodOrder order) throws DaoException {//TODO add method to find order by all parameters
+    public long create(FoodOrder order) throws DaoException {
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_ORDER, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(FIRST_PARAMETER_INDEX, order.getStatus().name());
             statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(order.getCreationDate().toLocalDate()));
             statement.setString(THIRD_PARAMETER_INDEX, order.getComment());
             statement.setString(FOURTH_PARAMETER_INDEX, order.getEvaluation().name());
-            UserDaoImpl userDao = UserDaoImpl.getInstance();
-            statement.setLong(FIRST_PARAMETER_INDEX, userDao.create(order.getUser()));
-            BillDaoImpl billDao = BillDaoImpl.getInstance();
-            statement.setLong(SIXTH_PARAMETER_INDEX, billDao.create(order.getBill()));
-            DeliveryDaoImpl deliveryDao = DaoProvider.getInstance().getDeliveryDao();
-            statement.setLong(SEVENTH_PARAMETER_INDEX, deliveryDao.create(order.getDelivery()));
+            statement.setLong(FIFTH_PARAMETER_INDEX, order.getUserId());
+            statement.setLong(SIXTH_PARAMETER_INDEX, order.getBillId());
+            statement.setLong(SEVENTH_PARAMETER_INDEX, order.getDeliveryId());
             statement.executeUpdate();
             try (ResultSet resultSet = statement.getGeneratedKeys()) {
                 long orderId = 0;
@@ -346,6 +342,9 @@ public class OrderDaoImpl implements OrderDao {
             try {
                 if (connection != null) {
                     connection.setAutoCommit(true);
+                    if (statement != null) {
+                        statement.close();
+                    }
                     connection.close();
                 }
             } catch (SQLException throwables) {

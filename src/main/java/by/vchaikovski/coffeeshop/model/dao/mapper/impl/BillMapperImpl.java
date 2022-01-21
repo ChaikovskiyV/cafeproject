@@ -28,12 +28,8 @@ public class BillMapperImpl implements BaseMapper<Bill> {
             BigDecimal totalPrice = resultSet.getBigDecimal(BILL_TOTAL_PRICE);
             Bill.BillStatus status = Bill.BillStatus.valueOf(resultSet.getString(BILL_STATUS).toUpperCase());
             LocalDateTime date = LocalDateTime.parse(resultSet.getDate(BILL_PAYMENT_DATE).toString());
-            Bill.BillBuilder builder = new Bill.BillBuilder();
-            bill = builder.setId(id)
-                    .setTotalPrice(totalPrice)
-                    .setStatus(status)
-                    .setPaymentDate(date)
-                    .build();
+            bill = new Bill(status, date, totalPrice);
+            bill.setId(id);
         } catch (SQLException e) {
             String message = "Bill can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";
             logger.error(message, e);

@@ -2,7 +2,7 @@ package by.vchaikovski.coffeeshop.model.dao.impl;
 
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.AddressDeliverDao;
+import by.vchaikovski.coffeeshop.model.dao.AddressDeliveryDao;
 import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
 import by.vchaikovski.coffeeshop.model.entity.AddressDelivery;
 import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AddressDeliveryDaoImpl implements AddressDeliverDao {
+public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
     private static final AddressDeliveryDaoImpl instance = new AddressDeliveryDaoImpl();
     private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";

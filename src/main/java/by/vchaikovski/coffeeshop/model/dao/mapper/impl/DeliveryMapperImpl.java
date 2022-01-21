@@ -2,8 +2,6 @@ package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
 
 import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
-import by.vchaikovski.coffeeshop.model.entity.AddressDelivery;
 import by.vchaikovski.coffeeshop.model.entity.Delivery;
 
 import java.sql.ResultSet;
@@ -29,14 +27,9 @@ public class DeliveryMapperImpl implements BaseMapper<Delivery> {
             long id = resultSet.getLong(DELIVERY_ID);
             Delivery.DeliveryType type = Delivery.DeliveryType.valueOf(resultSet.getString(DELIVERY_TYPE).toUpperCase());
             LocalDateTime deliveryTime = LocalDateTime.parse(resultSet.getString(DELIVERY_TIME));
-            AddressDeliveryMapperImpl addressDeliveryMapper = MapperProvider.getInstance().getAddressDeliveryMapper();
-            AddressDelivery address = addressDeliveryMapper.createEntity(resultSet);
-            Delivery.DeliveryBuilder deliveryBuilder = new Delivery.DeliveryBuilder();
-            delivery = deliveryBuilder.setId(id)
-                    .setDeliveryType(type)
-                    .setDeliveryTime(deliveryTime)
-                    .setAddress(address)
-                    .build();
+            long addressId = resultSet.getLong(ADDRESS_ID);
+            delivery = new Delivery(type, deliveryTime, addressId);
+            delivery.setId(id);
         } catch (SQLException e) {
             String message = "Delivery can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";
             logger.error(message, e);

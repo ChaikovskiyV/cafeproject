@@ -25,11 +25,8 @@ public class DiscountMapperImpl implements BaseMapper<Discount> {
             long id = resultSet.getLong(DISCOUNT_ID);
             Discount.DiscountType type = Discount.DiscountType.valueOf(resultSet.getString(DISCOUNT_TYPE).toUpperCase());
             int rate = resultSet.getInt(DISCOUNT_RATE);
-            Discount.DiscountBuilder builder = new Discount.DiscountBuilder();
-            discount = builder.setId(id)
-                    .setType(type)
-                    .setRate(rate)
-                    .build();
+            discount = new Discount(type, rate);
+            discount.setId(id);
         } catch (SQLException e) {
             String message = "Discount can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";
             logger.error(message, e);

@@ -198,13 +198,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              PreparedStatement statement = connection.prepareStatement(CREATE_DELIVERY, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(FIRST_PARAMETER_INDEX, delivery.getDeliveryType().name());
             statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(delivery.getDeliveryTime().format(formatter)));
-            if (delivery.getAddress() != null) {
-                AddressDeliveryDaoImpl addressDao = AddressDeliveryDaoImpl.getInstance();
-                long addressId = addressDao.create(delivery.getAddress());
-                statement.setLong(THIRD_PARAMETER_INDEX, addressId);
-            } else {
-                statement.setLong(THIRD_PARAMETER_INDEX, 0);
-            }
+            statement.setLong(THIRD_PARAMETER_INDEX, delivery.getAddressId());
             statement.executeUpdate();
             try (ResultSet resultSet = statement.getGeneratedKeys()) {
                 long billId = 0;

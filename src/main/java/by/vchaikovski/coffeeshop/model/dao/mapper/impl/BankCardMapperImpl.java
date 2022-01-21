@@ -29,12 +29,8 @@ public class BankCardMapperImpl implements BaseMapper<BankCard> {
             String number = resultSet.getString(CARD_NUMBER);
             LocalDate date = resultSet.getDate(CARD_EXPIRATION_DATE).toLocalDate();
             BigDecimal amount = resultSet.getBigDecimal(CARD_AMOUNT);
-            BankCard.BankCardBuilder builder = new BankCard.BankCardBuilder();
-            bankCard = builder.setId(id)
-                    .setCardNumber(number)
-                    .setExpirationDate(date)
-                    .setAmount(amount)
-                    .build();
+            bankCard = new BankCard(number, date, amount);
+            bankCard.setId(id);
         } catch (SQLException e) {
             String message = "BankCard can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";
             logger.error(message, e);

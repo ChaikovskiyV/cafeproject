@@ -5,7 +5,7 @@ import by.vchaikovski.coffeeshop.exception.DaoException;
 
 import java.util.List;
 
-public interface AddressDeliverDao extends BaseDao<AddressDelivery> {
+public interface AddressDeliveryDao extends BaseDao<AddressDelivery> {
     List<AddressDelivery> findByStreetName(String streetName) throws DaoException;
 
     boolean updateAddressDeliveryStreetName(long id, String streetName) throws DaoException;

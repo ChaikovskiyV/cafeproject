@@ -2,8 +2,6 @@ package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
 
 import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
-import by.vchaikovski.coffeeshop.model.entity.Discount;
 import by.vchaikovski.coffeeshop.model.entity.User;
 
 import java.sql.ResultSet;
@@ -33,7 +31,7 @@ public class UserMapperImpl implements BaseMapper<User> {
             String phoneNumber = resultSet.getString(USER_PHONE);
             User.Role role = User.Role.valueOf(resultSet.getString(USER_ROLE).toUpperCase());
             User.Status status = User.Status.valueOf(resultSet.getString(USER_STATUS).toUpperCase());
-            Discount discount = MapperProvider.getInstance().getDiscountMapper().createEntity(resultSet);
+            long discountId = resultSet.getLong(DISCOUNT_ID);
             User.UserBuilder userBuilder = new User.UserBuilder();
             user = userBuilder.setId(id)
                     .setLogin(login)
@@ -43,7 +41,7 @@ public class UserMapperImpl implements BaseMapper<User> {
                     .setPhoneNumber(phoneNumber)
                     .setRole(role)
                     .setStatus(status)
-                    .setDiscount(discount)
+                    .setDiscountId(discountId)
                     .build();
         } catch (SQLException e) {
             String message = "User can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";
