@@ -6,7 +6,7 @@ import jakarta.servlet.ServletContextListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class ContextListener implements ServletContextListener {
+public class ContextListenerImpl implements ServletContextListener {
     private static final Logger logger = LogManager.getLogger();
 
     @Override

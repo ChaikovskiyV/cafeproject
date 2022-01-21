@@ -7,7 +7,6 @@ import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.entity.BankCard;
 import by.vchaikovski.coffeeshop.model.service.BankCardService;
 import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
-import by.vchaikovski.coffeeshop.util.PageExtractor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +18,7 @@ import java.util.Optional;
 
 import static by.vchaikovski.coffeeshop.controller.command.PagePath.CARD_INFO_PAGE;
 import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.*;
 
 public class FindBankCardCommand implements BaseCommand {
     private static final Logger logger = LogManager.getLogger();
@@ -27,8 +27,6 @@ public class FindBankCardCommand implements BaseCommand {
     public Router execute(HttpServletRequest request) throws CommandException {
         BankCardService cardService = ServiceProvider.getInstance().getBankCardService();
         HttpSession session = request.getSession();
-        session.removeAttribute(CARD_PARAMETERS);
-        session.removeAttribute(CARD_ID);
         String cardNumber = request.getParameter(CARD_NUMBER);
         String expirationDate = request.getParameter(CARD_EXPIRATION_DATE);
         try {
@@ -47,10 +45,6 @@ public class FindBankCardCommand implements BaseCommand {
             logger.error(message, e);
             throw new CommandException(message, e);
         }
-        /*PageExtractor extractor = PageExtractor.getInstance();
-        String currantPage = extractor.extractCurrentPage(request);*/
-        session.setAttribute(CURRENT_PAGE, CARD_INFO_PAGE);
-
         return new Router(CARD_INFO_PAGE);
     }
 }

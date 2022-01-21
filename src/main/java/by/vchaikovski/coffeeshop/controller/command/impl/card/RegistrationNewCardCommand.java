@@ -6,7 +6,6 @@ import by.vchaikovski.coffeeshop.exception.CommandException;
 import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.service.BankCardService;
 import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
-import by.vchaikovski.coffeeshop.util.PageExtractor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +16,7 @@ import java.util.Map;
 
 import static by.vchaikovski.coffeeshop.controller.command.PagePath.REGISTRATION_CARD_PAGE;
 import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.*;
 
 public class RegistrationNewCardCommand implements BaseCommand {
     private static final Logger logger = LogManager.getLogger();
@@ -36,8 +36,8 @@ public class RegistrationNewCardCommand implements BaseCommand {
             long cardId = cardService.createBankCard(cardParameters);
             session.setAttribute(CARD_ID, cardId);
             if (cardId == 0) {
-                request.setAttribute(CARD_PARAMETERS, cardParameters);
                 logger.debug("Card wasn't registered.");
+                request.setAttribute(CARD_PARAMETERS_REQ, cardParameters);
                 for (Map.Entry<String, String> entry : cardParameters.entrySet()) {
                     String value = entry.getValue();
                     String key = entry.getKey();
@@ -52,7 +52,7 @@ public class RegistrationNewCardCommand implements BaseCommand {
                                 default -> logger.info(() -> "Unknown attribute: " + key);
                             }
                         }
-                        default -> logger.info(() -> key + " is correct");
+                        default -> logger.debug(() -> key + " is correct");
                     }
                 }
             } else {
@@ -63,10 +63,6 @@ public class RegistrationNewCardCommand implements BaseCommand {
             logger.error(message, e);
             throw new CommandException(message, e);
         }
-        /*PageExtractor extractor = PageExtractor.getInstance();
-        String currantPage = extractor.extractCurrentPage(request);*/
-        session.setAttribute(CURRENT_PAGE, REGISTRATION_CARD_PAGE);
-
         return new Router(REGISTRATION_CARD_PAGE);
     }
 }

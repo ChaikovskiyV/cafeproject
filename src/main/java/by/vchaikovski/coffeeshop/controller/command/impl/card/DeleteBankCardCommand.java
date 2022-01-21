@@ -6,14 +6,15 @@ import by.vchaikovski.coffeeshop.exception.CommandException;
 import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.service.BankCardService;
 import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
-import by.vchaikovski.coffeeshop.util.PageExtractor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static by.vchaikovski.coffeeshop.controller.command.PagePath.CARD_INFO_PAGE;
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.DELETE_RESULT;
+import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.CARD_ID;
+import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.CARD_PARAMETERS;
 
 public class DeleteBankCardCommand implements BaseCommand {
     private static final Logger logger = LogManager.getLogger();
@@ -22,11 +23,10 @@ public class DeleteBankCardCommand implements BaseCommand {
     public Router execute(HttpServletRequest request) throws CommandException {
         BankCardService cardService = ServiceProvider.getInstance().getBankCardService();
         HttpSession session = request.getSession();
-        session.removeAttribute(DELETE_RESULT);
-        Long cardId = (Long)session.getAttribute(CARD_ID);
+        long cardId = (long) session.getAttribute(CARD_ID);
         try {
-            boolean isDeleted = cardId != null && cardService.deleteBankCardById(cardId);
-            session.setAttribute(DELETE_RESULT, isDeleted);
+            boolean isDeleted = cardService.deleteBankCardById(cardId);
+            request.setAttribute(DELETE_RESULT, isDeleted);
             if (isDeleted) {
                 session.removeAttribute(CARD_PARAMETERS);
                 session.removeAttribute(CARD_ID);
@@ -36,9 +36,6 @@ public class DeleteBankCardCommand implements BaseCommand {
             logger.error(message, e);
             throw new CommandException(message, e);
         }
-        /*PageExtractor extractor = PageExtractor.getInstance();
-        String currantPage = extractor.extractCurrentPage(request);*/
-        session.setAttribute(CURRENT_PAGE, CARD_INFO_PAGE);
         Router router = new Router(CARD_INFO_PAGE);
         router.setRouterType(Router.RouterType.REDIRECT);
 
