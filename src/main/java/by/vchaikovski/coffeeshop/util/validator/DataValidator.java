@@ -21,6 +21,8 @@ public interface DataValidator {
 
     boolean isDateValid(String dateString);
 
+    boolean isDateTimeValid(String dateTimeString);
+
     boolean isDateLaterCurrently(LocalDate date);
 
     boolean isDiscountRateValid(String discountRate);

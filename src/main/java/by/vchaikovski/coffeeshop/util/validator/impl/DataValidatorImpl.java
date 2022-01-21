@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class DataValidatorImpl implements DataValidator {
     private static final Logger logger = LogManager.getLogger();
@@ -20,10 +19,11 @@ public class DataValidatorImpl implements DataValidator {
     private static final String CARD_NUMBER_REGEX = "\\d{16}";
     private static final String DISCOUNT_RATE_REGEX = "[1-9]\\d?";
     private static final String DATE_REGEX = "202[2-9]-((0[1-9])|(1[0-2]))-((0[1-9])|([12]\\d)|(3[01]))";
+    private static final String TIME_REGEX = "\\s?(([01]\\d)|(2[0-3])):[0-5]\\d";
 
     private static DataValidatorImpl instance;
 
-    private DataValidatorImpl() {
+    protected DataValidatorImpl() {
     }
 
     public static DataValidatorImpl getInstance() {
@@ -79,6 +79,11 @@ public class DataValidatorImpl implements DataValidator {
     }
 
     @Override
+    public boolean isDateTimeValid(String dateTimeString) {
+        return dateTimeString != null && dateTimeString.strip().matches(DATE_REGEX + TIME_REGEX);
+    }
+
+    @Override
     public boolean isDateLaterCurrently(LocalDate date) {
         return date.isAfter(LocalDate.now());
     }
@@ -96,7 +101,7 @@ public class DataValidatorImpl implements DataValidator {
     @Override
     public <T extends Enum<T>> boolean isEnumContains(String value, Class<T> enumClass) {
         boolean result = false;
-        if(value != null && enumClass != null) {
+        if (value != null && enumClass != null) {
             try {
                 T.valueOf(enumClass, value.strip().toUpperCase());
                 result = true;
