@@ -10,16 +10,10 @@ public class Bill extends AbstractEntity {
     private LocalDateTime paymentDate;
     private BillStatus status;
 
-    public Bill(BillBuilder builder) {
-        if (builder == null || !builder.isValid()) {
-            String message = "The builder " + builder + " is not valid.";
-            logger.error(message);
-            throw new IllegalArgumentException(message);
-        }
-        super.setId(builder.id);
-        totalPrice = builder.totalPrice;
-        paymentDate = builder.paymentDate;
-        status = builder.status != null ? builder.status : BillStatus.NOT_PAID;
+    public Bill(BillStatus status, LocalDateTime paymentDate, BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+        this.paymentDate = paymentDate;
+        this.status = status != null ? status : BillStatus.NOT_PAID;
     }
 
     public BigDecimal getTotalPrice() {
@@ -79,40 +73,5 @@ public class Bill extends AbstractEntity {
                 .append(status)
                 .append('}')
                 .toString();
-    }
-
-    public static class BillBuilder {
-        private long id;
-        private BigDecimal totalPrice;
-        private LocalDateTime paymentDate;
-        private BillStatus status;
-
-        public BillBuilder setId(long id) {
-            this.id = id;
-            return this;
-        }
-
-        public BillBuilder setTotalPrice(BigDecimal totalPrice) {
-            this.totalPrice = totalPrice;
-            return this;
-        }
-
-        public BillBuilder setPaymentDate(LocalDateTime paymentDate) {
-            this.paymentDate = paymentDate;
-            return this;
-        }
-
-        public BillBuilder setStatus(BillStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public boolean isValid() {
-            return totalPrice != null;
-        }
-
-        public Bill build() {
-            return new Bill(this);
-        }
     }
 }

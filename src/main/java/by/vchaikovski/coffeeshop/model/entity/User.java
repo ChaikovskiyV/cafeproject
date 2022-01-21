@@ -12,7 +12,7 @@ public class User extends AbstractEntity {
     private String phoneNumber;
     private Role role;
     private Status status;
-    private Discount discount;
+    private long discountId;
 
     public User(UserBuilder builder) {
         if (builder == null || !builder.isValid()) {
@@ -28,7 +28,7 @@ public class User extends AbstractEntity {
         phoneNumber = builder.phoneNumber;
         role = builder.role != null ? builder.role : Role.CLIENT;
         status = builder.status != null ? builder.status : Status.UNBANNED;
-        discount = builder.discount;
+        discountId = builder.discountId;
     }
 
     public String getLogin() {
@@ -87,12 +87,12 @@ public class User extends AbstractEntity {
         this.status = status;
     }
 
-    public Discount getDiscount() {
-        return discount;
+    public long getDiscountId() {
+        return discountId;
     }
 
-    public void setDiscount(Discount discount) {
-        this.discount = discount;
+    public void setDiscountId(long discountId) {
+        this.discountId = discountId;
     }
 
     @Override
@@ -104,9 +104,8 @@ public class User extends AbstractEntity {
                 (firstName != null ? firstName.equals(user.firstName) : user.firstName == null) &&
                 (lastName != null ? lastName.equals(user.lastName) : user.lastName == null) &&
                 (email != null ? email.equalsIgnoreCase(user.email) : user.email == null) &&
-                (discount != null ? discount.equals(user.discount) : user.discount == null) &&
                 (phoneNumber != null ? phoneNumber.equals(user.phoneNumber) : user.phoneNumber == null) &&
-                role == user.role && status == user.status;
+                role == user.role && status == user.status && discountId == user.discountId;
     }
 
     @Override
@@ -120,8 +119,8 @@ public class User extends AbstractEntity {
         result = result * first + (email != null ? email.hashCode() : 0);
         result = result * first + (phoneNumber != null ? phoneNumber.hashCode() : 0);
         result = result * first + (role != null ? role.hashCode() : 0);
-        result = result * first + (discount != null ? discount.hashCode() : 0);
         result = result * first + (status != null ? status.hashCode() : 0);
+        result = result * first + (int) discountId;
 
         return result;
     }
@@ -143,8 +142,8 @@ public class User extends AbstractEntity {
                 .append(role)
                 .append(", status=")
                 .append(status)
-                .append(", discount=")
-                .append(discount)
+                .append(", discountId=")
+                .append(discountId)
                 .append('}')
                 .toString();
     }
@@ -158,7 +157,7 @@ public class User extends AbstractEntity {
         private String phoneNumber;
         private Role role;
         private Status status;
-        private Discount discount;
+        private long discountId;
 
         public UserBuilder setId(long id) {
             this.id = id;
@@ -200,8 +199,8 @@ public class User extends AbstractEntity {
             return this;
         }
 
-        public UserBuilder setDiscount(Discount discount) {
-            this.discount = discount;
+        public UserBuilder setDiscountId(long discountId) {
+            this.discountId = discountId;
             return this;
         }
 

@@ -3,7 +3,7 @@ package by.vchaikovski.coffeeshop.model.entity;
 import java.time.LocalDateTime;
 
 public class FoodOrder extends AbstractEntity {
-    public enum OrderStatus {WAITING, ACCEPTED, REJECTED, READY, COMPLETED}
+    public enum OrderStatus {WAITING, ACCEPTED, CANCELLED, READY, COMPLETED}
 
     public enum OrderEvaluation {BAD, NICE, GREAT, BRILLIANT}
 
@@ -12,9 +12,9 @@ public class FoodOrder extends AbstractEntity {
     private String comment;
     private OrderEvaluation evaluation;
     private OrderCart cart;
-    private Delivery delivery;
-    private Bill bill;
-    private User user;
+    private long deliveryId;
+    private long billId;
+    private long userId;
 
     public FoodOrder(FoodOrderBuilder builder) {
         if (builder == null || !builder.isValid()) {
@@ -28,9 +28,9 @@ public class FoodOrder extends AbstractEntity {
         comment = builder.comment;
         evaluation = builder.evaluation;
         cart = builder.cart;
-        delivery = builder.delivery;
-        bill = builder.bill;
-        user = builder.user;
+        deliveryId = builder.deliveryId;
+        billId = builder.billId;
+        userId = builder.userId;
     }
 
     public OrderStatus getStatus() {
@@ -73,28 +73,28 @@ public class FoodOrder extends AbstractEntity {
         this.cart = cart;
     }
 
-    public Delivery getDelivery() {
-        return delivery;
+    public long getDeliveryId() {
+        return deliveryId;
     }
 
-    public void setDelivery(Delivery delivery) {
-        this.delivery = delivery;
+    public void setDeliveryId(long deliveryId) {
+        this.deliveryId = deliveryId;
     }
 
-    public Bill getBill() {
-        return bill;
+    public long getBillId() {
+        return billId;
     }
 
-    public void setBill(Bill bill) {
-        this.bill = bill;
+    public void setBillId(long billId) {
+        this.billId = billId;
     }
 
-    public User getUser() {
-        return user;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -103,12 +103,10 @@ public class FoodOrder extends AbstractEntity {
         if (o == null || getClass() != o.getClass()) return false;
         FoodOrder foodOrder = (FoodOrder) o;
         return super.equals(foodOrder) && status == foodOrder.status && evaluation == foodOrder.evaluation &&
+                deliveryId == foodOrder.deliveryId && billId == foodOrder.billId && userId == foodOrder.userId &&
                 (creationDate != null ? creationDate.equals(foodOrder.creationDate) : foodOrder.creationDate == null) &&
                 (comment != null ? comment.equals(foodOrder.comment) : foodOrder.comment == null) &&
-                (cart != null ? cart.equals(foodOrder.cart) : foodOrder.cart == null) &&
-                (delivery != null ? delivery.equals(foodOrder.delivery) : foodOrder.delivery == null) &&
-                (bill != null ? bill.equals(foodOrder.bill) : foodOrder.bill == null) &&
-                (user != null ? user.equals(foodOrder.user) : foodOrder.user == null);
+                (cart != null ? cart.equals(foodOrder.cart) : foodOrder.cart == null);
     }
 
     @Override
@@ -121,9 +119,9 @@ public class FoodOrder extends AbstractEntity {
         result = result * first + (comment != null ? comment.hashCode() : 0);
         result = result * first + (evaluation != null ? evaluation.hashCode() : 0);
         result = result * first + (cart != null ? cart.hashCode() : 0);
-        result = result * first + (delivery != null ? delivery.hashCode() : 0);
-        result = result * first + (bill != null ? bill.hashCode() : 0);
-        result = result * first + (user != null ? user.hashCode() : 0);
+        result = result * first + (int) deliveryId;
+        result = result * first + (int) billId;
+        result = result * first + (int) userId;
 
         return result;
     }
@@ -135,16 +133,16 @@ public class FoodOrder extends AbstractEntity {
                 .append(status)
                 .append(", creationDate = ")
                 .append(creationDate)
-                .append(", user = ")
-                .append(user)
+                .append(", userId = ")
+                .append(userId)
                 .append(", comment = ")
                 .append(comment)
                 .append(", cart = ")
                 .append(cart)
-                .append(", delivery = ")
-                .append(delivery)
-                .append(", bill = ")
-                .append(bill)
+                .append(", deliveryId = ")
+                .append(deliveryId)
+                .append(", billId = ")
+                .append(billId)
                 .append("', evaluation = ")
                 .append(evaluation)
                 .append('}')
@@ -158,9 +156,9 @@ public class FoodOrder extends AbstractEntity {
         private String comment;
         private OrderEvaluation evaluation;
         private OrderCart cart;
-        private Delivery delivery;
-        private Bill bill;
-        private User user;
+        private long deliveryId;
+        private long billId;
+        private long userId;
 
         public FoodOrderBuilder setId(long id) {
             this.id = id;
@@ -192,23 +190,23 @@ public class FoodOrder extends AbstractEntity {
             return this;
         }
 
-        public FoodOrderBuilder setDelivery(Delivery delivery) {
-            this.delivery = delivery;
+        public FoodOrderBuilder setDeliveryId(long deliveryId) {
+            this.deliveryId = deliveryId;
             return this;
         }
 
-        public FoodOrderBuilder setBill(Bill bill) {
-            this.bill = bill;
+        public FoodOrderBuilder setBillId(long billId) {
+            this.billId = billId;
             return this;
         }
 
-        public FoodOrderBuilder setUser(User user) {
-            this.user = user;
+        public FoodOrderBuilder setUserId(long userId) {
+            this.userId = userId;
             return this;
         }
 
         public boolean isValid() {
-            return cart != null && delivery != null && bill != null && user != null;
+            return cart != null && deliveryId != 0 && billId != 0 && userId != 0;
         }
 
         public FoodOrder build() {

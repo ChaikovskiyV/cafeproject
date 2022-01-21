@@ -7,11 +7,6 @@ public class AddressDelivery extends AbstractEntity {
     private int flatNumber;
 
     private AddressDelivery(AddressDeliveryBuilder builder) {
-        if (builder == null || !builder.isValid()) {
-            String message = "The builder " + builder + " is not valid.";
-            logger.error(message);
-            throw new IllegalArgumentException(message);
-        }
         super.setId(builder.id);
         streetName = builder.streetName;
         houseNumber = builder.houseNumber;
@@ -119,10 +114,6 @@ public class AddressDelivery extends AbstractEntity {
         public AddressDeliveryBuilder setFlatNumber(int flatNumber) {
             this.flatNumber = flatNumber;
             return this;
-        }
-
-        public boolean isValid() {
-            return streetName != null && houseNumber != null;
         }
 
         public AddressDelivery build() {

@@ -6,15 +6,9 @@ public class Discount extends AbstractEntity {
     private DiscountType type;
     private int rate;
 
-    public Discount(DiscountBuilder builder) {
-        if (builder == null) {
-            String message = "The builder " + builder + " is not valid.";
-            logger.error(message);
-            throw new IllegalArgumentException(message);
-        }
-        super.setId(builder.id);
-        type = builder.type != null ? builder.type : DiscountType.ZERO;
-        rate = builder.rate;
+    public Discount(DiscountType type, int rate) {
+        this.type = type != null ? type : DiscountType.ZERO;
+        this.rate = rate;
     }
 
     public DiscountType getType() {
@@ -61,30 +55,5 @@ public class Discount extends AbstractEntity {
                 .append(rate)
                 .append('}')
                 .toString();
-    }
-
-    public static class DiscountBuilder {
-        private long id;
-        private DiscountType type;
-        private int rate;
-
-        public DiscountBuilder setId(long id) {
-            this.id = id;
-            return this;
-        }
-
-        public DiscountBuilder setType(DiscountType type) {
-            this.type = type;
-            return this;
-        }
-
-        public DiscountBuilder setRate(int rate) {
-            this.rate = rate;
-            return this;
-        }
-
-        public Discount build() {
-            return new Discount(this);
-        }
     }
 }

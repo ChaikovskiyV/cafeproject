@@ -7,18 +7,17 @@ public class Delivery extends AbstractEntity {
 
     private DeliveryType deliveryType;
     private LocalDateTime deliveryTime;
-    private AddressDelivery address;
+    private long addressId;
 
-    public Delivery(DeliveryBuilder builder) {
-        if (builder == null || !builder.isValid()) {
-            String message = "The builder " + builder + " is not valid.";
-            logger.error(message);
-            throw new IllegalArgumentException(message);
-        }
-        super.setId(builder.id);
-        deliveryType = builder.deliveryType;
-        deliveryTime = builder.deliveryTime;
-        address = builder.address;
+    public Delivery(DeliveryType deliveryType, LocalDateTime deliveryTime, long addressId) {
+        this.deliveryType = deliveryType;
+        this.deliveryTime = deliveryTime;
+        this.addressId = addressId;
+    }
+
+    public Delivery(DeliveryType deliveryType, LocalDateTime deliveryTime) {
+        this.deliveryType = deliveryType;
+        this.deliveryTime = deliveryTime;
     }
 
     public DeliveryType getDeliveryType() {
@@ -37,15 +36,15 @@ public class Delivery extends AbstractEntity {
         this.deliveryTime = deliveryTime;
     }
 
-    public AddressDelivery getAddress() {
-        return address;
+    public long getAddressId() {
+        return addressId;
     }
 
-    public void setAddress(AddressDelivery address) {
+    public void setAddressId(long addressId) {
         if (deliveryType == DeliveryType.PICK_UP) {
             deliveryType = DeliveryType.DELIVERY;
         }
-        this.address = address;
+        this.addressId = addressId;
     }
 
     @Override
@@ -53,9 +52,8 @@ public class Delivery extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Delivery delivery = (Delivery) o;
-        return super.equals(delivery) && deliveryType == delivery.deliveryType &&
-                (deliveryTime != null ? deliveryTime.equals(delivery.deliveryTime) : delivery.deliveryTime == null) &&
-                (address != null ? address.equals(delivery.address) : delivery.address == null);
+        return super.equals(delivery) && deliveryType == delivery.deliveryType && addressId == delivery.addressId &&
+                (deliveryTime != null ? deliveryTime.equals(delivery.deliveryTime) : delivery.deliveryTime == null);
     }
 
     @Override
@@ -65,7 +63,7 @@ public class Delivery extends AbstractEntity {
         result = result * first + super.hashCode();
         result = result * first + (deliveryType != null ? deliveryType.hashCode() : 0);
         result = result * first + (deliveryTime != null ? deliveryTime.hashCode() : 0);
-        result = result * first + (address != null ? address.hashCode() : 0);
+        result = result * first + (int) addressId;
 
         return result;
     }
@@ -77,44 +75,9 @@ public class Delivery extends AbstractEntity {
                 .append(deliveryType)
                 .append(", deliveryTime = ")
                 .append(deliveryTime)
-                .append(", address = ")
-                .append(address)
+                .append(", addressId = ")
+                .append(addressId)
                 .append('}')
                 .toString();
-    }
-
-    public static class DeliveryBuilder {
-        private long id;
-        private DeliveryType deliveryType;
-        private LocalDateTime deliveryTime;
-        private AddressDelivery address;
-
-        public DeliveryBuilder setId(long id) {
-            this.id = id;
-            return this;
-        }
-
-        public DeliveryBuilder setDeliveryType(DeliveryType deliveryType) {
-            this.deliveryType = deliveryType;
-            return this;
-        }
-
-        public DeliveryBuilder setDeliveryTime(LocalDateTime deliveryTime) {
-            this.deliveryTime = deliveryTime;
-            return this;
-        }
-
-        public DeliveryBuilder setAddress(AddressDelivery address) {
-            this.address = address;
-            return this;
-        }
-
-        public boolean isValid() {
-            return deliveryType != null && deliveryTime != null;
-        }
-
-        public Delivery build() {
-            return new Delivery(this);
-        }
     }
 }

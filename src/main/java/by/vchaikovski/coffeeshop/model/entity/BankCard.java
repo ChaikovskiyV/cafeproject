@@ -8,16 +8,10 @@ public class BankCard extends AbstractEntity {
     private LocalDate expirationDate;
     private BigDecimal amount;
 
-    public BankCard(BankCardBuilder builder) {
-        if (builder == null || !builder.isValid()) {
-            String message = "The builder " + builder + " is not valid.";
-            logger.error(message);
-            throw new IllegalArgumentException(message);
-        }
-        super.setId(builder.id);
-        cardNumber = builder.cardNumber;
-        expirationDate = builder.expirationDate;
-        amount = builder.amount;
+    public BankCard(String cardNumber, LocalDate expirationDate, BigDecimal amount) {
+        this.cardNumber = cardNumber;
+        this.expirationDate = expirationDate;
+        this.amount = amount;
     }
 
     public String getCardNumber() {
@@ -79,40 +73,5 @@ public class BankCard extends AbstractEntity {
                 .append(amount)
                 .append('}')
                 .toString();
-    }
-
-    public static class BankCardBuilder {
-        private long id;
-        private String cardNumber;
-        private LocalDate expirationDate;
-        private BigDecimal amount;
-
-        public BankCardBuilder setId(long id) {
-            this.id = id;
-            return this;
-        }
-
-        public BankCardBuilder setCardNumber(String cardNumber) {
-            this.cardNumber = cardNumber;
-            return this;
-        }
-
-        public BankCardBuilder setExpirationDate(LocalDate expirationDate) {
-            this.expirationDate = expirationDate;
-            return this;
-        }
-
-        public BankCardBuilder setAmount(BigDecimal amount) {
-            this.amount = amount;
-            return this;
-        }
-
-        public boolean isValid() {
-            return cardNumber != null && expirationDate != null && amount != null;
-        }
-
-        public BankCard build() {
-            return new BankCard(this);
-        }
     }
 }

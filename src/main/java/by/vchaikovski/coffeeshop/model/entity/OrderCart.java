@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OrderCart extends AbstractEntity {
+    private final Map<Menu, Integer> cart;
+
     @Override
     public void setId(long id) {
         throw new UnsupportedOperationException("The setId(long id) method is not supported.");
@@ -15,8 +17,6 @@ public class OrderCart extends AbstractEntity {
     public long getId() {
         throw new UnsupportedOperationException("The getId() method is not supported.");
     }
-
-    private final Map<Menu, Integer> cart;
 
     public OrderCart() {
         cart = new HashMap<>();
@@ -63,7 +63,7 @@ public class OrderCart extends AbstractEntity {
 
     public long findProductsNumber() { // TODO review this method
         return cart.values().stream().count();
-    }
+    } //TODO check this method
 
     @Override
     public boolean equals(Object o) {
