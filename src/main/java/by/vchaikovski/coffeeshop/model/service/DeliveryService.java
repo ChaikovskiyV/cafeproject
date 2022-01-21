@@ -4,7 +4,6 @@ import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.entity.AddressDelivery;
 import by.vchaikovski.coffeeshop.model.entity.Delivery;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -14,29 +13,29 @@ public interface DeliveryService {
 
     long createAddress(Map<String, String> deliveryParameters) throws ServiceException;
 
-    boolean deleteDelivery(long id);
+    boolean deleteDelivery(long id) throws ServiceException;
 
-    boolean deleteAddress(long id);
+    boolean deleteAddress(long id) throws ServiceException;
 
-    List<Delivery> findDeliveryByAddressId(long addressId);
+    List<Delivery> findDeliveryByAddressId(long addressId) throws ServiceException;
 
-    List<Delivery> findDeliveryByDate(LocalDateTime dateTime);
+    List<Delivery> findDeliveryByDate(String dateTime) throws ServiceException;
 
-    List<Delivery> findDeliveryByPeriod(LocalDateTime startPeriod, LocalDateTime endPeriod);
+    List<Delivery> findDeliveryByPeriod(String startPeriod, String endPeriod) throws ServiceException;
 
-    List<Delivery> findDeliveryByType(Delivery.DeliveryType type);
+    List<Delivery> findDeliveryByType(String deliveryType) throws ServiceException;
 
-    List<AddressDelivery> findAddressByStreetName(String streetName);
+    List<AddressDelivery> findAddressByStreetName(String streetName) throws ServiceException;
 
-    boolean updateDeliveryDate(long id, LocalDateTime dateTime);
+    boolean updateDeliveryDate(long id, String dateTime) throws ServiceException;
 
-    boolean updateDeliveryType(long id, Delivery.DeliveryType type);
+    boolean updateDeliveryType(long id, String deliveryType) throws ServiceException;
 
-    boolean updateAddressStreetName(String streetName);
+    boolean updateAddressStreetName(long id, String streetName) throws ServiceException;
 
-    boolean updateAddressHouseNumber(String houseNumber);
+    boolean updateAddressHouseNumber(long id, String houseNumber) throws ServiceException;
 
-    boolean updateAddressBuildingNumber(int buildingNumber);
+    boolean updateAddressBuildingNumber(long id, String buildingNumber) throws ServiceException;
 
-    boolean updateAddressFlatNumber(int flatNumber);
+    boolean updateAddressFlatNumber(long id, String flatNumber) throws ServiceException;
 }
