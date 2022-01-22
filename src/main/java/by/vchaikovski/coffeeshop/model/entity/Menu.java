@@ -1,8 +1,6 @@
 package by.vchaikovski.coffeeshop.model.entity;
 
-import java.awt.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public class Menu extends AbstractEntity {
     public enum FoodType {BEVERAGE, SUPPLEMENT, PASTRY}
@@ -11,10 +9,8 @@ public class Menu extends AbstractEntity {
     private FoodType type;
     private BigDecimal price;
     private int quantityInStock;
-    private LocalDate productionDate;
-    private LocalDate expirationDate;
     private String description;
-    private transient Image foodImage;
+    private String image;
 
     public Menu(MenuBuilder builder) {
         super.setId(builder.id);
@@ -22,10 +18,8 @@ public class Menu extends AbstractEntity {
         type = builder.type;
         price = builder.price;
         quantityInStock = builder.quantityInStock; //TODO consider maybe it's excess
-        productionDate = builder.productionDate;
-        expirationDate = builder.expirationDate;
         description = builder.description;
-        foodImage = builder.foodImage;
+        image = builder.image;
     }
 
     public String getName() {
@@ -60,22 +54,6 @@ public class Menu extends AbstractEntity {
         this.quantityInStock = quantityInStock;
     }
 
-    public LocalDate getProductionDate() {
-        return productionDate;
-    }
-
-    public void setProductionDate(LocalDate productionDate) {
-        this.productionDate = productionDate;
-    }
-
-    public LocalDate getExpirationDate() {
-        return expirationDate;
-    }
-
-    public void setExpirationDate(LocalDate expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -84,12 +62,12 @@ public class Menu extends AbstractEntity {
         this.description = description;
     }
 
-    public Image getFoodImage() {
-        return foodImage;
+    public String getImage() {
+        return image;
     }
 
-    public void setFoodImage(Image foodImage) {
-        this.foodImage = foodImage;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     @Override
@@ -100,10 +78,8 @@ public class Menu extends AbstractEntity {
         return super.equals(menu) && quantityInStock == menu.quantityInStock && type == menu.type &&
                 (name != null ? name.equals(menu.name) : menu.name == null) &&
                 (price != null ? price.equals(menu.price) : menu.price == null) &&
-                (productionDate != null ? productionDate.equals(menu.productionDate) : menu.productionDate == null) &&
-                (expirationDate != null ? expirationDate.equals(menu.expirationDate) : menu.expirationDate == null) &&
                 (description != null ? description.equals(menu.description) : menu.description == null) &&
-                (foodImage != null ? foodImage.equals(menu.foodImage) : menu.foodImage == null);
+                (image != null ? image.equals(menu.image) : menu.image == null);
     }
 
     @Override
@@ -115,10 +91,8 @@ public class Menu extends AbstractEntity {
         result = result * first + (type != null ? type.hashCode() : 0);
         result = result * first + (price != null ? price.hashCode() : 0);
         result = result * first * quantityInStock;
-        result = result * first + (productionDate != null ? productionDate.hashCode() : 0);
-        result = result * first + (expirationDate != null ? expirationDate.hashCode() : 0);
         result = result * first + (description != null ? description.hashCode() : 0);
-        result = result * first + (foodImage != null ? foodImage.hashCode() : 0);
+        result = result * first + (image != null ? image.hashCode() : 0);
 
         return result;
     }
@@ -134,10 +108,6 @@ public class Menu extends AbstractEntity {
                 .append(price)
                 .append(", quantityInStock = ") //TODO consider maybe it's excess
                 .append(quantityInStock)
-                .append(", productionDate = ")
-                .append(productionDate)
-                .append(", expirationDate = ")
-                .append(expirationDate)
                 .append(", description = ")
                 .append(description)
                 .append('}')
@@ -150,10 +120,8 @@ public class Menu extends AbstractEntity {
         private FoodType type;
         private BigDecimal price;
         private int quantityInStock;
-        private LocalDate productionDate;
-        private LocalDate expirationDate;
         private String description;
-        private Image foodImage;
+        private String image;
 
         public MenuBuilder setId(long id) {
             this.id = id;
@@ -180,23 +148,13 @@ public class Menu extends AbstractEntity {
             return this;
         }
 
-        public MenuBuilder setProductionDate(LocalDate productionDate) {
-            this.productionDate = productionDate;
-            return this;
-        }
-
-        public MenuBuilder setExpirationDate(LocalDate expirationDate) {
-            this.expirationDate = expirationDate;
-            return this;
-        }
-
         public MenuBuilder setDescription(String description) {
             this.description = description;
             return this;
         }
 
-        public MenuBuilder setFoodImage(Image foodImage) {
-            this.foodImage = foodImage;
+        public MenuBuilder setFoodImage(String image) {
+            this.image = image;
             return this;
         }
 
