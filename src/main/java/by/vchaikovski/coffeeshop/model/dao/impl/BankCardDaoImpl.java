@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class BankCardDaoImpl implements BankCardDao {
     private static final BankCardDaoImpl instance = new BankCardDaoImpl();
-    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
+    private static final MapperProvider mapperProvider = MapperProvider.getInstance();
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String UPDATE_MESSAGE = "The query \"update bankCard with id=";
     private static final String FIND_ALL_CARDS = "SELECT card_id, number, card_expiration_date, amount FROM cards";
@@ -41,7 +41,7 @@ public class BankCardDaoImpl implements BankCardDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_CARDS)) {
             while (resultSet.next()) {
-                BankCard card = MAPPER_PROVIDER.getBankCardMapper().createEntity(resultSet);
+                BankCard card = mapperProvider.getBankCardMapper().createEntity(resultSet);
                 cards.add(card);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -59,7 +59,7 @@ public class BankCardDaoImpl implements BankCardDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_CARDS + FIND_CARD_BY_ID + id)) {
             if (resultSet.next()) {
-                card = MAPPER_PROVIDER.getBankCardMapper().createEntity(resultSet);
+                card = mapperProvider.getBankCardMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find bankCard by id=" + id + FAILED_MESSAGE;
@@ -77,7 +77,7 @@ public class BankCardDaoImpl implements BankCardDao {
             statement.setString(FIRST_PARAMETER_INDEX, cardNumber);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    card = MAPPER_PROVIDER.getBankCardMapper().createEntity(resultSet);
+                    card = mapperProvider.getBankCardMapper().createEntity(resultSet);
                 }
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -97,7 +97,7 @@ public class BankCardDaoImpl implements BankCardDao {
             statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(expirationDate));
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    card = MAPPER_PROVIDER.getBankCardMapper().createEntity(resultSet);
+                    card = mapperProvider.getBankCardMapper().createEntity(resultSet);
                 }
             }
         } catch (SQLException | ConnectionPoolException e) {

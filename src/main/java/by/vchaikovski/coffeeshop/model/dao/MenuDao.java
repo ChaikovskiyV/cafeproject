@@ -1,43 +1,33 @@
 package by.vchaikovski.coffeeshop.model.dao;
 
+import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MenuDao extends BaseDao<Menu> {
-    List<Menu> findByName(String name);
+    List<Menu> findByName(String name) throws DaoException;
 
-    List<Menu> findByFoodType(Menu.FoodType foodType);
+    List<Menu> findByFoodType(Menu.FoodType foodType) throws DaoException;
 
-    List<Menu> findByPrice(BigDecimal price);
+    List<Menu> findByPrice(BigDecimal price) throws DaoException;
 
-    List<Menu> findByPrice(BigDecimal minPrice, BigDecimal maxPrice);
+    List<Menu> findByPrice(BigDecimal minPrice, BigDecimal maxPrice) throws DaoException;
 
-    List<Menu> findByQuantityInStock(int quantityInStock);
+    List<Menu> findByQuantityInStock(int quantityInStock) throws DaoException;
 
-    List<Menu> findByQuantityInStock(int minQuantity, int maxQuantity);
+    List<Menu> findByQuantityInStock(int minQuantity, int maxQuantity) throws DaoException;
 
-    List<Menu> findByProductionDate (LocalDateTime productionDate);
+    boolean updateMenuName(long id, String name) throws DaoException;
 
-    List<Menu> findByProductionDate (LocalDateTime startPeriod, LocalDateTime endPeriod);
+    boolean updateMenuFoodType(long id, Menu.FoodType foodType) throws DaoException;
 
-    List<Menu> findByExpirationDate(LocalDateTime expirationDate);
+    boolean updateMenuPrice(long id, BigDecimal price) throws DaoException;
 
-    List<Menu> findByExpirationDate(LocalDateTime startPeriod, LocalDateTime endPeriod);
+    boolean updateMenuQuantityInStock(long id, int quantityInStock) throws DaoException;
 
-    List<Menu> findWithOutDescription(); //TODO may be it can be deleted
+    boolean updateMenuDescription(long id, String description) throws DaoException;
 
-    boolean updateMenuName(long id, String name);
-
-    boolean updateMenuFoodType(long id, Menu.FoodType foodType);
-
-    boolean updateMenuPrice(long id, BigDecimal price);
-
-    boolean updateMenuQuantityInStock(long id, int quantityInStock);
-
-    boolean updateMenuProductionDate (long id, LocalDateTime productionDate);
-
-    boolean updateMenuExpirationDate(long id, LocalDateTime expirationDate);
+    boolean updateMenuImage(long id, byte[] image) throws  DaoException;
 }
