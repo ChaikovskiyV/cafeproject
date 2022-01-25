@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class DataValidatorImpl implements DataValidator {
     private static final Logger logger = LogManager.getLogger();
@@ -15,11 +16,15 @@ public class DataValidatorImpl implements DataValidator {
     private static final String PHONE_NUMBER_REGEX = "\\+\\d{12}";
     private static final String NUMBER_REGEX = "\\d{1,5}";
     private static final String STREET_NAME_REGEX = "(.{3,35})(([a-zA-Z]+[-\\s]?[a-zA-Z]+)|([а-яА-Я]+[-\\s]?[а-яА-Я]+))";
-    private static final String HOUSE_NUMBER_REGEX = "[1-9]\\d*\\p{Alpha}?";
+    private static final String HOUSE_NUMBER_REGEX = "[1-9]\\d*\\w?";
     private static final String CARD_NUMBER_REGEX = "\\d{16}";
     private static final String DISCOUNT_RATE_REGEX = "[1-9]\\d?";
     private static final String DATE_REGEX = "202[2-9]-((0[1-9])|(1[0-2]))-((0[1-9])|([12]\\d)|(3[01]))";
     private static final String TIME_REGEX = "\\s?(([01]\\d)|(2[0-3])):[0-5]\\d";
+    private static final String TEXT_REGEX = "^[.&&[^<>]].+";
+    private static final String IMAGE_REGEX = "(jpe?g)|(tiff?)|(bmp)|(png)";
+    private static final String FILENAME_DELIMITER = ".";
+
 
     private static DataValidatorImpl instance;
 
@@ -110,5 +115,16 @@ public class DataValidatorImpl implements DataValidator {
             }
         }
         return result;
+    }
+
+    @Override
+    public boolean isTextValid(String text) {
+        return text !=null && text.strip().matches(TEXT_REGEX);
+    }
+
+    @Override
+    public boolean isPicture(String filePath) {
+        String fileType = filePath.substring(filePath.lastIndexOf(FILENAME_DELIMITER));
+        return fileType.matches(IMAGE_REGEX);
     }
 }

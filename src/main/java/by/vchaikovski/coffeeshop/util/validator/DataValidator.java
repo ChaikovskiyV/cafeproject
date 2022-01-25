@@ -30,4 +30,8 @@ public interface DataValidator {
     boolean isPhoneNumberValid(String phoneNumber);
 
     <T extends Enum<T>> boolean isEnumContains(String value, Class<T> enumClass);
+
+    boolean isTextValid(String text);
+
+    boolean isPicture(String filePath);
 }
