@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public class DiscountDaoImpl implements DiscountDao {
     private static final DiscountDaoImpl instance = new DiscountDaoImpl();
-    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
+    private static final MapperProvider mapperProvider = MapperProvider.getInstance();
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String UPDATE_MESSAGE = "The query \"update discount with id=";
     private static final String FIND_ALL_DISCOUNTS = "SELECT discount_id, discount_type, rate FROM discounts";
@@ -41,7 +41,7 @@ public class DiscountDaoImpl implements DiscountDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DISCOUNTS)) {
             while (resultSet.next()) {
-                Discount discount = MAPPER_PROVIDER.getDiscountMapper().createEntity(resultSet);
+                Discount discount = mapperProvider.getDiscountMapper().createEntity(resultSet);
                 discounts.add(discount);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -59,7 +59,7 @@ public class DiscountDaoImpl implements DiscountDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DISCOUNTS + FIND_DISCOUNT_BY_ID + id)) {
             if (resultSet.next()) {
-                discount = MAPPER_PROVIDER.getDiscountMapper().createEntity(resultSet);
+                discount = mapperProvider.getDiscountMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find discount by id=" + id + FAILED_MESSAGE;
@@ -84,7 +84,7 @@ public class DiscountDaoImpl implements DiscountDao {
             statement.setInt(SECOND_PARAMETER_INDEX, rate);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    discount = MAPPER_PROVIDER.getDiscountMapper().createEntity(resultSet);
+                    discount = mapperProvider.getDiscountMapper().createEntity(resultSet);
                 }
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -103,7 +103,7 @@ public class DiscountDaoImpl implements DiscountDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_DISCOUNT_BY_USER_ID + userId)) {
             if (resultSet.next()) {
-                discount = MAPPER_PROVIDER.getDiscountMapper().createEntity(resultSet);
+                discount = mapperProvider.getDiscountMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find discount by userId=" + userId + FAILED_MESSAGE;

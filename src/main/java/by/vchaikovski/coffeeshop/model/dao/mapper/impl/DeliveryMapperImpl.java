@@ -26,7 +26,7 @@ public class DeliveryMapperImpl implements BaseMapper<Delivery> {
         try {
             long id = resultSet.getLong(DELIVERY_ID);
             Delivery.DeliveryType type = Delivery.DeliveryType.valueOf(resultSet.getString(DELIVERY_TYPE).toUpperCase());
-            LocalDateTime deliveryTime = LocalDateTime.parse(resultSet.getString(DELIVERY_TIME));
+            LocalDateTime deliveryTime = LocalDateTime.parse(resultSet.getTimestamp(DELIVERY_TIME).toString());
             long addressId = resultSet.getLong(ADDRESS_ID);
             delivery = new Delivery(type, deliveryTime, addressId);
             delivery.setId(id);

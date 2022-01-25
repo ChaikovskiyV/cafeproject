@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class DeliveryDaoImpl implements DeliveryDao {
     private static final DeliveryDaoImpl instance = new DeliveryDaoImpl();
-    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
+    private static final MapperProvider mapperProvider = MapperProvider.getInstance();
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String FIND_ALL_DELIVERIES = "SELECT delivery_id, delivery_type, delivery_time FROM deliveries" +
@@ -45,7 +45,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES)) {
             while (resultSet.next()) {
-                Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
+                Delivery delivery = mapperProvider.getDeliveryMapper().createEntity(resultSet);
                 deliveries.add(delivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -63,7 +63,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES + FIND_DELIVERY_BY_ID + id)) {
             if (resultSet.next()) {
-                delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
+                delivery = mapperProvider.getDeliveryMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find all deliveries\" is failed. DataBase connection error.";
@@ -80,7 +80,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES + FIND_DELIVERY_BY_TYPE + deliveryType)) {
             while (resultSet.next()) {
-                Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
+                Delivery delivery = mapperProvider.getDeliveryMapper().createEntity(resultSet);
                 deliveries.add(delivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -98,7 +98,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES + FIND_DELIVERY_BY_ADDRESS + addressDeliveryId)) {
             while (resultSet.next()) {
-                Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
+                Delivery delivery = mapperProvider.getDeliveryMapper().createEntity(resultSet);
                 deliveries.add(delivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -117,7 +117,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES + FIND_DELIVERY_BY_DATE + timeDelivery.format(formatter))) {
             while (resultSet.next()) {
-                Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
+                Delivery delivery = mapperProvider.getDeliveryMapper().createEntity(resultSet);
                 deliveries.add(delivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -138,7 +138,7 @@ public class DeliveryDaoImpl implements DeliveryDao {
             statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(endPeriod.format(formatter)));
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Delivery delivery = MAPPER_PROVIDER.getDeliveryMapper().createEntity(resultSet);
+                    Delivery delivery = mapperProvider.getDeliveryMapper().createEntity(resultSet);
                     deliveries.add(delivery);
                 }
             }

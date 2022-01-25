@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class BillDaoImpl implements BillDao {
     private static final BillDaoImpl instance = new BillDaoImpl();
-    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
+    private static final MapperProvider mapperProvider = MapperProvider.getInstance();
     private static final String UPDATE_MESSAGE = "The query \"update bill with id=";
     private static final String FIND_ALL_BILLS = "SELECT bill_id, total_price, bill_status, payment_date FROM bills";
     private static final String FIND_BILL_BY_ID = " WHERE bill_id=";
@@ -45,7 +45,7 @@ public class BillDaoImpl implements BillDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_BILLS)) {
             while (resultSet.next()) {
-                Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                Bill bill = mapperProvider.getBillMapper().createEntity(resultSet);
                 bills.add(bill);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -63,7 +63,7 @@ public class BillDaoImpl implements BillDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_BILLS + FIND_BILL_BY_ID + id)) {
             if (resultSet.next()) {
-                bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                bill = mapperProvider.getBillMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find a bill by id=" + id + FAILED_MESSAGE;
@@ -81,7 +81,7 @@ public class BillDaoImpl implements BillDao {
             statement.setString(FIRST_PARAMETER_INDEX, billStatus.name());
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                    Bill bill = mapperProvider.getBillMapper().createEntity(resultSet);
                     bills.add(bill);
                 }
             }
@@ -102,7 +102,7 @@ public class BillDaoImpl implements BillDao {
             statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(paymentDate.format(timeFormatter)));
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                    Bill bill = mapperProvider.getBillMapper().createEntity(resultSet);
                     bills.add(bill);
                 }
             }
@@ -124,7 +124,7 @@ public class BillDaoImpl implements BillDao {
             statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(endPeriod.format(timeFormatter)));
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                    Bill bill = mapperProvider.getBillMapper().createEntity(resultSet);
                     bills.add(bill);
                 }
             }
@@ -146,7 +146,7 @@ public class BillDaoImpl implements BillDao {
             statement.setBigDecimal(SECOND_PARAMETER_INDEX, maxPrice);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Bill bill = MAPPER_PROVIDER.getBillMapper().createEntity(resultSet);
+                    Bill bill = mapperProvider.getBillMapper().createEntity(resultSet);
                     bills.add(bill);
                 }
             }
@@ -218,7 +218,7 @@ public class BillDaoImpl implements BillDao {
              PreparedStatement statement = connection.prepareStatement(CREATE_BILL, Statement.RETURN_GENERATED_KEYS)) {
             statement.setBigDecimal(FIRST_PARAMETER_INDEX, bill.getTotalPrice());
             statement.setString(SECOND_PARAMETER_INDEX, bill.getStatus().name());
-            statement.setDate(THIRD_PARAMETER_INDEX, Date.valueOf(bill.getPaymentDate().toLocalDate()));
+            statement.setTimestamp(THIRD_PARAMETER_INDEX, Timestamp.valueOf(bill.getPaymentDate().toString()));
             statement.executeUpdate();
             try (ResultSet resultSet = statement.getGeneratedKeys()) {
                 long billId = 0;

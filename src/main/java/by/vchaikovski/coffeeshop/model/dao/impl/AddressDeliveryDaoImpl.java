@@ -14,7 +14,7 @@ import java.util.Optional;
 
 public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
     private static final AddressDeliveryDaoImpl instance = new AddressDeliveryDaoImpl();
-    private static final MapperProvider MAPPER_PROVIDER = MapperProvider.getInstance();
+    private static final MapperProvider mapperProvider = MapperProvider.getInstance();
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String UPDATE_MESSAGE = "The query \"update addressDelivery with id=";
     private static final String FIND_ALL = "SELECT address_id, street_name, house_number, building_number, " +
@@ -43,7 +43,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL)) {
             while (resultSet.next()) {
-                AddressDelivery addressDelivery = MAPPER_PROVIDER.getAddressDeliveryMapper().createEntity(resultSet);
+                AddressDelivery addressDelivery = mapperProvider.getAddressDeliveryMapper().createEntity(resultSet);
                 addressDeliveries.add(addressDelivery);
             }
         } catch (SQLException | ConnectionPoolException e) {
@@ -62,7 +62,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
              ResultSet resultSet = statement.executeQuery(FIND_ALL + FIND_ADDRESS_BY_ID + id)) {
 
             if (resultSet.next()) {
-                addressDelivery = MAPPER_PROVIDER.getAddressDeliveryMapper().createEntity(resultSet);
+                addressDelivery = mapperProvider.getAddressDeliveryMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find delivery by id=" + id + FAILED_MESSAGE;
@@ -80,7 +80,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
             statement.setString(FIRST_PARAMETER_INDEX, streetName);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    AddressDelivery addressDelivery = MAPPER_PROVIDER.getAddressDeliveryMapper().createEntity(resultSet);
+                    AddressDelivery addressDelivery = mapperProvider.getAddressDeliveryMapper().createEntity(resultSet);
                     addressDeliveries.add(addressDelivery);
                 }
             }

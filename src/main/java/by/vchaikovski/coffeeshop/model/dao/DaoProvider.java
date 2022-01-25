@@ -3,47 +3,63 @@ package by.vchaikovski.coffeeshop.model.dao;
 import by.vchaikovski.coffeeshop.model.dao.impl.*;
 
 public class DaoProvider {
-    private static final DaoProvider instance = new DaoProvider();
-    private static final AddressDeliveryDaoImpl addressDeliveryDao = AddressDeliveryDaoImpl.getInstance();
-    private static final BankCardDaoImpl bankCardDao = BankCardDaoImpl.getInstance();
-    private static final BillDaoImpl billDao = BillDaoImpl.getInstance();
-    private static final DeliveryDaoImpl deliveryDao = DeliveryDaoImpl.getInstance();
-    private static final DiscountDaoImpl discountDao = DiscountDaoImpl.getInstance();
-    private static final OrderDaoImpl orderDao = OrderDaoImpl.getInstance();
-    private static final UserDaoImpl userDao = UserDaoImpl.getInstance();
+    private static DaoProvider instance = new DaoProvider();
+    private final AddressDeliveryDao addressDeliveryDao;
+    private final BankCardDao bankCardDao;
+    private final BillDao billDao;
+    private final DeliveryDao deliveryDao;
+    private final DiscountDao discountDao;
+    private final OrderDao orderDao;
+    private final UserDao userDao;
+    private final MenuDao menuDao;
 
     private DaoProvider() {
+        addressDeliveryDao = AddressDeliveryDaoImpl.getInstance();
+        bankCardDao = BankCardDaoImpl.getInstance();
+        billDao = BillDaoImpl.getInstance();
+        deliveryDao = DeliveryDaoImpl.getInstance();
+        discountDao = DiscountDaoImpl.getInstance();
+        menuDao = MenuDaoImpl.getInstance();
+        orderDao = OrderDaoImpl.getInstance();
+        userDao = UserDaoImpl.getInstance();
     }
 
     public static DaoProvider getInstance() {
+        if(instance == null) {
+            instance = new DaoProvider();
+        }
         return instance;
     }
 
-    public AddressDeliveryDaoImpl getAddressDeliveryDao() {
+    public AddressDeliveryDao getAddressDeliveryDao() {
         return addressDeliveryDao;
     }
 
-    public BankCardDaoImpl getBankCardDao() {
+    public BankCardDao getBankCardDao() {
         return bankCardDao;
     }
 
-    public BillDaoImpl getBillDao() {
+    public BillDao getBillDao() {
         return billDao;
     }
 
-    public DeliveryDaoImpl getDeliveryDao() {
+    public DeliveryDao getDeliveryDao() {
         return deliveryDao;
     }
 
-    public DiscountDaoImpl getDiscountDao() {
+    public DiscountDao getDiscountDao() {
         return discountDao;
     }
 
-    public OrderDaoImpl getOrderDao() {
+    public OrderDao getOrderDao() {
         return orderDao;
     }
 
-    public UserDaoImpl getUserDao() {
+    public UserDao getUserDao() {
         return userDao;
+    }
+
+    public MenuDao getMenuDao() {
+        return menuDao;
     }
 }

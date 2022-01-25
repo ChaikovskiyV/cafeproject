@@ -1,7 +1,7 @@
 package by.vchaikovski.coffeeshop.model.dao;
 
-import by.vchaikovski.coffeeshop.model.entity.Bill;
 import by.vchaikovski.coffeeshop.exception.DaoException;
+import by.vchaikovski.coffeeshop.model.entity.Bill;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

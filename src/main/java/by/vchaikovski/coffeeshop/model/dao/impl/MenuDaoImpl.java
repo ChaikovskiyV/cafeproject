@@ -40,6 +40,17 @@ public class MenuDaoImpl implements MenuDao {
     private static final String UPDATE_MENU_QUANTITY_IN_STOCK = "UPDATE menu SET quantity_in_stock=? WHERE menu_id=?";
     private static final String UPDATE_MENU_IMAGE = "UPDATE menu SET image=? WHERE menu_id=?";
     private static final String DELETE_MENU_BY_ID = "DELETE FROM menu WHERE menu_id=";
+    private static MenuDao instance;
+
+    private MenuDaoImpl() {
+    }
+
+    public static MenuDao getInstance() {
+        if(instance == null) {
+            instance = new MenuDaoImpl();
+        }
+        return instance;
+    }
 
     @Override
     public List<Menu> findAll() throws DaoException {

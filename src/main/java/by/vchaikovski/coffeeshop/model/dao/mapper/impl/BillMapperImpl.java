@@ -27,7 +27,7 @@ public class BillMapperImpl implements BaseMapper<Bill> {
             long id = resultSet.getLong(BILL_ID);
             BigDecimal totalPrice = resultSet.getBigDecimal(BILL_TOTAL_PRICE);
             Bill.BillStatus status = Bill.BillStatus.valueOf(resultSet.getString(BILL_STATUS).toUpperCase());
-            LocalDateTime date = LocalDateTime.parse(resultSet.getDate(BILL_PAYMENT_DATE).toString());
+            LocalDateTime date = LocalDateTime.parse(resultSet.getTimestamp(BILL_PAYMENT_DATE).toString());
             bill = new Bill(status, date, totalPrice);
             bill.setId(id);
         } catch (SQLException e) {
