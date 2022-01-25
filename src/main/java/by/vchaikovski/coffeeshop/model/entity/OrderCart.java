@@ -1,12 +1,17 @@
 package by.vchaikovski.coffeeshop.model.entity;
 
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 public class OrderCart extends AbstractEntity {
-    private final Map<Menu, Integer> cart;
+    private Map<Menu, Integer> cart;
+    private long orderId;
+
+    public OrderCart(long orderId, Map<Menu, Integer> cart) {
+        this.orderId = orderId;
+        this.cart = cart != null ? cart : new HashMap<>();
+    }
 
     @Override
     public void setId(long id) {
@@ -18,52 +23,21 @@ public class OrderCart extends AbstractEntity {
         throw new UnsupportedOperationException("The getId() method is not supported.");
     }
 
-    public OrderCart() {
-        cart = new HashMap<>();
-    }
-
     public Map<Menu, Integer> getCart() {
         return cart;
     }
 
-    public void addProduct(Menu menu, int quantity) {
-        if (cart.containsKey(menu)) {
-            int number = cart.get(menu);
-            cart.put(menu, number + quantity);
-        } else {
-            cart.put(menu, quantity);
-        }
+    public void setCart(Map<Menu, Integer> cart) {
+        this.cart = cart;
     }
 
-    public void reduceNumber(Menu menu, int quantity) {
-        if (cart.containsKey(menu)) {
-            int number = cart.get(menu);
-            if (number > quantity) {
-                cart.put(menu, number - quantity);
-            } else {
-                cart.remove(menu);
-            }
-        }
+    public long getOrderId() {
+        return orderId;
     }
 
-    public void deleteProduct(Menu menu) {
-        cart.remove(menu);
+    public void setOrderId(long orderId) {
+        this.orderId = orderId;
     }
-
-    public void clearCart() {
-        cart.clear();
-    }
-
-    public BigDecimal findTotalPrice() {
-        BigDecimal totalPrice = new BigDecimal(0);
-        cart.forEach((k, v) -> totalPrice.add(k.getPrice().multiply(new BigDecimal(v))));
-
-        return totalPrice;
-    }
-
-    public long findProductsNumber() { // TODO review this method
-        return cart.values().stream().count();
-    } //TODO check this method
 
     @Override
     public boolean equals(Object o) {
@@ -71,24 +45,28 @@ public class OrderCart extends AbstractEntity {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         OrderCart orderCart = (OrderCart) o;
-        return cart.equals(orderCart.cart);
+        return cart.equals(orderCart.cart) && orderId == orderCart.orderId;
     }
 
     @Override
     public int hashCode() {
         int first = 31;
-        return first * cart.hashCode();
+        int result = first + (int) orderId;
+        result = result * cart.hashCode();
+        return result;
     }
 
     @Override
     public String toString() {
-        StringBuffer sB = new StringBuffer("OrderCart{");
-        cart.forEach((k, v) -> sB.append(k)
+        StringBuffer orderCart = new StringBuffer("OrderCart{")
+                .append("id =")
+                .append(orderId);
+        cart.forEach((k, v) -> orderCart.append(k)
                 .append(", quantity=")
                 .append(v)
                 .append(", "));
-        sB.append('}');
+        orderCart.append('}');
 
-        return sB.toString();
+        return orderCart.toString();
     }
 }
