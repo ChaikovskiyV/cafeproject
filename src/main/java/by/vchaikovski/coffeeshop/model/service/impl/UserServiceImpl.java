@@ -4,7 +4,7 @@ import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
 import by.vchaikovski.coffeeshop.model.dao.DiscountDao;
-import by.vchaikovski.coffeeshop.model.dao.impl.UserDaoImpl;
+import by.vchaikovski.coffeeshop.model.dao.UserDao;
 import by.vchaikovski.coffeeshop.model.entity.Discount;
 import by.vchaikovski.coffeeshop.model.entity.User;
 import by.vchaikovski.coffeeshop.model.service.UserService;
@@ -26,7 +26,7 @@ import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
 public class UserServiceImpl implements UserService {
     private static final Logger logger = LogManager.getLogger();
     private static UserServiceImpl instance;
-    private final UserDaoImpl userDao;
+    private final UserDao userDao;
 
     private UserServiceImpl() {
         userDao = DaoProvider.getInstance().getUserDao();

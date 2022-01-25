@@ -1,16 +1,22 @@
 package by.vchaikovski.coffeeshop.model.service;
 
-import by.vchaikovski.coffeeshop.model.service.impl.BankCardServiceImpl;
-import by.vchaikovski.coffeeshop.model.service.impl.OrderServiceImpl;
-import by.vchaikovski.coffeeshop.model.service.impl.UserServiceImpl;
+import by.vchaikovski.coffeeshop.model.service.impl.*;
 
 public class ServiceProvider {
     private static ServiceProvider instance;
-    private static UserService userService = UserServiceImpl.getInstance();
-    private static BankCardService bankCardService = BankCardServiceImpl.getInstance();
-    private static OrderService orderService = OrderServiceImpl.getInstance();
+    private final UserService userService;
+    private final BankCardService bankCardService;
+    private final OrderService orderService;
+    private final DeliveryService deliveryService;
+    private final DiscountService discountService;
+
 
     private ServiceProvider() {
+        userService = UserServiceImpl.getInstance();
+        bankCardService = BankCardServiceImpl.getInstance();
+        orderService = OrderServiceImpl.getInstance();
+        deliveryService = DeliveryServiceImpl.getInstance();
+        discountService = DiscountServiceImpl.getInstance();
     }
 
     public static ServiceProvider getInstance() {
@@ -30,5 +36,13 @@ public class ServiceProvider {
 
     public OrderService getOrderService() {
         return orderService;
+    }
+
+    public DeliveryService getDeliveryService() {
+        return deliveryService;
+    }
+
+    public DiscountService getDiscountService() {
+        return discountService;
     }
 }

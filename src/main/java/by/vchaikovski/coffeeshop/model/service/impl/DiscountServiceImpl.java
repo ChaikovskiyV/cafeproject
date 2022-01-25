@@ -15,7 +15,7 @@ import java.util.Optional;
 public class DiscountServiceImpl implements DiscountService {
     private static final Logger logger = LogManager.getLogger();
     private static DiscountService instance;
-    private DiscountDao discountDao;
+    private final DiscountDao discountDao;
 
     private DiscountServiceImpl() {
         discountDao = DaoProvider.getInstance().getDiscountDao();
@@ -71,7 +71,7 @@ public class DiscountServiceImpl implements DiscountService {
     public boolean updateDiscountType(long id, Discount.DiscountType discountType) throws ServiceException {
         boolean result;
         try {
-            result = discountDao != null && discountDao.updateDiscountType(id, discountType);
+            result = discountType != null && discountDao.updateDiscountType(id, discountType);
         } catch (DaoException e) {
             String message = "Discount can't be updated by type " + discountType;
             logger.error(message, e);
@@ -84,7 +84,7 @@ public class DiscountServiceImpl implements DiscountService {
     public boolean updateDiscountRate(long id, int rate) throws ServiceException {
         boolean result;
         try {
-            result = discountDao != null && discountDao.updateDiscountRate(id, rate);
+            result = discountDao.updateDiscountRate(id, rate);
         } catch (DaoException e) {
             String message = "Discount can't be updated by discount rate " + rate;
             logger.error(message, e);

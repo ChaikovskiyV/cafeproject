@@ -2,8 +2,8 @@ package by.vchaikovski.coffeeshop.model.service.impl;
 
 import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.exception.ServiceException;
+import by.vchaikovski.coffeeshop.model.dao.BankCardDao;
 import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
-import by.vchaikovski.coffeeshop.model.dao.impl.BankCardDaoImpl;
 import by.vchaikovski.coffeeshop.model.entity.BankCard;
 import by.vchaikovski.coffeeshop.model.service.BankCardService;
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
@@ -24,7 +24,7 @@ import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
 public class BankCardServiceImpl implements BankCardService {
     private static final Logger logger = LogManager.getLogger();
     private static BankCardServiceImpl instance = new BankCardServiceImpl();
-    private final BankCardDaoImpl cardDao;
+    private final BankCardDao cardDao;
 
     private BankCardServiceImpl() {
         cardDao = DaoProvider.getInstance().getBankCardDao();

@@ -5,20 +5,28 @@ import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
 import by.vchaikovski.coffeeshop.model.dao.OrderDao;
 import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
+import by.vchaikovski.coffeeshop.model.entity.OrderCart;
 import by.vchaikovski.coffeeshop.model.service.OrderService;
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
 import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class OrderServiceImpl implements OrderService {
     private static final Logger logger = LogManager.getLogger();
+    private static final String DATA_TIME_FORMAT = "yyyy-MM-dd HH:ss";
     private static OrderServiceImpl instance;
+    private final OrderDao orderDao;
 
     private OrderServiceImpl() {
+        orderDao = DaoProvider.getInstance().getOrderDao();
     }
 
     public static OrderServiceImpl getInstance() {
@@ -29,8 +37,51 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public long createOrder(Map<String, String> orderParameters) {
+        return 0;
+    }
+
+    @Override
+    public boolean deleteOrderById(long id) throws ServiceException {
+        boolean result;
+        try {
+            result = orderDao.deleteById(id);
+        } catch (DaoException e) {
+            String message = "FoodOrder can't be deleted by id=" + id;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<FoodOrder> findAllOrders() throws ServiceException {
+        List<FoodOrder> orders;
+            try {
+                orders = orderDao.findAll();
+            } catch (DaoException e) {
+                String message = "FoodOrders can't be found";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        return orders;
+    }
+
+    @Override
+    public Optional<FoodOrder> findOrderById(long orderId) throws ServiceException {
+        Optional<FoodOrder> optionalOrder;
+        try {
+            optionalOrder = orderDao.findById(orderId);
+        } catch (DaoException e) {
+            String message = "FoodOrder can't be found by id=" + orderId;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return optionalOrder;
+    }
+
+    @Override
     public List<FoodOrder> findOrderByStatus(String orderStatus) throws ServiceException {
-        OrderDao orderDao = DaoProvider.getInstance().getOrderDao();
         DataValidator validator = DataValidatorImpl.getInstance();
         List<FoodOrder> orders = new ArrayList<>();
         if (validator.isEnumContains(orderStatus, FoodOrder.OrderStatus.class)) {
@@ -44,5 +95,164 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return orders;
+    }
+
+    @Override
+    public List<FoodOrder> findOrderByCreationDate(String creationDate) throws ServiceException {
+        List<FoodOrder> orders = new ArrayList<>();
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if(validator.isDateTimeValid(creationDate)) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_TIME_FORMAT);
+            try {
+                orders = orderDao.findByCreationDate(LocalDateTime.parse(creationDate, formatter));
+            } catch (DaoException e) {
+                String message = "FoodOrders can't be found by creation date=" + creationDate;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public List<FoodOrder> findOrderByCreationPeriod(String startPeriod, String endPeriod) throws ServiceException {
+        List<FoodOrder> orders = new ArrayList<>();
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if(validator.isDateTimeValid(startPeriod) && validator.isDateTimeValid(endPeriod)) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_TIME_FORMAT);
+            try {
+                LocalDateTime start = LocalDateTime.parse(startPeriod, formatter);
+                LocalDateTime finish = LocalDateTime.parse(endPeriod, formatter);
+                orders = orderDao.findByCreationDate(start, finish);
+            } catch (DaoException e) {
+                String message = "FoodOrders can't be found by creation period=" + startPeriod + " - " + endPeriod;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public List<FoodOrder> findOrderByEvaluation(String orderEvaluation) throws ServiceException {
+        List<FoodOrder> orders = new ArrayList<>();
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if(validator.isEnumContains(orderEvaluation, FoodOrder.OrderEvaluation.class)) {
+            try {
+                orders = orderDao.findByEvaluation(FoodOrder.OrderEvaluation.valueOf(orderEvaluation.toUpperCase()));
+            } catch (DaoException e) {
+                String message = "FoodOrders can't be found by evaluation=" + orderEvaluation;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public List<FoodOrder> findOrderByDeliveryId(long deliveryId) throws ServiceException {
+        List<FoodOrder> orders;
+            try {
+                orders = orderDao.findByDelivery(deliveryId);
+            } catch (DaoException e) {
+                String message = "FoodOrders can't be found by delivery id=" + deliveryId;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        return orders;
+    }
+
+    @Override
+    public List<FoodOrder> findOrderByBillId(long billId) throws ServiceException {
+        List<FoodOrder> orders;
+        try {
+            orders = orderDao.findByBill(billId);
+        } catch (DaoException e) {
+            String message = "FoodOrders can't be found by bill id=" + billId;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return orders;
+    }
+
+    @Override
+    public List<FoodOrder> findOrderByUserId(long userId) throws ServiceException {
+        List<FoodOrder> orders;
+        try {
+            orders = orderDao.findByUser(userId);
+        } catch (DaoException e) {
+            String message = "FoodOrders can't be found by user id=" + userId;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return orders;
+    }
+
+    @Override
+    public boolean updateOrder(long id, FoodOrder order) {
+        return false;
+    }
+
+    @Override
+    public boolean updateOrderStatus(long id, String orderStatus) throws ServiceException {
+        boolean result = false;
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if(validator.isEnumContains(orderStatus, FoodOrder.OrderStatus.class)) {
+            try {
+                result = orderDao.updateOrderStatus(id, FoodOrder.OrderStatus.valueOf(orderStatus));
+            } catch (DaoException e) {
+                String message = "FoodOrders can't be updated by order status=" + orderStatus;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean updateGoodsNumberInCart(long id, String goodsNumber) throws ServiceException {
+        boolean result = false;
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if(validator.isNumberValid(goodsNumber)) {
+            try {
+                result = orderDao.updateGoodsNumberInCart(id, Integer.parseInt(goodsNumber));
+            } catch (DaoException e) {
+                String message = "Goods number in cart can't be updated";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public int createOrderCart(OrderCart orderCart, long orderId) {
+        return 0;
+    }
+
+    @Override
+    public boolean deleteOrderCartByOrderId(long orderId) throws ServiceException {
+        boolean result;
+        try {
+            result = orderDao.deleteOrderCartByOrderId(orderId);
+        } catch (DaoException e) {
+            String message = "Order cart can't be deleted by order id=" + orderId;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean deleteOrderCartByOrderIdAndMenuId(long orderId, long menuId) throws ServiceException {
+        boolean result;
+        try {
+            result = orderDao.deleteOrderCartByOrderIdAndMenuId(orderId, menuId);
+        } catch (DaoException e) {
+            String message = "Order cart can't be deleted by order id=" + orderId + " and menu id=" + menuId;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return result;
     }
 }
