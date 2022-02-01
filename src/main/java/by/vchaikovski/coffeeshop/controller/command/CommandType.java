@@ -1,12 +1,12 @@
 package by.vchaikovski.coffeeshop.controller.command;
 
-import by.vchaikovski.coffeeshop.controller.command.impl.ChangeLocaleCommand;
+import by.vchaikovski.coffeeshop.controller.command.impl.common.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.DefaultCommand;
-import by.vchaikovski.coffeeshop.controller.command.impl.user.guest.SignInCommand;
+import by.vchaikovski.coffeeshop.controller.command.impl.go.*;
+import by.vchaikovski.coffeeshop.controller.command.impl.user.barista.ChangeOrderStatusCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.SignOutCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.card.*;
-import by.vchaikovski.coffeeshop.controller.command.impl.go.GoToCardInfoCommand;
-import by.vchaikovski.coffeeshop.controller.command.impl.go.GoToRegistrationCardCommand;
+import by.vchaikovski.coffeeshop.controller.command.impl.user.client.*;
 import by.vchaikovski.coffeeshop.model.entity.User;
 
 import java.util.List;
@@ -14,16 +14,34 @@ import static by.vchaikovski.coffeeshop.model.entity.User.Role.*;
 
 public enum CommandType {
     DEFAULT(new DefaultCommand(), List.of(ADMIN, BARISTA, CLIENT, GUEST)),
-    LOG_IN(new SignInCommand(), List.of(GUEST)),
-    LOG_OUT(new SignOutCommand(), List.of(ADMIN, BARISTA, CLIENT)),
-    TOP_UP_CARD_BALANCE(new TopUpCardBalanceCommand(), List.of(CLIENT)),
-    PAYMENT(new PaymentCommand(), List.of(CLIENT)),
-    REGISTRATION_NEW_CARD(new RegistrationNewCardCommand(), List.of(CLIENT)),
-    DELETE_BANK_CARD(new DeleteBankCardCommand(), List.of(CLIENT)),
-    FIND_BANK_CARD(new FindBankCardCommand(), List.of(CLIENT)),
+    SIGN_IN(new SignInCommand(), List.of(GUEST)),
     CHANGE_LOCALE(new ChangeLocaleCommand(), List.of(ADMIN, BARISTA, CLIENT, GUEST)),
-    GO_TO_REGISTRATION_CARD(new GoToRegistrationCardCommand(), List.of(CLIENT)),
-    GO_TO_CARD_INFO(new GoToCardInfoCommand(), List.of(CLIENT))
+    GO_TO_MAIN(new GoToMainCommand(), List.of(ADMIN, BARISTA, CLIENT, GUEST)),
+    GO_TO_ABOUT(new GoToAboutCommand(), List.of(ADMIN, BARISTA, CLIENT, GUEST)),
+    GO_TO_SIGN_UP(new GoToSignUpCommand(), List.of(GUEST, ADMIN)),
+    SIGN_UP_NEW_USER(new SignUpNewUserCommand(), List.of(GUEST, ADMIN)),
+    SHOW_MENU(new ShowMenuCommand(), List.of(ADMIN, BARISTA, CLIENT, GUEST)),
+    SHOW_MENU_INFO(new ShowMenuInfoCommand(), List.of(ADMIN, BARISTA, CLIENT, GUEST)),
+
+    SIGN_OUT(new SignOutCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    GO_TO_REGISTRATION_CARD(new GoToRegistrationCardCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    GO_TO_CARD_INFO(new GoToCardInfoCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    REGISTRATION_NEW_CARD(new RegistrationNewCardCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    FIND_BANK_CARD(new FindBankCardCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    DELETE_BANK_CARD(new DeleteBankCardCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    TOP_UP_CARD_BALANCE(new TopUpCardBalanceCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    PAY(new PayCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    GO_TO_CART(new GoToCartCommand(), List.of(CLIENT)),
+    ADD_TO_CART(new AddToCartCommand(), List.of(CLIENT)),
+    DELETE_FROM_CART(new DeleteFromCartCommand(), List.of(CLIENT)),
+    INCREASE_QUANTITY_IN_CART(new IncreaseQuantityInCartCommand(), List.of(CLIENT)),
+    REDUCE_QUANTITY_IN_CART(new ReduceQuantityInCartCommand(), List.of(CLIENT)),
+    GO_TO_USER_PROFILE(new GoToUserProfileCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    UPDATE_USER_DATA(new UpdateUserDataCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+
+
+    CHANGE_ORDER_STATUS(new ChangeOrderStatusCommand(), List.of(ADMIN, BARISTA)),
+
     ;
     private BaseCommand command;
     private List<User.Role> usersRole;

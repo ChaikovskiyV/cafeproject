@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.controller.command.impl.user.guest;
+package by.vchaikovski.coffeeshop.controller.command.impl.common;
 
 import by.vchaikovski.coffeeshop.controller.Router;
 import by.vchaikovski.coffeeshop.controller.command.BaseCommand;
@@ -79,26 +79,23 @@ public class SignUpNewUserCommand implements BaseCommand {
         for (Map.Entry<String, String> param : userParameters.entrySet()) {
             String key = param.getKey();
             String value = param.getValue();
-            switch (value) {
-                case NOT_UNIQUE_MEANING -> {
-                    switch (key) {
-                        case LOGIN -> request.setAttribute(LOGIN_CHECK, value);
-                        case EMAIL -> request.setAttribute(EMAIL_CHECK, value);
-                        case PHONE_NUMBER -> request.setAttribute(PHONE_NUMBER_CHECK, value);
-                    }
-                }
-                case WRONG_MEANING -> {
-                    switch (key) {
-                        case LOGIN -> request.setAttribute(LOGIN_CHECK, value);
-                        case EMAIL -> request.setAttribute(EMAIL_CHECK, value);
-                        case PHONE_NUMBER -> request.setAttribute(PHONE_NUMBER_CHECK, value);
-                        case FIRST_NAME -> request.setAttribute(FIRST_NAME_CHECK, value);
-                        case LAST_NAME -> request.setAttribute(LAST_NAME_CHECK, value);
-                        case PASSWORD -> request.setAttribute(PASSWORD_CHECK, value);
-                    }
-                }
-                default -> logger.debug(() -> key + " is correct");
+            if (value.equals(NOT_UNIQUE_MEANING) || value.equals(WRONG_MEANING)) {
+                fillWrongAttr(key, value, request);
+            } else {
+                logger.debug(() -> key + " is correct");
             }
+        }
+    }
+
+    private void fillWrongAttr(String attrName, String attrMeaning, HttpServletRequest request) {
+        switch (attrName) {
+            case LOGIN -> request.setAttribute(LOGIN_CHECK, attrMeaning);
+            case EMAIL -> request.setAttribute(EMAIL_CHECK, attrMeaning);
+            case PHONE_NUMBER -> request.setAttribute(PHONE_NUMBER_CHECK, attrMeaning);
+            case FIRST_NAME -> request.setAttribute(FIRST_NAME_CHECK, attrMeaning);
+            case LAST_NAME -> request.setAttribute(LAST_NAME_CHECK, attrMeaning);
+            case PASSWORD -> request.setAttribute(PASSWORD_CHECK, attrMeaning);
+            default -> logger.debug(() -> "Uncheckable parameter: " + attrName);
         }
     }
 }

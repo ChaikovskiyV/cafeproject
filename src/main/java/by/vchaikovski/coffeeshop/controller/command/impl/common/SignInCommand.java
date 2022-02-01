@@ -1,8 +1,9 @@
-package by.vchaikovski.coffeeshop.controller.command.impl.user.guest;
+package by.vchaikovski.coffeeshop.controller.command.impl.common;
 
 import by.vchaikovski.coffeeshop.controller.Router;
 import by.vchaikovski.coffeeshop.controller.command.BaseCommand;
 import by.vchaikovski.coffeeshop.controller.command.PagePath;
+import by.vchaikovski.coffeeshop.exception.CommandException;
 import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.entity.User;
 import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
@@ -23,11 +24,11 @@ public class SignInCommand implements BaseCommand {
     private static final Logger logger = LogManager.getLogger();
 
     @Override
-    public Router execute(HttpServletRequest request) {
+    public Router execute(HttpServletRequest request) throws CommandException {
         UserService userService = ServiceProvider.getInstance().getUserService();
         String login = request.getParameter(LOGIN);
         String password = request.getParameter(PASSWORD);
-        Router router = null;
+        Router router;
         try {
             Optional<User> optionalUser = userService.findUserByLoginAndPassword(login, password);
             if (optionalUser.isPresent()) {
@@ -41,7 +42,9 @@ public class SignInCommand implements BaseCommand {
                 router = new Router(PagePath.LOG_IN_PAGE);
             }
         } catch (ServiceException e) {
-            e.printStackTrace();
+            String message = "Sing in command can't be executed";
+            logger.error(message, e);
+            throw new CommandException(message, e);
         }
         return router;
     }

@@ -44,14 +44,7 @@ public class RegistrationNewCardCommand implements BaseCommand {
                     switch (value) {
                         case NOT_UNIQUE_MEANING -> request.setAttribute(CARD_NUMBER_CHECK, value);
                         case DATE_EXPIRED -> request.setAttribute(CARD_DATE_CHECK, value);
-                        case WRONG_MEANING -> {
-                            switch (key) {
-                                case CARD_NUMBER -> request.setAttribute(CARD_NUMBER_CHECK, value);
-                                case CARD_EXPIRATION_DATE -> request.setAttribute(CARD_DATE_CHECK, value);
-                                case CARD_AMOUNT -> request.setAttribute(CARD_AMOUNT_CHECK, value);
-                                default -> logger.info(() -> "Unknown attribute: " + key);
-                            }
-                        }
+                        case WRONG_MEANING -> setWrongAttribute(key, value, request);
                         default -> logger.debug(() -> key + " is correct");
                     }
                 }
@@ -64,5 +57,14 @@ public class RegistrationNewCardCommand implements BaseCommand {
             throw new CommandException(message, e);
         }
         return new Router(REGISTRATION_CARD_PAGE);
+    }
+
+    private void setWrongAttribute(String key, String value, HttpServletRequest request) {
+        switch (key) {
+            case CARD_NUMBER -> request.setAttribute(CARD_NUMBER_CHECK, value);
+            case CARD_EXPIRATION_DATE -> request.setAttribute(CARD_DATE_CHECK, value);
+            case CARD_AMOUNT -> request.setAttribute(CARD_AMOUNT_CHECK, value);
+            default -> logger.info(() -> "Unknown attribute: " + key);
+        }
     }
 }

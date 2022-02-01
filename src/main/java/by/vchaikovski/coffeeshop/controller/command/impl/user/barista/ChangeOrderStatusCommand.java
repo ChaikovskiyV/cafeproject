@@ -5,16 +5,13 @@ import by.vchaikovski.coffeeshop.controller.command.BaseCommand;
 import by.vchaikovski.coffeeshop.controller.command.PagePath;
 import by.vchaikovski.coffeeshop.exception.CommandException;
 import by.vchaikovski.coffeeshop.exception.ServiceException;
-import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
 import by.vchaikovski.coffeeshop.model.service.OrderService;
 import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
-
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.ORDER_LIST;
+import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.ORDER_ID;
 import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.ORDER_STATUS;
 
 public class ChangeOrderStatusCommand implements BaseCommand {
@@ -24,11 +21,9 @@ public class ChangeOrderStatusCommand implements BaseCommand {
     public Router execute(HttpServletRequest request) throws CommandException {
         OrderService orderService = ServiceProvider.getInstance().getOrderService();
         String orderStatus = request.getParameter(ORDER_STATUS);
+        String orderId = request.getParameter(ORDER_ID);
         try {
-            List<FoodOrder> orders = orderService.findOrderByStatus(orderStatus);
-            if (!orders.isEmpty()) {
-                request.setAttribute(ORDER_LIST, orders);
-            }
+            orderService.updateOrderStatus(Long.parseLong(orderId), orderStatus);
         } catch (ServiceException e) {
             String message = "Change order status command can't be executed";
             logger.error(message, e);

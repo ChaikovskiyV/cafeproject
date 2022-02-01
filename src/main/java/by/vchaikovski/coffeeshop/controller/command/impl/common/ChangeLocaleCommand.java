@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.controller.command.impl;
+package by.vchaikovski.coffeeshop.controller.command.impl.common;
 
 import by.vchaikovski.coffeeshop.controller.Router;
 import by.vchaikovski.coffeeshop.controller.command.BaseCommand;
@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.*;
 
 public class ChangeLocaleCommand implements BaseCommand {
