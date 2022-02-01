@@ -25,6 +25,17 @@ public class BillServiceImpl implements BillService {
     private static final Logger logger = LogManager.getLogger();
     private static final BillDao billDao = DaoProvider.getInstance().getBillDao();
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:ss";
+    private static BillService instance;
+
+    private BillServiceImpl() {
+    }
+
+    public static BillService getInstance() {
+        if (instance == null) {
+            instance = new BillServiceImpl();
+        }
+        return instance;
+    }
 
     @Override
     public long createBill(Map<String, String> billParameters) throws ServiceException {
@@ -204,17 +215,14 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public boolean updateBillStatus(long billId, String status) throws ServiceException {
-        boolean result = false;
-        DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isEnumContains(status, Bill.BillStatus.class)) {
-            try {
-                result = billDao.updateBillStatus(billId, Bill.BillStatus.valueOf(status.toUpperCase()));
-            } catch (DaoException e) {
-                String message = "Bill can't be updated by status=" + status;
-                logger.error(message, e);
-                throw new ServiceException(message, e);
-            }
+    public boolean updateBillStatus(long billId, Bill.BillStatus status) throws ServiceException {
+        boolean result;
+        try {
+            result = billDao.updateBillStatus(billId, status);
+        } catch (DaoException e) {
+            String message = "Bill can't be updated by status=" + status;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
         }
         return result;
     }

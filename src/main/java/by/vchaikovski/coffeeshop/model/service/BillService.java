@@ -27,7 +27,7 @@ public interface BillService {
 
     boolean updateBill(long billId, Map<String, String> billParameters) throws ServiceException;
 
-    boolean updateBillStatus(long id, String status) throws ServiceException;
+    boolean updateBillStatus(long id, Bill.BillStatus status) throws ServiceException;
 
     boolean updateBillPaymentTime(long id, String paymentDate) throws ServiceException;
 

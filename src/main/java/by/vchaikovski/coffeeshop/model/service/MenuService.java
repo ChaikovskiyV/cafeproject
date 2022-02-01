@@ -4,8 +4,16 @@ import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public interface MenuService {
+    long create(Map<String, String> menuParameters) throws ServiceException;
+
+    List<Menu> findAll() throws ServiceException;
+
+    Optional<Menu> findById(long id) throws ServiceException;
+
     List<Menu> findByName(String name) throws ServiceException;
 
     List<Menu> findByFoodType(String foodType) throws ServiceException;
@@ -26,7 +34,13 @@ public interface MenuService {
 
     boolean updateMenuQuantityInStock(long id, String quantityInStock) throws ServiceException;
 
+    boolean increaseQuantityInStock(long id, String quantity) throws ServiceException;
+
+    boolean reduceQuantityInStock(long id, String quantity) throws ServiceException;
+
     boolean updateMenuDescription(long id, String description) throws ServiceException;
 
     boolean updateMenuImage(long id, String imagePath) throws ServiceException;
+
+    boolean deleteById(long id) throws ServiceException;
 }

@@ -9,6 +9,8 @@ public class ServiceProvider {
     private final OrderService orderService;
     private final DeliveryService deliveryService;
     private final DiscountService discountService;
+    private final BillService billService;
+    private final MenuService menuService;
 
 
     private ServiceProvider() {
@@ -17,6 +19,8 @@ public class ServiceProvider {
         orderService = OrderServiceImpl.getInstance();
         deliveryService = DeliveryServiceImpl.getInstance();
         discountService = DiscountServiceImpl.getInstance();
+        billService = BillServiceImpl.getInstance();
+        menuService = MenuServiceImpl.getInstance();
     }
 
     public static ServiceProvider getInstance() {
@@ -44,5 +48,13 @@ public class ServiceProvider {
 
     public DiscountService getDiscountService() {
         return discountService;
+    }
+
+    public BillService getBillService() {
+        return billService;
+    }
+
+    public MenuService getMenuService() {
+        return menuService;
     }
 }

@@ -94,7 +94,7 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public long createDiscount(Discount discount) throws ServiceException {
+    public long createDiscount(Discount discount) throws ServiceException { //TODO Make validation
         long discountId;
         try {
             discountId = discountDao.create(discount);

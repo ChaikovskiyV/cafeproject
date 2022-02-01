@@ -2,7 +2,7 @@ package by.vchaikovski.coffeeshop.model.service;
 
 import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
-import by.vchaikovski.coffeeshop.model.entity.OrderCart;
+import by.vchaikovski.coffeeshop.model.entity.Menu;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface OrderService {
 
-    long createOrder(Map<String, String> orderParameters);
+    long createOrder(Map<String, String> orderParameters, Map<Menu, Integer> cart) throws ServiceException;
 
     boolean deleteOrderById(long id) throws ServiceException;
 
@@ -32,13 +32,11 @@ public interface OrderService {
 
     List<FoodOrder> findOrderByUserId(long userId) throws ServiceException;
 
-    boolean updateOrder(long id, FoodOrder order);
-
     boolean updateOrderStatus(long id, String orderStatus) throws ServiceException;
 
-    boolean updateGoodsNumberInCart(long id, String goodsNumber) throws ServiceException;
+    boolean updateGoodsNumberInCart(long orderId, long menuId, String goodsNumber) throws ServiceException;
 
-    int createOrderCart(OrderCart orderCart, long orderId);
+    int createOrderCart(long orderId, Map<Menu, Integer> cart) throws ServiceException;
 
     boolean deleteOrderCartByOrderId(long orderId) throws ServiceException;
 

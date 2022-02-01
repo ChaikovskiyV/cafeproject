@@ -6,8 +6,11 @@ import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
 import by.vchaikovski.coffeeshop.model.dao.MenuDao;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
 import by.vchaikovski.coffeeshop.model.service.MenuService;
+import by.vchaikovski.coffeeshop.util.PictureLoader;
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
+import by.vchaikovski.coffeeshop.util.validator.FormValidator;
 import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,6 +20,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
 
 public class MenuServiceImpl implements MenuService {
     private static final Logger logger = LogManager.getLogger();
@@ -32,6 +39,64 @@ public class MenuServiceImpl implements MenuService {
             instance = new MenuServiceImpl();
         }
         return instance;
+    }
+
+    @Override
+    public long create(Map<String, String> menuParameters) throws ServiceException {
+        long menuId = 0;
+        FormValidator formValidator = FormValidatorImpl.getInstance();
+        if (formValidator.isMenuParametersValid(menuParameters)) {
+            String name = menuParameters.get(MENU_NAME);
+            String type = menuParameters.get(MENU_TYPE);
+            String price = menuParameters.get(MENU_PRICE);
+            String quantityInStock = menuParameters.get(MENU_QUANTITY_IN_STOCK);
+            String description = menuParameters.get(MENU_DESCRIPTION);
+            Menu.FoodType foodType = Menu.FoodType.valueOf(type);
+            PictureLoader pictureLoader = PictureLoader.getInstance();
+            byte[] defaultPicture = pictureLoader.loadDefaultPicture(foodType);
+            Menu menu = new Menu.MenuBuilder()
+                    .setName(name)
+                    .setType(foodType)
+                    .setPrice(new BigDecimal(price))
+                    .setQuantityInStock(Integer.parseInt(quantityInStock))
+                    .setDescription(description)
+                    .setFoodImage(defaultPicture)
+                    .build();
+            try {
+                menuId = menuDao.create(menu);
+            } catch (DaoException e) {
+                String message = "Menu can't be inserted in data base";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return menuId;
+    }
+
+    @Override
+    public List<Menu> findAll() throws ServiceException {
+        List<Menu> menuList;
+        try {
+            menuList = menuDao.findAll();
+        } catch (DaoException e) {
+            String message = "Any menu can't be found";
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return menuList;
+    }
+
+    @Override
+    public Optional<Menu> findById(long id) throws ServiceException {
+        Optional<Menu> optionalMenu;
+        try {
+            optionalMenu = menuDao.findById(id);
+        } catch (DaoException e) {
+            String message = "Menu can't be found by id=" + id;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return optionalMenu;
     }
 
     @Override
@@ -196,6 +261,38 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public boolean increaseQuantityInStock(long id, String quantity) throws ServiceException {
+        boolean result = false;
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if(validator.isNumberValid(quantity)) {
+            try {
+                result = menuDao.increaseQuantityInStock(id, Integer.parseInt(quantity));
+            } catch (DaoException e) {
+                String message = "Quantity in stock can't be increased on number=" + quantity;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean reduceQuantityInStock(long id, String quantity) throws ServiceException {
+        boolean result = false;
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if(validator.isNumberValid(quantity)) {
+            try {
+                result = menuDao.reduceQuantityInStock(id, Integer.parseInt(quantity));
+            } catch (DaoException e) {
+                String message = "Quantity in stock can't be reduced on number=" + quantity;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public boolean updateMenuDescription(long id, String description) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
@@ -225,6 +322,19 @@ public class MenuServiceImpl implements MenuService {
                 logger.error(message, e);
                 throw new ServiceException(message, e);
             }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean deleteById(long id) throws ServiceException {
+        boolean result;
+        try {
+            result = menuDao.deleteById(id);
+        } catch (DaoException e) {
+            String message = "Menu can't be deleted by id=" + id;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
         }
         return result;
     }

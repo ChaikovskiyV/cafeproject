@@ -5,10 +5,13 @@ import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
 import by.vchaikovski.coffeeshop.model.dao.OrderDao;
 import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
-import by.vchaikovski.coffeeshop.model.entity.OrderCart;
+import by.vchaikovski.coffeeshop.model.entity.Menu;
 import by.vchaikovski.coffeeshop.model.service.OrderService;
+import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
+import by.vchaikovski.coffeeshop.util.validator.FormValidator;
 import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.COMMENT;
+import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.USER_ID;
 
 public class OrderServiceImpl implements OrderService {
     private static final Logger logger = LogManager.getLogger();
@@ -37,8 +43,32 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public long createOrder(Map<String, String> orderParameters) {
-        return 0;
+    public long createOrder(Map<String, String> orderParameters, Map<Menu, Integer> cart) throws ServiceException {
+        ServiceProvider serviceProvider = ServiceProvider.getInstance();
+        long orderId = 0;
+        FormValidator validator = FormValidatorImpl.getInstance();
+        if (validator.isOrderParameterValid(orderParameters)) {
+            String userIdStr = orderParameters.get(USER_ID);
+            String comment = orderParameters.get(COMMENT);
+            long deliveryId = serviceProvider.getDeliveryService().createDelivery(orderParameters);
+            long billId = serviceProvider.getBillService().createBill(orderParameters);
+            FoodOrder order = new FoodOrder.FoodOrderBuilder()
+                    .setUserId(Long.parseLong(userIdStr))
+                    .setDeliveryId(deliveryId)
+                    .setBillId(billId)
+                    .setComment(comment)
+                    .setCart(cart)
+                    .build();
+            try {
+                orderId = orderDao.create(order);
+                orderDao.createOrderCart(orderId, cart);
+            } catch (DaoException e) {
+                String message = "FoodOrder can't be inserted in data base";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return orderId;
     }
 
     @Override
@@ -57,13 +87,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<FoodOrder> findAllOrders() throws ServiceException {
         List<FoodOrder> orders;
-            try {
-                orders = orderDao.findAll();
-            } catch (DaoException e) {
-                String message = "FoodOrders can't be found";
-                logger.error(message, e);
-                throw new ServiceException(message, e);
-            }
+        try {
+            orders = orderDao.findAll();
+        } catch (DaoException e) {
+            String message = "FoodOrders can't be found";
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
         return orders;
     }
 
@@ -101,7 +131,7 @@ public class OrderServiceImpl implements OrderService {
     public List<FoodOrder> findOrderByCreationDate(String creationDate) throws ServiceException {
         List<FoodOrder> orders = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
-        if(validator.isDateTimeValid(creationDate)) {
+        if (validator.isDateTimeValid(creationDate)) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_TIME_FORMAT);
             try {
                 orders = orderDao.findByCreationDate(LocalDateTime.parse(creationDate, formatter));
@@ -118,7 +148,7 @@ public class OrderServiceImpl implements OrderService {
     public List<FoodOrder> findOrderByCreationPeriod(String startPeriod, String endPeriod) throws ServiceException {
         List<FoodOrder> orders = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
-        if(validator.isDateTimeValid(startPeriod) && validator.isDateTimeValid(endPeriod)) {
+        if (validator.isDateTimeValid(startPeriod) && validator.isDateTimeValid(endPeriod)) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_TIME_FORMAT);
             try {
                 LocalDateTime start = LocalDateTime.parse(startPeriod, formatter);
@@ -137,7 +167,7 @@ public class OrderServiceImpl implements OrderService {
     public List<FoodOrder> findOrderByEvaluation(String orderEvaluation) throws ServiceException {
         List<FoodOrder> orders = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
-        if(validator.isEnumContains(orderEvaluation, FoodOrder.OrderEvaluation.class)) {
+        if (validator.isEnumContains(orderEvaluation, FoodOrder.OrderEvaluation.class)) {
             try {
                 orders = orderDao.findByEvaluation(FoodOrder.OrderEvaluation.valueOf(orderEvaluation.toUpperCase()));
             } catch (DaoException e) {
@@ -152,13 +182,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<FoodOrder> findOrderByDeliveryId(long deliveryId) throws ServiceException {
         List<FoodOrder> orders;
-            try {
-                orders = orderDao.findByDelivery(deliveryId);
-            } catch (DaoException e) {
-                String message = "FoodOrders can't be found by delivery id=" + deliveryId;
-                logger.error(message, e);
-                throw new ServiceException(message, e);
-            }
+        try {
+            orders = orderDao.findByDelivery(deliveryId);
+        } catch (DaoException e) {
+            String message = "FoodOrders can't be found by delivery id=" + deliveryId;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
         return orders;
     }
 
@@ -189,15 +219,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean updateOrder(long id, FoodOrder order) {
-        return false;
-    }
-
-    @Override
     public boolean updateOrderStatus(long id, String orderStatus) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
-        if(validator.isEnumContains(orderStatus, FoodOrder.OrderStatus.class)) {
+        if (validator.isEnumContains(orderStatus, FoodOrder.OrderStatus.class) && isOrderUncompleted(id)) {
             try {
                 result = orderDao.updateOrderStatus(id, FoodOrder.OrderStatus.valueOf(orderStatus));
             } catch (DaoException e) {
@@ -210,12 +235,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean updateGoodsNumberInCart(long id, String goodsNumber) throws ServiceException {
+    public boolean updateGoodsNumberInCart(long orderId, long menuId, String goodsNumber) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
-        if(validator.isNumberValid(goodsNumber)) {
+        if (validator.isNumberValid(goodsNumber) && isOrderUncompleted(orderId)) {
             try {
-                result = orderDao.updateGoodsNumberInCart(id, Integer.parseInt(goodsNumber));
+                result = orderDao.updateGoodsNumberInCart(orderId, menuId, Integer.parseInt(goodsNumber));
             } catch (DaoException e) {
                 String message = "Goods number in cart can't be updated";
                 logger.error(message, e);
@@ -226,8 +251,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public int createOrderCart(OrderCart orderCart, long orderId) {
-        return 0;
+    public int createOrderCart(long orderId, Map<Menu, Integer> cart) throws ServiceException {
+        int rowNumber = 0;
+        if (isOrderUncompleted(orderId)) {
+            try {
+                rowNumber = orderDao.createOrderCart(orderId, cart);
+            } catch (DaoException e) {
+                String message = "Cart can't be created";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return rowNumber;
     }
 
     @Override
@@ -252,6 +287,23 @@ public class OrderServiceImpl implements OrderService {
             String message = "Order cart can't be deleted by order id=" + orderId + " and menu id=" + menuId;
             logger.error(message, e);
             throw new ServiceException(message, e);
+        }
+        return result;
+    }
+
+    private boolean isOrderUncompleted(long orderId) throws ServiceException {
+        boolean result = false;
+        Optional<FoodOrder> optionalOrder;
+        try {
+            optionalOrder = orderDao.findById(orderId);
+        } catch (DaoException e) {
+            String message = "Order can't be found by id=" + orderId;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        if (optionalOrder.isPresent()) {
+            FoodOrder.OrderStatus status = optionalOrder.get().getStatus();
+            result = status != FoodOrder.OrderStatus.COMPLETED && status != FoodOrder.OrderStatus.CANCELLED;
         }
         return result;
     }
