@@ -14,9 +14,13 @@ public interface DiscountService {
 
     Optional<Discount> findDiscountByUserId(long userId) throws ServiceException;
 
-    boolean updateDiscountType(long id, Discount.DiscountType discountType) throws ServiceException;
+    List<Discount> findDiscountsByRate(String rate) throws ServiceException;
 
-    boolean updateDiscountRate(long id, int rate) throws ServiceException;
+    List<Discount> findDiscountsByType(String discountType) throws ServiceException;
+
+    boolean updateDiscountType(long id, String discountType) throws ServiceException;
+
+    boolean updateDiscountRate(long id, String rate) throws ServiceException;
 
     long createDiscount(Map<String, String> discountParameters) throws ServiceException;
 

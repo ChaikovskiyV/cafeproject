@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
 import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.USER_ID;
@@ -226,42 +225,37 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<FoodOrder> findOrderBySeveralParameters(Map<String, String> orderParameters) throws ServiceException {
         DataValidator validator = DataValidatorImpl.getInstance();
-        Stream<FoodOrder> orderStream = Stream.empty();
-        String billStatus = orderParameters.get(BILL_STATUS);
-        String paymentDate = orderParameters.get(PAYMENT_DATE);
-        String creationDate = orderParameters.get(CREATION_DATE);
-        String deliveryTime = orderParameters.get(DELIVERY_TIME);
-        String deliveryType = orderParameters.get(DELIVERY_TYPE);
-        String userId = orderParameters.get(USER_ID);
-        String orderStatus = orderParameters.get(ORDER_STATUS);
-        try {
-            List<FoodOrder> orders = orderDao.findAll();
-            orderStream = orders.stream();
-
+        List<FoodOrder> orders = findAllOrders();
+        if (orderParameters != null && !orderParameters.isEmpty()) {
+            String billStatus = orderParameters.get(BILL_STATUS);
+            String paymentDate = orderParameters.get(PAYMENT_DATE);
+            String creationDate = orderParameters.get(CREATION_DATE);
+            String deliveryTime = orderParameters.get(DELIVERY_TIME);
+            String deliveryType = orderParameters.get(DELIVERY_TYPE);
+            String userId = orderParameters.get(USER_ID);
+            String orderStatus = orderParameters.get(ORDER_STATUS);
             BillService billService = ServiceProvider.getInstance().getBillService();
-            filterOrdersByBill(billService.findBillByStatus(billStatus), orderStream);
-            filterOrdersByBill(billService.findBillByPaymentTime(paymentDate), orderStream);
+            orders = filterOrdersByBill(billService.findBillByStatus(billStatus), orders);
+            orders = filterOrdersByBill(billService.findBillByPaymentTime(paymentDate), orders);
 
             DeliveryService deliveryService = ServiceProvider.getInstance().getDeliveryService();
-            filterOrdersByDelivery(deliveryService.findDeliveryByType(deliveryType), orderStream);
-            filterOrdersByDelivery(deliveryService.findDeliveryByDate(deliveryTime), orderStream);
+            orders = filterOrdersByDelivery(deliveryService.findDeliveryByType(deliveryType), orders);
+            orders = filterOrdersByDelivery(deliveryService.findDeliveryByDate(deliveryTime), orders);
 
             if (validator.isDateTimeValid(creationDate)) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_TIME_FORMAT);
                 LocalDateTime dateTime = LocalDateTime.parse(creationDate, formatter);
-                orderStream.filter(order -> order.getCreationDate().isEqual(dateTime));
+                orders = orders.stream().filter(order -> order.getCreationDate().isEqual(dateTime)).toList();
             }
             if (validator.isEnumContains(orderStatus, FoodOrder.OrderStatus.class)) {
                 FoodOrder.OrderStatus status = FoodOrder.OrderStatus.valueOf(orderStatus.toUpperCase());
-                orderStream.filter(order -> order.getStatus() == status);
+                orders = orders.stream().filter(order -> order.getStatus() == status).toList();
             }
             if (validator.isNumberValid(userId)) {
-                orderStream.filter(order -> order.getUserId() == Long.parseLong(userId));
+                orders = orders.stream().filter(order -> order.getUserId() == Long.parseLong(userId)).toList();
             }
-        } catch (DaoException e) {
-            e.printStackTrace();
         }
-        return orderStream.toList();
+        return orders;
     }
 
     @Override
@@ -354,21 +348,23 @@ public class OrderServiceImpl implements OrderService {
         return result;
     }
 
-    private void filterOrdersByBill(List<Bill> bills, Stream<FoodOrder> orderStream) {
+    private List<FoodOrder> filterOrdersByBill(List<Bill> bills, List<FoodOrder> orders) {
         if (bills != null && !bills.isEmpty()) {
             List<Long> billsId = bills.stream()
                     .map(Bill::getId)
                     .toList();
-            orderStream.filter(order -> billsId.contains(order.getBillId()));
+            orders = orders.stream().filter(order -> billsId.contains(order.getBillId())).toList();
         }
+        return orders;
     }
 
-    private void filterOrdersByDelivery(List<Delivery> deliveries, Stream<FoodOrder> orderStream) {
+    private List<FoodOrder> filterOrdersByDelivery(List<Delivery> deliveries, List<FoodOrder> orders) {
         if (deliveries != null && !deliveries.isEmpty()) {
             List<Long> deliveriesId = deliveries.stream()
                     .map(Delivery::getId)
                     .toList();
-            orderStream.filter(order -> deliveriesId.contains(order.getDeliveryId()));
+            orders = orders.stream().filter(order -> deliveriesId.contains(order.getDeliveryId())).toList();
         }
+        return orders;
     }
 }

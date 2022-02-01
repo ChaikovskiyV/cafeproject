@@ -7,6 +7,8 @@ import by.vchaikovski.coffeeshop.model.dao.DiscountDao;
 import by.vchaikovski.coffeeshop.model.dao.UserDao;
 import by.vchaikovski.coffeeshop.model.entity.Discount;
 import by.vchaikovski.coffeeshop.model.entity.User;
+import by.vchaikovski.coffeeshop.model.service.DiscountService;
+import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
 import by.vchaikovski.coffeeshop.model.service.UserService;
 import by.vchaikovski.coffeeshop.util.PasswordEncryptor;
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
@@ -228,6 +230,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> findUsersBySeveralParameters(Map<String, String> userParameters) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
+        List<User> users = findAllUsers();
+        if (userParameters != null && !userParameters.isEmpty()) {
+            String firstName = userParameters.get(FIRST_NAME);
+            String lastName = userParameters.get(LAST_NAME);
+            String discountRate = userParameters.get(DISCOUNT_RATE);
+            String discountType = userParameters.get(DISCOUNT_TYPE);
+            String userStatus = userParameters.get(USER_STATUS);
+            String userRole = userParameters.get(USER_ROLE);
+            if (validator.isNameValid(firstName)) {
+                users = users.stream().filter(user -> user.getFirstName().equals(firstName)).toList();
+            }
+            if (validator.isNameValid(lastName)) {
+                users = users.stream().filter(user -> user.getLastName().equals(lastName)).toList();
+            }
+            if (validator.isEnumContains(userStatus, User.Status.class)) {
+                User.Status status = User.Status.valueOf(userStatus.toUpperCase());
+                users = users.stream().filter(user -> user.getStatus() == status).toList();
+            }
+            if (validator.isEnumContains(userRole, User.Role.class)) {
+                User.Role role = User.Role.valueOf(userRole);
+                users = users.stream().filter(user -> user.getRole() == role).toList();
+            }
+            DiscountService discountService = ServiceProvider.getInstance().getDiscountService();
+            users = filterUsersByDiscount(discountService.findDiscountsByRate(discountRate), users);
+            users = filterUsersByDiscount(discountService.findDiscountsByType(discountType), users);
+        }
+        return users;
+    }
+
+    @Override
     public boolean updateUserLogin(long id, Map<String, String> userParameters) throws ServiceException {
         DataValidator validator = DataValidatorImpl.getInstance();
         String login = userParameters.get(LOGIN);
@@ -326,25 +360,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateUserRole(long id, User.Role role) throws ServiceException {
-        try {
-            return userDao.updateUserRole(id, role);
-        } catch (DaoException e) {
-            String message = "User can't be updated by role.";
-            logger.error(message, e);
-            throw new ServiceException(message, e);
+    public boolean updateUserRole(long id, String role) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
+        boolean result = false;
+        if (validator.isEnumContains(role, User.Role.class)) {
+            User.Role userRole = User.Role.valueOf(role.toUpperCase());
+            try {
+                result = userDao.updateUserRole(id, userRole);
+            } catch (DaoException e) {
+                String message = "User can't be updated by role.";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
         }
+        return result;
     }
 
     @Override
-    public boolean updateUserStatus(long id, User.Status status) throws ServiceException {
-        try {
-            return userDao.updateUserStatus(id, status);
-        } catch (DaoException e) {
-            String message = "User can't be updated by status.";
-            logger.error(message, e);
-            throw new ServiceException(message, e);
+    public boolean updateUserStatus(long id, String status) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
+        boolean result = false;
+        if (validator.isEnumContains(status, User.Status.class)) {
+            User.Status userStatus = User.Status.valueOf(status.toUpperCase());
+            try {
+                result = userDao.updateUserStatus(id, userStatus);
+            } catch (DaoException e) {
+                String message = "User can't be updated by status.";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
         }
+        return result;
     }
 
     @Override
@@ -432,5 +478,15 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return result;
+    }
+
+    private List<User> filterUsersByDiscount(List<Discount> discountList, List<User> users) {
+        if (discountList != null && !discountList.isEmpty()) {
+            List<Long> discountsId = discountList.stream()
+                    .map(Discount::getId)
+                    .toList();
+            users = users.stream().filter(user -> discountsId.contains(user.getDiscountId())).toList();
+        }
+        return users;
     }
 }

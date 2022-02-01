@@ -6,11 +6,14 @@ import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
 import by.vchaikovski.coffeeshop.model.dao.DiscountDao;
 import by.vchaikovski.coffeeshop.model.entity.Discount;
 import by.vchaikovski.coffeeshop.model.service.DiscountService;
+import by.vchaikovski.coffeeshop.util.validator.DataValidator;
 import by.vchaikovski.coffeeshop.util.validator.FormValidator;
+import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
 import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -74,27 +77,67 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public boolean updateDiscountType(long id, Discount.DiscountType discountType) throws ServiceException {
-        boolean result;
-        try {
-            result = discountType != null && discountDao.updateDiscountType(id, discountType);
-        } catch (DaoException e) {
-            String message = "Discount can't be updated by type " + discountType;
-            logger.error(message, e);
-            throw new ServiceException(message, e);
+    public List<Discount> findDiscountsByRate(String rate) throws ServiceException {
+        List<Discount> discounts = new ArrayList<>();
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if (validator.isNumberValid(rate)) {
+            try {
+                discounts = discountDao.findByRate(Integer.parseInt(rate));
+            } catch (DaoException e) {
+                String message = "Discounts can't be found by rate=" + rate;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return discounts;
+    }
+
+    @Override
+    public List<Discount> findDiscountsByType(String discountType) throws ServiceException {
+        List<Discount> discounts = new ArrayList<>();
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if (validator.isEnumContains(discountType, Discount.DiscountType.class)) {
+            Discount.DiscountType type = Discount.DiscountType.valueOf(discountType);
+            try {
+                discounts = discountDao.findByType(type);
+            } catch (DaoException e) {
+                String message = "Discounts can't be found by discount type=" + discountType;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return discounts;
+    }
+
+    @Override
+    public boolean updateDiscountType(long id, String discountType) throws ServiceException {
+        boolean result = false;
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if (validator.isEnumContains(discountType, Discount.DiscountType.class)) {
+            Discount.DiscountType type = Discount.DiscountType.valueOf(discountType.toUpperCase());
+            try {
+                result = discountDao.updateDiscountType(id, type);
+            } catch (DaoException e) {
+                String message = "Discount can't be updated by type " + discountType;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
         }
         return result;
     }
 
     @Override
-    public boolean updateDiscountRate(long id, int rate) throws ServiceException {
-        boolean result;
-        try {
-            result = discountDao.updateDiscountRate(id, rate);
-        } catch (DaoException e) {
-            String message = "Discount can't be updated by discount rate " + rate;
-            logger.error(message, e);
-            throw new ServiceException(message, e);
+    public boolean updateDiscountRate(long id, String rate) throws ServiceException {
+        boolean result = false;
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if (validator.isNumberValid(rate)) {
+            try {
+                result = discountDao.updateDiscountRate(id, Integer.parseInt(rate));
+            } catch (DaoException e) {
+                String message = "Discount can't be updated by discount rate " + rate;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
         }
         return result;
     }

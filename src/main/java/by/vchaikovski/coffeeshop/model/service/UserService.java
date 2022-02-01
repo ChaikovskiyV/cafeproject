@@ -35,6 +35,8 @@ public interface UserService {
 
     List<User> findUsersByDiscountRate(String rate) throws ServiceException;
 
+    List<User> findUsersBySeveralParameters(Map<String, String> userParameters) throws ServiceException;
+
     boolean updateUserLogin(long id, Map<String, String> userParameters) throws ServiceException;
 
     boolean updateUserPassword(long id, Map<String, String> userParameters) throws ServiceException;
@@ -47,9 +49,9 @@ public interface UserService {
 
     boolean updateUserPhoneNumber(long id, Map<String, String> userParameters) throws ServiceException;
 
-    boolean updateUserRole(long id, User.Role role) throws ServiceException;
+    boolean updateUserRole(long id, String role) throws ServiceException;
 
-    boolean updateUserStatus(long id, User.Status status) throws ServiceException;
+    boolean updateUserStatus(long id, String status) throws ServiceException;
 
     long createUser(Map<String, String> userParameters) throws ServiceException;
 
