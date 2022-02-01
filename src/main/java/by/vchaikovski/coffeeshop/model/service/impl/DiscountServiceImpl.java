@@ -6,11 +6,17 @@ import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
 import by.vchaikovski.coffeeshop.model.dao.DiscountDao;
 import by.vchaikovski.coffeeshop.model.entity.Discount;
 import by.vchaikovski.coffeeshop.model.service.DiscountService;
+import by.vchaikovski.coffeeshop.util.validator.FormValidator;
+import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.DISCOUNT_ID;
+import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.DISCOUNT_RATE;
 
 public class DiscountServiceImpl implements DiscountService {
     private static final Logger logger = LogManager.getLogger();
@@ -94,14 +100,21 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public long createDiscount(Discount discount) throws ServiceException { //TODO Make validation
-        long discountId;
-        try {
-            discountId = discountDao.create(discount);
-        } catch (DaoException e) {
-            String message = "Discount can't be inserted in data base";
-            logger.error(message, e);
-            throw new ServiceException(message, e);
+    public long createDiscount(Map<String, String> discountParameters) throws ServiceException {
+        long discountId = 0;
+        FormValidator validator = FormValidatorImpl.getInstance();
+        if (validator.isDiscountParametersValid(discountParameters)) {
+            try {
+                String discountType = discountParameters.get(DISCOUNT_ID);
+                String discountRate = discountParameters.get(DISCOUNT_RATE);
+                Discount discount = new Discount(Discount.DiscountType.valueOf(discountType.toUpperCase()),
+                        Integer.parseInt(discountRate));
+                discountId = discountDao.create(discount);
+            } catch (DaoException e) {
+                String message = "Discount can't be inserted in data base";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
         }
         return discountId;
     }

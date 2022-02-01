@@ -5,7 +5,10 @@ import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.dao.BillDao;
 import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
 import by.vchaikovski.coffeeshop.model.entity.Bill;
+import by.vchaikovski.coffeeshop.model.entity.Discount;
 import by.vchaikovski.coffeeshop.model.service.BillService;
+import by.vchaikovski.coffeeshop.model.service.DiscountService;
+import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
 import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
 import org.apache.logging.log4j.LogManager;
@@ -20,6 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.USER_ID;
 
 public class BillServiceImpl implements BillService {
     private static final Logger logger = LogManager.getLogger();
@@ -44,9 +48,10 @@ public class BillServiceImpl implements BillService {
         String totalPrice = billParameters.get(TOTAL_PRICE);
         String billStatus = billParameters.get(BILL_STATUS);
         String paymentDate = billParameters.get(PAYMENT_DATE);
+        String userId = billParameters.get(USER_ID);
         if (validator.isNumberValid(totalPrice) && validator.isEnumContains(billStatus, Bill.BillStatus.class)) {
             Bill.BillStatus status = Bill.BillStatus.valueOf(billStatus.toUpperCase());
-            BigDecimal price = new BigDecimal(totalPrice);
+            BigDecimal price = findPriceWithDiscount(new BigDecimal(totalPrice), userId);
             LocalDateTime date = null;
             if (status == Bill.BillStatus.PAID) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
@@ -259,5 +264,19 @@ public class BillServiceImpl implements BillService {
             }
         }
         return result;
+    }
+
+    private BigDecimal findPriceWithDiscount(BigDecimal price, String userId) throws ServiceException {
+        BigDecimal newPrice = price;
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if (validator.isNumberValid(userId)) {
+            DiscountService discountService = ServiceProvider.getInstance().getDiscountService();
+            Optional<Discount> optionalDiscount = discountService.findDiscountByUserId(Long.parseLong(userId));
+            if (optionalDiscount.isPresent()) {
+                int rate = optionalDiscount.get().getRate();
+                newPrice = price.multiply(new BigDecimal(1 - rate / 100));
+            }
+        }
+        return newPrice;
     }
 }

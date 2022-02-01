@@ -4,6 +4,7 @@ import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.entity.Discount;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface DiscountService {
@@ -17,7 +18,7 @@ public interface DiscountService {
 
     boolean updateDiscountRate(long id, int rate) throws ServiceException;
 
-    long createDiscount(Discount discount) throws ServiceException;
+    long createDiscount(Map<String, String> discountParameters) throws ServiceException;
 
     boolean deleteDiscountById(long id) throws ServiceException;
 }

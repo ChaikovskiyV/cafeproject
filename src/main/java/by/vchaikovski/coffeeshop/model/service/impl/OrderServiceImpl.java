@@ -4,8 +4,12 @@ import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.exception.ServiceException;
 import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
 import by.vchaikovski.coffeeshop.model.dao.OrderDao;
+import by.vchaikovski.coffeeshop.model.entity.Bill;
+import by.vchaikovski.coffeeshop.model.entity.Delivery;
 import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
+import by.vchaikovski.coffeeshop.model.service.BillService;
+import by.vchaikovski.coffeeshop.model.service.DeliveryService;
 import by.vchaikovski.coffeeshop.model.service.OrderService;
 import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
 import by.vchaikovski.coffeeshop.util.validator.DataValidator;
@@ -21,8 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.COMMENT;
+import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
 import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.USER_ID;
 
 public class OrderServiceImpl implements OrderService {
@@ -193,16 +198,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<FoodOrder> findOrderByBillId(long billId) throws ServiceException {
-        List<FoodOrder> orders;
+    public Optional<FoodOrder> findOrderByBillId(long billId) throws ServiceException {
+        Optional<FoodOrder> orderOptional;
         try {
-            orders = orderDao.findByBill(billId);
+            orderOptional = orderDao.findByBill(billId);
         } catch (DaoException e) {
             String message = "FoodOrders can't be found by bill id=" + billId;
             logger.error(message, e);
             throw new ServiceException(message, e);
         }
-        return orders;
+        return orderOptional;
     }
 
     @Override
@@ -216,6 +221,47 @@ public class OrderServiceImpl implements OrderService {
             throw new ServiceException(message, e);
         }
         return orders;
+    }
+
+    @Override
+    public List<FoodOrder> findOrderBySeveralParameters(Map<String, String> orderParameters) throws ServiceException {
+        DataValidator validator = DataValidatorImpl.getInstance();
+        Stream<FoodOrder> orderStream = Stream.empty();
+        String billStatus = orderParameters.get(BILL_STATUS);
+        String paymentDate = orderParameters.get(PAYMENT_DATE);
+        String creationDate = orderParameters.get(CREATION_DATE);
+        String deliveryTime = orderParameters.get(DELIVERY_TIME);
+        String deliveryType = orderParameters.get(DELIVERY_TYPE);
+        String userId = orderParameters.get(USER_ID);
+        String orderStatus = orderParameters.get(ORDER_STATUS);
+        try {
+            List<FoodOrder> orders = orderDao.findAll();
+            orderStream = orders.stream();
+
+            BillService billService = ServiceProvider.getInstance().getBillService();
+            filterOrdersByBill(billService.findBillByStatus(billStatus), orderStream);
+            filterOrdersByBill(billService.findBillByPaymentTime(paymentDate), orderStream);
+
+            DeliveryService deliveryService = ServiceProvider.getInstance().getDeliveryService();
+            filterOrdersByDelivery(deliveryService.findDeliveryByType(deliveryType), orderStream);
+            filterOrdersByDelivery(deliveryService.findDeliveryByDate(deliveryTime), orderStream);
+
+            if (validator.isDateTimeValid(creationDate)) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_TIME_FORMAT);
+                LocalDateTime dateTime = LocalDateTime.parse(creationDate, formatter);
+                orderStream.filter(order -> order.getCreationDate().isEqual(dateTime));
+            }
+            if (validator.isEnumContains(orderStatus, FoodOrder.OrderStatus.class)) {
+                FoodOrder.OrderStatus status = FoodOrder.OrderStatus.valueOf(orderStatus.toUpperCase());
+                orderStream.filter(order -> order.getStatus() == status);
+            }
+            if (validator.isNumberValid(userId)) {
+                orderStream.filter(order -> order.getUserId() == Long.parseLong(userId));
+            }
+        } catch (DaoException e) {
+            e.printStackTrace();
+        }
+        return orderStream.toList();
     }
 
     @Override
@@ -306,5 +352,23 @@ public class OrderServiceImpl implements OrderService {
             result = status != FoodOrder.OrderStatus.COMPLETED && status != FoodOrder.OrderStatus.CANCELLED;
         }
         return result;
+    }
+
+    private void filterOrdersByBill(List<Bill> bills, Stream<FoodOrder> orderStream) {
+        if (bills != null && !bills.isEmpty()) {
+            List<Long> billsId = bills.stream()
+                    .map(Bill::getId)
+                    .toList();
+            orderStream.filter(order -> billsId.contains(order.getBillId()));
+        }
+    }
+
+    private void filterOrdersByDelivery(List<Delivery> deliveries, Stream<FoodOrder> orderStream) {
+        if (deliveries != null && !deliveries.isEmpty()) {
+            List<Long> deliveriesId = deliveries.stream()
+                    .map(Delivery::getId)
+                    .toList();
+            orderStream.filter(order -> deliveriesId.contains(order.getDeliveryId()));
+        }
     }
 }

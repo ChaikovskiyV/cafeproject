@@ -28,9 +28,11 @@ public interface OrderService {
 
     List<FoodOrder> findOrderByDeliveryId(long deliveryId) throws ServiceException;
 
-    List<FoodOrder> findOrderByBillId(long billId) throws ServiceException;
+    Optional<FoodOrder> findOrderByBillId(long billId) throws ServiceException;
 
     List<FoodOrder> findOrderByUserId(long userId) throws ServiceException;
+
+    List<FoodOrder> findOrderBySeveralParameters(Map<String, String> orderParameters) throws ServiceException;
 
     boolean updateOrderStatus(long id, String orderStatus) throws ServiceException;
 
