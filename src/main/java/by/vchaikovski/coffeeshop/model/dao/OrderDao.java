@@ -1,12 +1,14 @@
 package by.vchaikovski.coffeeshop.model.dao;
 
 import by.vchaikovski.coffeeshop.exception.DaoException;
+import by.vchaikovski.coffeeshop.model.entity.Bill;
 import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface OrderDao extends BaseDao<FoodOrder> {
     List<FoodOrder> findByOrderStatus(FoodOrder.OrderStatus orderStatus) throws DaoException;
@@ -19,7 +21,9 @@ public interface OrderDao extends BaseDao<FoodOrder> {
 
     List<FoodOrder> findByDelivery(long deliveryId) throws DaoException;
 
-    List<FoodOrder> findByBill(long billId) throws DaoException;
+    Optional<FoodOrder> findByBill(long billId) throws DaoException;
+
+    List<FoodOrder> findOrderByBills(List<Bill> bills) throws DaoException;
 
     List<FoodOrder> findByUser(long userId) throws DaoException;
 

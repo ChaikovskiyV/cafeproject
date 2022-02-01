@@ -4,6 +4,7 @@ import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.model.dao.OrderDao;
 import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeeshop.model.entity.Bill;
 import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
 import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
@@ -194,22 +195,44 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public List<FoodOrder> findByBill(long billId) throws DaoException {
-        List<FoodOrder> orders = new ArrayList<>();
+    public Optional<FoodOrder> findByBill(long billId) throws DaoException {
+        FoodOrder order = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + FIND_ORDER_BY_BILL + billId)) {
-            while (resultSet.next()) {
-                FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
-                orders.add(order);
+            if (resultSet.next()) {
+                order = mapperProvider.getFoodMapper().createEntity(resultSet);
             }
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"find orders by billId=" + billId + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
+        return Optional.ofNullable(order);
+    }
+
+    @Override
+    public List<FoodOrder> findOrderByBills(List<Bill> bills) throws DaoException {
+        List<FoodOrder> orders = new ArrayList<>();
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             Statement statement = connection.createStatement()) {
+            for (Bill bill : bills) {
+                long billId = bill.getId();
+                try (ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + FIND_ORDER_BY_BILL + billId)) {
+                    if (resultSet.next()) {
+                        FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                        orders.add(order);
+                    }
+                }
+            }
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = "The query \"find orders by bills list=" + bills + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        }
         return orders;
     }
+
 
     @Override
     public List<FoodOrder> findByUser(long userId) throws DaoException {
