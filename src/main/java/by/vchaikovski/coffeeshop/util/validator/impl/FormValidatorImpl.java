@@ -1,5 +1,6 @@
 package by.vchaikovski.coffeeshop.util.validator.impl;
 
+import by.vchaikovski.coffeeshop.model.entity.Discount;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
 import by.vchaikovski.coffeeshop.util.validator.FormValidator;
 import org.apache.logging.log4j.LogManager;
@@ -8,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Map;
 
 import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
-import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.*;
+import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.USER_ID;
 
 public class FormValidatorImpl extends DataValidatorImpl implements FormValidator {
     private static final Logger logger = LogManager.getLogger();
@@ -28,7 +29,7 @@ public class FormValidatorImpl extends DataValidatorImpl implements FormValidato
     @Override
     public boolean isCardParametersValid(Map<String, String> cardParameters) {
         boolean result = true;
-        if(cardParameters == null || cardParameters.isEmpty()) {
+        if (cardParameters == null || cardParameters.isEmpty()) {
             return false;
         }
         for (Map.Entry<String, String> param : cardParameters.entrySet()) {
@@ -62,7 +63,7 @@ public class FormValidatorImpl extends DataValidatorImpl implements FormValidato
     @Override
     public boolean isUserParametersValid(Map<String, String> userParameters) {
         boolean result = true;
-        if(userParameters == null || userParameters.isEmpty()) {
+        if (userParameters == null || userParameters.isEmpty()) {
             return false;
         }
         for (Map.Entry<String, String> param : userParameters.entrySet()) {
@@ -108,33 +109,33 @@ public class FormValidatorImpl extends DataValidatorImpl implements FormValidato
     @Override
     public boolean isMenuParametersValid(Map<String, String> menuParameters) {
         boolean result = true;
-        if(menuParameters == null || menuParameters.isEmpty()) {
+        if (menuParameters == null || menuParameters.isEmpty()) {
             return false;
         }
-        for(Map.Entry<String, String> menuParam : menuParameters.entrySet()) {
+        for (Map.Entry<String, String> menuParam : menuParameters.entrySet()) {
             String key = menuParam.getKey();
             String value = menuParam.getValue();
             switch (key) {
                 case MENU_NAME -> {
-                    if(!isNameValid(value)) {
+                    if (!isNameValid(value)) {
                         menuParameters.replace(key, WRONG_MEANING);
                         result = false;
                     }
                 }
                 case MENU_TYPE -> {
-                    if(!isEnumContains(value, Menu.FoodType.class)) {
+                    if (!isEnumContains(value, Menu.FoodType.class)) {
                         menuParameters.replace(key, WRONG_MEANING);
                         result = false;
                     }
                 }
                 case MENU_PRICE, MENU_QUANTITY_IN_STOCK -> {
-                    if(!isNumberValid(value)) {
+                    if (!isNumberValid(value)) {
                         menuParameters.replace(key, WRONG_MEANING);
                         result = false;
                     }
                 }
                 case MENU_DESCRIPTION -> {
-                    if(!isTextValid(value)) {
+                    if (!isTextValid(value)) {
                         menuParameters.replace(key, WRONG_MEANING);
                         result = false;
                     }
@@ -148,21 +149,21 @@ public class FormValidatorImpl extends DataValidatorImpl implements FormValidato
     @Override
     public boolean isOrderParameterValid(Map<String, String> orderParameters) {
         boolean result = true;
-        if(orderParameters == null || orderParameters.isEmpty() || !orderParameters.containsKey(USER_ID)) {
+        if (orderParameters == null || orderParameters.isEmpty() || !orderParameters.containsKey(USER_ID)) {
             return false;
         }
-        for(Map.Entry<String, String> orderParam : orderParameters.entrySet()) {
+        for (Map.Entry<String, String> orderParam : orderParameters.entrySet()) {
             String key = orderParam.getKey();
             String value = orderParam.getValue();
             switch (key) {
                 case USER_ID -> {
-                    if(!isNumberValid(value)) {
+                    if (!isNumberValid(value)) {
                         orderParameters.replace(key, WRONG_MEANING);
                         result = false;
                     }
                 }
                 case COMMENT -> {
-                    if(!isTextValid(value)) {
+                    if (!isTextValid(value)) {
                         orderParameters.replace(key, WRONG_MEANING);
                         result = false;
                     }
@@ -176,7 +177,7 @@ public class FormValidatorImpl extends DataValidatorImpl implements FormValidato
     @Override
     public boolean isAddressParametersValid(Map<String, String> deliveryParameters) {
         boolean result = true;
-        if(deliveryParameters == null || deliveryParameters.isEmpty()) {
+        if (deliveryParameters == null || deliveryParameters.isEmpty()) {
             return false;
         }
         for (Map.Entry<String, String> param : deliveryParameters.entrySet()) {
@@ -203,6 +204,25 @@ public class FormValidatorImpl extends DataValidatorImpl implements FormValidato
                 }
                 default -> logger.debug(() -> UNCHECKED_PARAM_MESS + key);
             }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isDiscountParametersValid(Map<String, String> discountParameters) {
+        boolean result = true;
+        if (discountParameters == null || discountParameters.isEmpty()) {
+            return false;
+        }
+        String discountType = discountParameters.get(DISCOUNT_TYPE);
+        String discountRate = discountParameters.get(DISCOUNT_RATE);
+        if (!isEnumContains(discountType, Discount.DiscountType.class)) {
+            discountParameters.replace(DISCOUNT_TYPE, WRONG_MEANING);
+            result = false;
+        }
+        if (!isNumberValid(discountRate)) {
+            discountParameters.replace(DISCOUNT_RATE, WRONG_MEANING);
+            result = false;
         }
         return result;
     }

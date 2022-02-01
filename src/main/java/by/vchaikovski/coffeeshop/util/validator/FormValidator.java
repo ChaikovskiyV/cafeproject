@@ -12,4 +12,6 @@ public interface FormValidator {
     boolean isOrderParameterValid(Map<String, String> orderParameters);
 
     boolean isAddressParametersValid(Map<String, String> deliveryParameters);
+
+    boolean isDiscountParametersValid(Map<String, String> discountParameters);
 }
