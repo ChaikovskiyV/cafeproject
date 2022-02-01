@@ -3,8 +3,11 @@ package by.vchaikovski.coffeeshop.controller.command;
 import by.vchaikovski.coffeeshop.controller.command.impl.common.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.DefaultCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.go.*;
+import by.vchaikovski.coffeeshop.controller.command.impl.user.admin.FindUserCommand;
+import by.vchaikovski.coffeeshop.controller.command.impl.user.admin.UpdateUserRoleCommand;
+import by.vchaikovski.coffeeshop.controller.command.impl.user.admin.UpdateUserStatusCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.barista.ChangeOrderStatusCommand;
-import by.vchaikovski.coffeeshop.controller.command.impl.user.SignOutCommand;
+import by.vchaikovski.coffeeshop.controller.command.impl.user.client.SignOutCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.card.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.barista.FindOrderCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.client.*;
@@ -47,6 +50,9 @@ public enum CommandType {
     FIND_ORDER(new FindOrderCommand(), List.of(BARISTA, ADMIN)),
     CHANGE_ORDER_STATUS(new ChangeOrderStatusCommand(), List.of(ADMIN, BARISTA)),
 
+    FIND_USER(new FindUserCommand(), List.of(ADMIN)),
+    UPDATE_USER_STATUS(new UpdateUserStatusCommand(), List.of(ADMIN)),
+    UPDATE_USER_ROLE(new UpdateUserRoleCommand(), List.of(ADMIN)),
 
 
 

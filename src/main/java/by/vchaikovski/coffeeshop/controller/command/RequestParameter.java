@@ -50,6 +50,8 @@ public enum RequestParameter {
     public static final String HOUSE_NUMBER_CHECK = "house_number_check";
     /* I */
     public static final String IS_FOUND = "is_found";
+    public static final String IS_UPDATED_USER_STATUS = "is_updated_user_status";
+    public static final String IS_UPDATED_USER_ROLE = "is_updated_user_role";
     /* L */
     public static final String LOGIN = "login";
     public static final String LOGIN_CHECK = "login_check";
@@ -87,7 +89,6 @@ public enum RequestParameter {
     public static final String PASSWORD_REPEAT_CHECK = "password_repeat_check";
     public static final String PASSWORD_CHECK = "password_result_check";
     /* R */
-    public static final String ROLE = "role";
     public static final String RESULT = "result";
     /* S */
     public static final String STREET = "street";
@@ -99,4 +100,7 @@ public enum RequestParameter {
     public static final String WRONG_MEANING = "wrong_meaning";
     /* U */
     public static final String USER_STATUS = "user_status";
+    public static final String USER_ROLE = "user_role";
+    public static final String USER_LIST = "user_list";
+    public static final String USER_ID_REQ = "user_id";
 }

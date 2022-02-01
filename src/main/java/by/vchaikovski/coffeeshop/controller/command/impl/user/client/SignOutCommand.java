@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.controller.command.impl.user;
+package by.vchaikovski.coffeeshop.controller.command.impl.user.client;
 
 import by.vchaikovski.coffeeshop.controller.Router;
 import by.vchaikovski.coffeeshop.controller.command.BaseCommand;
