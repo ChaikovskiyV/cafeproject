@@ -2,6 +2,7 @@ package by.vchaikovski.coffeeshop.model.dao.impl;
 
 import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import by.vchaikovski.coffeeshop.exception.DaoException;
+import by.vchaikovski.coffeeshop.model.dao.ColumnTable;
 import by.vchaikovski.coffeeshop.model.dao.MenuDao;
 import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
@@ -46,7 +47,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     public static MenuDao getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new MenuDaoImpl();
         }
         return instance;
@@ -202,7 +203,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public boolean update(long id, Menu menu) throws DaoException {
+    public boolean update(long id, Menu menu) throws DaoException { //TODO DELETE
         boolean result;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_MENU_ALL_PARAM)) {
@@ -211,7 +212,7 @@ public class MenuDaoImpl implements MenuDao {
             statement.setString(THIRD_PARAMETER_INDEX, menu.getDescription());
             statement.setBigDecimal(FOURTH_PARAMETER_INDEX, menu.getPrice());
             statement.setInt(FIFTH_PARAMETER_INDEX, menu.getQuantityInStock());
-            byte[] imageBytes = menu.getImage().getBytes();
+            byte[] imageBytes = menu.getImage();
             Blob blob = new SerialBlob(imageBytes);
             statement.setBlob(SIXTH_PARAMETER_INDEX, blob);
             statement.setLong(SEVENTH_PARAMETER_INDEX, id);
@@ -289,6 +290,92 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
+    public boolean increaseQuantityInStock(long id, int quantity) throws DaoException {
+        boolean result;
+        Connection connection = null;
+        try {
+            connection = ConnectionPool.getInstance().getConnection();
+            connection.setAutoCommit(false);
+            try (Statement statement = connection.createStatement();
+                 ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID);
+                 PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_MENU_QUANTITY_IN_STOCK)) {
+                int quantityInStock = resultSet.getInt(ColumnTable.MENU_QUANTITY_IN_STOCK);
+                int newQuantity = quantityInStock + quantity;
+                preparedStatement.setInt(FIRST_PARAMETER_INDEX, newQuantity);
+                preparedStatement.setLong(SECOND_PARAMETER_INDEX, id);
+                result = preparedStatement.execute();
+                connection.commit();
+            }
+        } catch (SQLException | ConnectionPoolException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    logger.warn("Rollback can't be completed", ex);
+                }
+            }
+            String message = "The query \"increase quantity in stock on number=" + quantity + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    logger.warn("Close connection can't be completed", e);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean reduceQuantityInStock(long id, int quantity) throws DaoException {
+        boolean result;
+        Connection connection = null;
+        try {
+            connection = ConnectionPool.getInstance().getConnection();
+            connection.setAutoCommit(false);
+            try (Statement statement = connection.createStatement();
+                 ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID);
+                 PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_MENU_QUANTITY_IN_STOCK)) {
+                int quantityInStock = resultSet.getInt(ColumnTable.MENU_QUANTITY_IN_STOCK);
+                if (quantityInStock >= quantity) {
+                    int newQuantity = quantityInStock - quantity;
+                    preparedStatement.setInt(FIRST_PARAMETER_INDEX, newQuantity);
+                    preparedStatement.setLong(SECOND_PARAMETER_INDEX, id);
+                    result = preparedStatement.execute();
+                    connection.commit();
+                } else {
+                    result = false;
+                }
+            }
+        } catch (SQLException | ConnectionPoolException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    logger.warn("Rollback can't be completed", ex);
+                }
+            }
+            String message = "The query \"increase quantity in stock on number=" + quantity + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    logger.warn("Close connection can't be completed", e);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public boolean updateMenuDescription(long id, String description) throws DaoException {
         boolean result;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
@@ -330,7 +417,7 @@ public class MenuDaoImpl implements MenuDao {
             statement.setString(THIRD_PARAMETER_INDEX, menu.getDescription());
             statement.setBigDecimal(FOURTH_PARAMETER_INDEX, menu.getPrice());
             statement.setInt(FIFTH_PARAMETER_INDEX, menu.getQuantityInStock());
-            byte[] imageBytes = menu.getImage().getBytes();
+            byte[] imageBytes = menu.getImage();
             Blob blob = new SerialBlob(imageBytes);
             statement.setBlob(SIXTH_PARAMETER_INDEX, blob);
             try (ResultSet resultSet = statement.getGeneratedKeys()) {

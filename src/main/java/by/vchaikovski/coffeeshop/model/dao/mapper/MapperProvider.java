@@ -11,7 +11,6 @@ public class MapperProvider {
     private static final DiscountMapperImpl discountMapper = DiscountMapperImpl.getInstance();
     private static final FoodOrderMapperImpl foodMapper = FoodOrderMapperImpl.getInstance();
     private static final MenuMapperImpl menuMapper = MenuMapperImpl.getInstance();
-    private static final OrderCartMapperImpl orderCardMapper = OrderCartMapperImpl.getInstance();
     private static final UserMapperImpl userMapper = UserMapperImpl.getInstance();
 
     private MapperProvider() {
@@ -47,10 +46,6 @@ public class MapperProvider {
 
     public MenuMapperImpl getMenuMapper() {
         return menuMapper;
-    }
-
-    public OrderCartMapperImpl getOrderCardMapper() {
-        return orderCardMapper;
     }
 
     public UserMapperImpl getUserMapper() {

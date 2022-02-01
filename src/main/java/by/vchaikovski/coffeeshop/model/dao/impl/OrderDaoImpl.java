@@ -6,7 +6,6 @@ import by.vchaikovski.coffeeshop.model.dao.OrderDao;
 import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
 import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
-import by.vchaikovski.coffeeshop.model.entity.OrderCart;
 import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
 
 import java.sql.*;
@@ -252,15 +251,16 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public boolean updateGoodsNumberInCart(long id, int goodsNumber) throws DaoException {
+    public boolean updateGoodsNumberInCart(long orderId, long menuId, int goodsNumber) throws DaoException {
         int rowsNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_ORDER_GOODS_NUMBER_IN_CART)) {
             statement.setInt(FIRST_PARAMETER_INDEX, goodsNumber);
-            statement.setLong(SECOND_PARAMETER_INDEX, id);
+            statement.setLong(SECOND_PARAMETER_INDEX, orderId);
+            statement.setLong(THIRD_PARAMETER_INDEX, menuId);
             rowsNumber = statement.executeUpdate();
         } catch (SQLException | ConnectionPoolException e) {
-            String message = UPDATE_MESSAGE + id + " by goodsNumber in cart=" + goodsNumber + FAILED_MESSAGE;
+            String message = UPDATE_MESSAGE + menuId + " by goodsNumber in cart=" + goodsNumber + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
@@ -308,21 +308,19 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public int createOrderCart(OrderCart orderCart, long orderId) throws DaoException { //TODO Change this method
+    public int createOrderCart(long orderId, Map<Menu, Integer> cart) throws DaoException { //TODO Change this method
+        int rowNumber = 0;
         Connection connection = null;
         PreparedStatement statement = null;
         try {
             connection = ConnectionPool.getInstance().getConnection();
             connection.setAutoCommit(false);
-            for (Map.Entry<Menu, Integer> entry : orderCart.getCart().entrySet()) {
+            for (Map.Entry<Menu, Integer> entry : cart.entrySet()) {
                 statement = connection.prepareStatement(CREATE_ORDER_CART);
                 statement.setLong(FIRST_PARAMETER_INDEX, orderId);
                 statement.setInt(SECOND_PARAMETER_INDEX, entry.getValue());
                 statement.setLong(THIRD_PARAMETER_INDEX, entry.getKey().getId());
-                statement.addBatch();
-            }
-            if (statement != null) {
-                statement.executeBatch();
+                rowNumber = rowNumber + statement.executeUpdate();
             }
             connection.commit();
         } catch (SQLException | ConnectionPoolException e) {
@@ -335,23 +333,24 @@ public class OrderDaoImpl implements OrderDao {
                 logger.error(message, ex);
                 throw new DaoException(message, ex);
             }
-            String message = "The query \"create foodOrder " + orderCart + FAILED_MESSAGE;
+            String message = "The query \"create foodOrder " + cart + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         } finally {
             try {
+                if (statement != null) {
+                    statement.close();
+                }
                 if (connection != null) {
                     connection.setAutoCommit(true);
-                    if (statement != null) {
-                        statement.close();
-                    }
                     connection.close();
                 }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            } catch (SQLException ex) {
+                String message = "Autocommit wasn't changed";
+                logger.error(message, ex);
             }
         }
-        return 0;
+        return rowNumber;
     }
 
     @Override

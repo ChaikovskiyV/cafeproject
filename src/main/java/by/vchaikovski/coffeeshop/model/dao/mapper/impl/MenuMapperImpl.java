@@ -4,13 +4,10 @@ import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
 import by.vchaikovski.coffeeshop.model.entity.Menu;
 
-import javax.swing.*;
-import java.awt.*;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
 
@@ -43,7 +40,7 @@ public class MenuMapperImpl implements BaseMapper<Menu> {
                     .setDescription(description)
                     .setPrice(price)
                     .setQuantityInStock(quantityInStock)
-                    .setFoodImage(Arrays.toString(imageBytes))
+                    .setFoodImage(imageBytes)
                     .build();
         } catch (SQLException e) {
             String message = "Menu can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";

@@ -4,11 +4,13 @@ import by.vchaikovski.coffeeshop.exception.DaoException;
 import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
 import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
 import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
-import by.vchaikovski.coffeeshop.model.entity.OrderCart;
+import by.vchaikovski.coffeeshop.model.entity.Menu;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
 
@@ -24,7 +26,6 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
 
     @Override
     public FoodOrder createEntity(ResultSet resultSet) throws DaoException {
-        MapperProvider mapperProvider = MapperProvider.getInstance();
         FoodOrder order;
         try {
             long id = resultSet.getLong(ORDER_ID);
@@ -36,8 +37,7 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
             long userId = resultSet.getLong(USER_ID);
             long billId = resultSet.getLong(BILL_ID);
             long deliveryId = resultSet.getLong(DELIVERY_ID);
-            OrderCartMapperImpl cartMapper = mapperProvider.getOrderCardMapper();
-            OrderCart cart = cartMapper.createEntity(resultSet);
+            Map<Menu, Integer> cart = createCart(resultSet);
             FoodOrder.FoodOrderBuilder orderBuilder = new FoodOrder.FoodOrderBuilder();
             order = orderBuilder.setId(id)
                     .setStatus(status)
@@ -55,5 +55,15 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
             throw new DaoException(message, e);
         }
         return order;
+    }
+
+    private Map<Menu, Integer> createCart(ResultSet resultSet) throws SQLException, DaoException {
+        Map<Menu, Integer> cart = new HashMap<>();
+        while (!resultSet.isAfterLast()) {
+            Menu menu = MapperProvider.getInstance().getMenuMapper().createEntity(resultSet);
+            int quantity = resultSet.getInt(CART_QUANTITY);
+            cart.put(menu, quantity);
+        }
+        return cart;
     }
 }

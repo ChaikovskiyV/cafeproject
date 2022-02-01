@@ -1,11 +1,12 @@
 package by.vchaikovski.coffeeshop.model.dao;
 
-import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
-import by.vchaikovski.coffeeshop.model.entity.OrderCart;
 import by.vchaikovski.coffeeshop.exception.DaoException;
+import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
+import by.vchaikovski.coffeeshop.model.entity.Menu;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface OrderDao extends BaseDao<FoodOrder> {
     List<FoodOrder> findByOrderStatus(FoodOrder.OrderStatus orderStatus) throws DaoException;
@@ -24,9 +25,9 @@ public interface OrderDao extends BaseDao<FoodOrder> {
 
     boolean updateOrderStatus(long id, FoodOrder.OrderStatus orderStatus) throws DaoException;
 
-    boolean updateGoodsNumberInCart(long id, int goodsNumber) throws DaoException;
+    boolean updateGoodsNumberInCart(long orderId, long menuId, int goodsNumber) throws DaoException;
 
-    int createOrderCart(OrderCart orderCart, long orderId) throws DaoException;
+    int createOrderCart(long orderId, Map<Menu, Integer> cart) throws DaoException;
 
     boolean deleteOrderCartByOrderId(long orderId) throws DaoException;
 

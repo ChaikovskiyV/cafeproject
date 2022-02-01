@@ -27,6 +27,10 @@ public interface MenuDao extends BaseDao<Menu> {
 
     boolean updateMenuQuantityInStock(long id, int quantityInStock) throws DaoException;
 
+    boolean increaseQuantityInStock(long id, int quantity) throws DaoException;
+
+    boolean reduceQuantityInStock(long id, int quantity) throws DaoException;
+
     boolean updateMenuDescription(long id, String description) throws DaoException;
 
     boolean updateMenuImage(long id, byte[] image) throws  DaoException;
