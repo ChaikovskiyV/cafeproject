@@ -6,6 +6,7 @@ import by.vchaikovski.coffeeshop.controller.command.impl.go.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.barista.ChangeOrderStatusCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.SignOutCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.card.*;
+import by.vchaikovski.coffeeshop.controller.command.impl.user.barista.FindOrderCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.client.*;
 import by.vchaikovski.coffeeshop.model.entity.User;
 
@@ -38,9 +39,17 @@ public enum CommandType {
     REDUCE_QUANTITY_IN_CART(new ReduceQuantityInCartCommand(), List.of(CLIENT)),
     GO_TO_USER_PROFILE(new GoToUserProfileCommand(), List.of(ADMIN, BARISTA, CLIENT)),
     UPDATE_USER_DATA(new UpdateUserDataCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    CREATE_ORDER(new CreateOrderCommand(), List.of(CLIENT)),
+    GO_TO_ORDERS(new GoToOrdersCommand(), List.of(CLIENT)),
+    GO_TO_ORDER_INFO(new GoToOrderInfoCommand(), List.of(CLIENT, BARISTA, ADMIN)),
+    SHOW_USER_ORDERS(new ShowUserOrdersCommand(), List.of(CLIENT)),
 
-
+    FIND_ORDER(new FindOrderCommand(), List.of(BARISTA, ADMIN)),
     CHANGE_ORDER_STATUS(new ChangeOrderStatusCommand(), List.of(ADMIN, BARISTA)),
+
+
+
+
 
     ;
     private BaseCommand command;

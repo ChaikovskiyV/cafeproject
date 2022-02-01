@@ -21,6 +21,7 @@ public enum RequestParameter {
     public static final String COMMENT = "comment";
     public static final String COMMENT_CHECK = "comment_check";
     public static final String CURRENT_MENU_ID = "current_menu_id";
+    public static final String CREATION_DATE = "creation_date";
     public static final String CLIENT = "client";
     /* D */
     public static final String DATE_EXPIRED = "date_expired";

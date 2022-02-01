@@ -27,6 +27,7 @@ public enum PagePath {
     public static final String REGISTRATION_PAGE = "/jsp/registration.jsp";
     public static final String MENU_PARAMETERS_PAGE = "/jsp/menu_parameters.jsp";
     public static final String ORDER_INFO_PAGE = "/jsp/order_info.jsp";
+    public static final String ORDER_RESEARCH_PAGE = "/jsp/order_research.jsp";
     /* admin pages */
     public static final String WAITING_ORDERS_PAGE = "/jsp/waiting_orders.jsp";
     public static final String ORDERS_PROCESSING_PAGE = "/jsp/orders_processing.jsp";
