@@ -16,6 +16,11 @@ public class Bill extends AbstractEntity {
         this.status = status != null ? status : BillStatus.NOT_PAID;
     }
 
+    public Bill(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+        this.status = BillStatus.NOT_PAID;
+    }
+
     public BigDecimal getTotalPrice() {
         return totalPrice;
     }

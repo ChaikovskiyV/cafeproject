@@ -1,23 +1,24 @@
 package by.vchaikovski.coffeeshop.model.entity;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 public class Menu extends AbstractEntity {
-    public enum FoodType {BEVERAGE, SUPPLEMENT, PASTRY}
+    public enum FoodType {COFFEE, TEA, PASTRY}
 
     private String name;
     private FoodType type;
     private BigDecimal price;
     private int quantityInStock;
     private String description;
-    private String image;
+    private byte[] image;
 
     public Menu(MenuBuilder builder) {
         super.setId(builder.id);
         name = builder.name;
         type = builder.type;
         price = builder.price;
-        quantityInStock = builder.quantityInStock; //TODO consider maybe it's excess
+        quantityInStock = builder.quantityInStock;
         description = builder.description;
         image = builder.image;
     }
@@ -62,11 +63,11 @@ public class Menu extends AbstractEntity {
         this.description = description;
     }
 
-    public String getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
 
@@ -79,7 +80,7 @@ public class Menu extends AbstractEntity {
                 (name != null ? name.equals(menu.name) : menu.name == null) &&
                 (price != null ? price.equals(menu.price) : menu.price == null) &&
                 (description != null ? description.equals(menu.description) : menu.description == null) &&
-                (image != null ? image.equals(menu.image) : menu.image == null);
+                (image != null ? Arrays.equals(image, menu.image) : menu.image == null);
     }
 
     @Override
@@ -92,7 +93,7 @@ public class Menu extends AbstractEntity {
         result = result * first + (price != null ? price.hashCode() : 0);
         result = result * first * quantityInStock;
         result = result * first + (description != null ? description.hashCode() : 0);
-        result = result * first + (image != null ? image.hashCode() : 0);
+        result = result * first + (image != null ? Arrays.hashCode(image) : 0);
 
         return result;
     }
@@ -106,7 +107,7 @@ public class Menu extends AbstractEntity {
                 .append(type)
                 .append(", price = ")
                 .append(price)
-                .append(", quantityInStock = ") //TODO consider maybe it's excess
+                .append(", quantityInStock = ")
                 .append(quantityInStock)
                 .append(", description = ")
                 .append(description)
@@ -121,7 +122,7 @@ public class Menu extends AbstractEntity {
         private BigDecimal price;
         private int quantityInStock;
         private String description;
-        private String image;
+        private byte[] image;
 
         public MenuBuilder setId(long id) {
             this.id = id;
@@ -153,7 +154,7 @@ public class Menu extends AbstractEntity {
             return this;
         }
 
-        public MenuBuilder setFoodImage(String image) {
+        public MenuBuilder setFoodImage(byte[] image) {
             this.image = image;
             return this;
         }

@@ -1,17 +1,19 @@
 package by.vchaikovski.coffeeshop.model.entity;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FoodOrder extends AbstractEntity {
     public enum OrderStatus {WAITING, ACCEPTED, CANCELLED, READY, COMPLETED}
 
-    public enum OrderEvaluation {BAD, NICE, GREAT, BRILLIANT}
+    public enum OrderEvaluation {BAD, NICE, GREAT, BRILLIANT, NO_EVALUATION}
 
     private OrderStatus status;
     private LocalDateTime creationDate;
     private String comment;
     private OrderEvaluation evaluation;
-    private OrderCart cart;
+    private Map<Menu, Integer> cart;
     private long deliveryId;
     private long billId;
     private long userId;
@@ -21,8 +23,8 @@ public class FoodOrder extends AbstractEntity {
         status = builder.status != null ? builder.status : OrderStatus.WAITING;
         creationDate = builder.creationDate != null ? builder.creationDate : LocalDateTime.now();
         comment = builder.comment;
-        evaluation = builder.evaluation;
-        cart = builder.cart;
+        evaluation = builder.evaluation != null ? builder.evaluation : OrderEvaluation.NO_EVALUATION;
+        cart = builder.cart != null ? builder.cart : new HashMap<>();
         deliveryId = builder.deliveryId;
         billId = builder.billId;
         userId = builder.userId;
@@ -60,11 +62,11 @@ public class FoodOrder extends AbstractEntity {
         this.evaluation = evaluation;
     }
 
-    public OrderCart getCart() {
+    public Map<Menu, Integer> getCart() {
         return cart;
     }
 
-    public void setCart(OrderCart cart) {
+    public void setCart(Map<Menu, Integer> cart) {
         this.cart = cart;
     }
 
@@ -150,7 +152,7 @@ public class FoodOrder extends AbstractEntity {
         private LocalDateTime creationDate;
         private String comment;
         private OrderEvaluation evaluation;
-        private OrderCart cart;
+        private Map<Menu, Integer> cart;
         private long deliveryId;
         private long billId;
         private long userId;
@@ -180,7 +182,7 @@ public class FoodOrder extends AbstractEntity {
             return this;
         }
 
-        public FoodOrderBuilder setCart(OrderCart cart) {
+        public FoodOrderBuilder setCart(Map<Menu, Integer> cart) {
             this.cart = cart;
             return this;
         }
