@@ -1,17 +1,17 @@
 package by.vchaikovski.coffeeshop.controller.command;
 
-import by.vchaikovski.coffeeshop.controller.command.impl.common.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.DefaultCommand;
+import by.vchaikovski.coffeeshop.controller.command.impl.card.*;
+import by.vchaikovski.coffeeshop.controller.command.impl.common.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.go.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.admin.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.barista.ChangeOrderStatusCommand;
-import by.vchaikovski.coffeeshop.controller.command.impl.user.client.SignOutCommand;
-import by.vchaikovski.coffeeshop.controller.command.impl.card.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.barista.FindOrderCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.client.*;
 import by.vchaikovski.coffeeshop.model.entity.User;
 
 import java.util.List;
+
 import static by.vchaikovski.coffeeshop.model.entity.User.Role.*;
 
 public enum CommandType {
@@ -24,6 +24,7 @@ public enum CommandType {
     SIGN_UP_NEW_USER(new SignUpNewUserCommand(), List.of(GUEST, ADMIN)),
     SHOW_MENU(new ShowMenuCommand(), List.of(ADMIN, BARISTA, CLIENT, GUEST)),
     SHOW_MENU_INFO(new ShowMenuInfoCommand(), List.of(ADMIN, BARISTA, CLIENT, GUEST)),
+    FIND_MENU(new FindMenuCommand(), List.of(ADMIN, BARISTA, CLIENT, GUEST)),
 
     SIGN_OUT(new SignOutCommand(), List.of(ADMIN, BARISTA, CLIENT)),
     GO_TO_REGISTRATION_CARD(new GoToRegistrationCardCommand(), List.of(ADMIN, BARISTA, CLIENT)),
@@ -48,7 +49,6 @@ public enum CommandType {
     UPDATE_ORDER_COMMENT(new UpdateOrderCommentCommand(), List.of(CLIENT, ADMIN)),
     CHANGE_PASSWORD(new ChangePasswordCommand(), List.of(ADMIN, BARISTA, CLIENT)),
 
-
     FIND_ORDER(new FindOrderCommand(), List.of(BARISTA, ADMIN)),
     CHANGE_ORDER_STATUS(new ChangeOrderStatusCommand(), List.of(ADMIN, BARISTA)),
 
@@ -63,6 +63,8 @@ public enum CommandType {
     DELETE_USER(new DeleteUserCommand(), List.of(ADMIN)),
     DELETE_ORDER(new DeleteOrderCommand(), List.of(ADMIN)),
     DELETE_DISCOUNT(new DeleteDiscountCommand(), List.of(ADMIN)),
+    CREATE_MENU(new CreateMenuCommand(), List.of(ADMIN)),
+    CREATE_DISCOUNT(new CreateDiscountCommand(), List.of(ADMIN))
     ;
     private BaseCommand command;
     private List<User.Role> usersRole;

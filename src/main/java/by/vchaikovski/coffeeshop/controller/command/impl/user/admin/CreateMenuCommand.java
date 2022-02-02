@@ -16,13 +16,13 @@ import java.util.Map;
 
 import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
 
-public class UpdateMenuCommand implements BaseCommand {
+public class CreateMenuCommand implements BaseCommand {
     private static final Logger logger = LogManager.getLogger();
 
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
+        Router router = new Router(PagePath.MENU_CREATION_PAGE);
         MenuService menuService = ServiceProvider.getInstance().getMenuService();
-        String menuId = request.getParameter(MENU_ID);
         String menuName = request.getParameter(MENU_NAME);
         String menuType = request.getParameter(MENU_TYPE);
         String description = request.getParameter(MENU_DESCRIPTION);
@@ -40,17 +40,19 @@ public class UpdateMenuCommand implements BaseCommand {
             menuParameters.put(MENU_IMAGE, imagePath);
         }
         try {
-            boolean isUpdated = menuService.updateMenu(Long.parseLong(menuId), menuParameters);
-            request.setAttribute(IS_UPDATED_MENU, isUpdated);
-            if (!isUpdated) {
+            long menuId = menuService.create(menuParameters);
+            request.setAttribute(MENU_ID, menuId);
+            if (menuId == 0) {
                 fillWrongAttr(menuParameters, request);
+            } else {
+                router.setRouterType(Router.RouterType.REDIRECT);
             }
         } catch (ServiceException e) {
-            String message = "Update menu command can't be completed";
+            String message = "Create menu command can't be completed";
             logger.error(message, e);
             throw new CommandException(message, e);
         }
-        return new Router(PagePath.MENU_INFO_PAGE);
+        return router;
     }
 
     private void fillWrongAttr(Map<String, String> menuParameters, HttpServletRequest request) {

@@ -17,6 +17,7 @@ public enum PagePath {
     public static final String REGISTRATION_CARD_PAGE = "/jsp/card/registration_card.jsp";
     public static final String CARD_INFO_PAGE = "/jsp/card/card_info.jsp";
     public static final String USER_INFO_PAGE = "/jsp/user_info.jsp";
+    public static final String MENU_RESEARCH_PAGE = "/jsp/menu_research.jsp";
     /* client pages */
     public static final String ORDER_CREATION_PAGE = "/jsp/order_creation.jsp";
     public static final String CART_PAGE = "/jsp/cart.jsp";
@@ -44,5 +45,4 @@ public enum PagePath {
     public static final String ERROR_400_PAGE = "/jsp/error/error400.jsp";
     public static final String NOT_AVAILABLE_ACTION_PAGE = "/jsp/error/error403.jsp";
     public static final String ERROR_500_PAGE = "/jsp/error/error500.jsp";
-
 }
