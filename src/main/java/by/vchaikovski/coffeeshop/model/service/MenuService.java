@@ -26,6 +26,8 @@ public interface MenuService {
 
     List<Menu> findByQuantityInStockRange(String minQuantity, String maxQuantity) throws ServiceException;
 
+    List<Menu> findMenuBySeveralParameter(Map<String, String> menuParameters) throws ServiceException;
+
     boolean updateMenu(long id, Map<String, String> menuParameters) throws ServiceException;
 
     boolean updateMenuName(long id, String name) throws ServiceException;

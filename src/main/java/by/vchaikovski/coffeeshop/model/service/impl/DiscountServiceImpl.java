@@ -148,11 +148,16 @@ public class DiscountServiceImpl implements DiscountService {
         FormValidator validator = FormValidatorImpl.getInstance();
         if (validator.isDiscountParametersValid(discountParameters)) {
             try {
-                String discountType = discountParameters.get(DISCOUNT_ID);
-                String discountRate = discountParameters.get(DISCOUNT_RATE);
-                Discount discount = new Discount(Discount.DiscountType.valueOf(discountType.toUpperCase()),
-                        Integer.parseInt(discountRate));
-                discountId = discountDao.create(discount);
+                Discount.DiscountType discountType =
+                        Discount.DiscountType.valueOf(discountParameters.get(DISCOUNT_ID).toUpperCase());
+                int discountRate = Integer.parseInt(discountParameters.get(DISCOUNT_RATE));
+                Optional<Discount> optionalDiscount = discountDao.findByTypeAndRate(discountType, discountRate);
+                if (optionalDiscount.isPresent()) {
+                    discountId = optionalDiscount.get().getId();
+                } else {
+                    Discount discount = new Discount(discountType, discountRate);
+                    discountId = discountDao.create(discount);
+                }
             } catch (DaoException e) {
                 String message = "Discount can't be inserted in data base";
                 logger.error(message, e);

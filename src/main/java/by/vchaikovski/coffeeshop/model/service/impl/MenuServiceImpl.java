@@ -51,16 +51,22 @@ public class MenuServiceImpl implements MenuService {
             String price = menuParameters.get(MENU_PRICE);
             String quantityInStock = menuParameters.get(MENU_QUANTITY_IN_STOCK);
             String description = menuParameters.get(MENU_DESCRIPTION);
+            String imagePath = menuParameters.get(MENU_IMAGE);
             Menu.FoodType foodType = Menu.FoodType.valueOf(type);
             PictureLoader pictureLoader = PictureLoader.getInstance();
-            byte[] defaultPicture = pictureLoader.loadDefaultPicture(foodType);
+            byte[] image;
+            if (imagePath != null) {
+                image = pictureLoader.loadPicture(imagePath);
+            } else {
+                image = pictureLoader.loadDefaultPicture(foodType);
+            }
             Menu menu = new Menu.MenuBuilder()
                     .setName(name)
                     .setType(foodType)
                     .setPrice(new BigDecimal(price))
                     .setQuantityInStock(Integer.parseInt(quantityInStock))
                     .setDescription(description)
-                    .setFoodImage(defaultPicture)
+                    .setFoodImage(image)
                     .build();
             try {
                 menuId = menuDao.create(menu);
@@ -191,6 +197,42 @@ public class MenuServiceImpl implements MenuService {
                         minQuantity + " - " + maxQuantity;
                 logger.error(message, e);
                 throw new ServiceException(message, e);
+            }
+        }
+        return menuList;
+    }
+
+    @Override
+    public List<Menu> findMenuBySeveralParameter(Map<String, String> menuParameters) throws ServiceException {
+        List<Menu> menuList = findAll();
+        if (menuParameters != null && !menuParameters.isEmpty()) {
+            DataValidator validator = DataValidatorImpl.getInstance();
+            String menuName = menuParameters.get(MENU_NAME);
+            String menuPrice = menuParameters.get(MENU_PRICE);
+            String menuType = menuParameters.get(MENU_TYPE);
+            String quantityInStock = menuParameters.get(MENU_QUANTITY_IN_STOCK);
+            if (validator.isNameValid(menuName)) {
+                menuList = menuList.stream()
+                        .filter(menu -> menu.getName().equals(menuName))
+                        .toList();
+            }
+            if (validator.isNumberValid(menuPrice)) {
+                BigDecimal price = new BigDecimal(menuPrice);
+                menuList = menuList.stream()
+                        .filter(menu -> menu.getPrice().compareTo(price) == 0)
+                        .toList();
+            }
+            if (validator.isEnumContains(menuType, Menu.FoodType.class)) {
+                Menu.FoodType type = Menu.FoodType.valueOf(menuType.toUpperCase());
+                menuList = menuList.stream()
+                        .filter(menu -> menu.getType() == type)
+                        .toList();
+            }
+            if (validator.isNumberValid(quantityInStock)) {
+                int quantity = Integer.parseInt(quantityInStock);
+                menuList = menuList.stream()
+                        .filter(menu -> menu.getQuantityInStock() == quantity)
+                        .toList();
             }
         }
         return menuList;
