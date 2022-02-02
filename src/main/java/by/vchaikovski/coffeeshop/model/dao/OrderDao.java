@@ -36,4 +36,8 @@ public interface OrderDao extends BaseDao<FoodOrder> {
     boolean deleteOrderCartByOrderId(long orderId) throws DaoException;
 
     boolean deleteOrderCartByOrderIdAndMenuId(long orderId, long menuId) throws DaoException;
+
+    boolean updateComment(long orderId, String comment) throws DaoException;
+
+    boolean updateEvaluation(long orderId, FoodOrder.OrderEvaluation evaluation) throws DaoException;
 }

@@ -203,7 +203,7 @@ public class MenuDaoImpl implements MenuDao {
     }
 
     @Override
-    public boolean update(long id, Menu menu) throws DaoException { //TODO DELETE
+    public boolean update(long id, Menu menu) throws DaoException {
         boolean result;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_MENU_ALL_PARAM)) {

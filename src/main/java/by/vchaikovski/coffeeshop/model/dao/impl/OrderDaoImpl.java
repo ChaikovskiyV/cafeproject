@@ -42,6 +42,8 @@ public class OrderDaoImpl implements OrderDao {
     private static final String UPDATE_ORDER_STATUS = "UPDATE orders SET order_status=? WHERE order_id=?";
     private static final String UPDATE_ORDER_GOODS_NUMBER_IN_CART = "UPDATE order_cart SET quantity=? " +
             "WHERE fk_order_id=? AND fk_menu_id=?";
+    private static final String UPDATE_ORDER_COMMENT = "UPDATE orders SET comment=? WHERE order_id=?";
+    private static final String UPDATE_ORDER_EVALUATION = "UPDATE orders SET evaluation=? WHERE order_id=?";
     private static final String CREATE_ORDER = "INSERT INTO orders(order_status, creation_date, comment, evaluation, fk_user_id, fk_bill_id, fk_delivery_id)" +
             "VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String CREATE_ORDER_CART = "INSERT INTO order_cart(fk_order_id, quantity, fk_menu_id) VALUES (?, ?, ?)";
@@ -334,16 +336,16 @@ public class OrderDaoImpl implements OrderDao {
     public int createOrderCart(long orderId, Map<Menu, Integer> cart) throws DaoException { //TODO Change this method
         int rowNumber = 0;
         Connection connection = null;
-        PreparedStatement statement = null;
         try {
             connection = ConnectionPool.getInstance().getConnection();
             connection.setAutoCommit(false);
             for (Map.Entry<Menu, Integer> entry : cart.entrySet()) {
-                statement = connection.prepareStatement(CREATE_ORDER_CART);
-                statement.setLong(FIRST_PARAMETER_INDEX, orderId);
-                statement.setInt(SECOND_PARAMETER_INDEX, entry.getValue());
-                statement.setLong(THIRD_PARAMETER_INDEX, entry.getKey().getId());
-                rowNumber = rowNumber + statement.executeUpdate();
+                try (PreparedStatement statement = connection.prepareStatement(CREATE_ORDER_CART)) {
+                    statement.setLong(FIRST_PARAMETER_INDEX, orderId);
+                    statement.setInt(SECOND_PARAMETER_INDEX, entry.getValue());
+                    statement.setLong(THIRD_PARAMETER_INDEX, entry.getKey().getId());
+                    rowNumber = rowNumber + statement.executeUpdate();
+                }
             }
             connection.commit();
         } catch (SQLException | ConnectionPoolException e) {
@@ -361,9 +363,6 @@ public class OrderDaoImpl implements OrderDao {
             throw new DaoException(message, e);
         } finally {
             try {
-                if (statement != null) {
-                    statement.close();
-                }
                 if (connection != null) {
                     connection.setAutoCommit(true);
                     connection.close();
@@ -400,6 +399,38 @@ public class OrderDaoImpl implements OrderDao {
             rowsNumber = statement.executeUpdate();
         } catch (SQLException | ConnectionPoolException e) {
             String message = "The query \"delete orderCart by orderId=" + orderId + " and menuId=" + menuId + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        }
+        return rowsNumber != 0;
+    }
+
+    @Override
+    public boolean updateComment(long orderId, String comment) throws DaoException {
+        int rowsNumber;
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_ORDER_COMMENT)) {
+            statement.setString(FIRST_PARAMETER_INDEX, comment);
+            statement.setLong(SECOND_PARAMETER_INDEX, orderId);
+            rowsNumber = statement.executeUpdate();
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = UPDATE_MESSAGE + orderId + " by comment=" + comment + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        }
+        return rowsNumber != 0;
+    }
+
+    @Override
+    public boolean updateEvaluation(long orderId, FoodOrder.OrderEvaluation evaluation) throws DaoException {
+        int rowsNumber;
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(UPDATE_ORDER_EVALUATION)) {
+            statement.setString(FIRST_PARAMETER_INDEX, evaluation.name());
+            statement.setLong(SECOND_PARAMETER_INDEX, orderId);
+            rowsNumber = statement.executeUpdate();
+        } catch (SQLException | ConnectionPoolException e) {
+            String message = UPDATE_MESSAGE + orderId + " by status=" + evaluation.name() + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
