@@ -140,6 +140,12 @@ public class FormValidatorImpl extends DataValidatorImpl implements FormValidato
                         result = false;
                     }
                 }
+                case MENU_IMAGE -> {
+                    if(!isPicture(value)) {
+                        menuParameters.replace(key, WRONG_MEANING);
+                        result = false;
+                    }
+                }
                 default -> logger.debug(() -> UNCHECKED_PARAM_MESS + key);
             }
         }
