@@ -281,29 +281,42 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean updateUserPassword(long id, Map<String, String> userParameters) throws ServiceException {
         DataValidator validator = DataValidatorImpl.getInstance();
-        String oldPassword = userParameters.get(OLD_PASSWORD);
-        if (!validator.isPasswordValid(oldPassword)) {
-            userParameters.remove(OLD_PASSWORD);
-            return false;
-        }
-        try {
-            PasswordEncryptor encryptor = PasswordEncryptor.getInstance();
-            String encryptedOldPass = encryptor.encryptPassword(oldPassword);
-            Optional<User> user = userDao.findByIdAndPassword(id, encryptedOldPass);
-            String newPassword = userParameters.get(NEW_PASSWORD);
-            if (user.isEmpty() || !validator.isPasswordValid(newPassword)) {
-                userParameters.remove(OLD_PASSWORD);
-                userParameters.remove(NEW_PASSWORD);
-                logger.debug("Password is wrong or not correct");
-                return false;
+        boolean result;
+        String password = userParameters.get(PASSWORD);
+        String passwordRepeat = userParameters.get(PASSWORD_REPEAT);
+        if (!validator.isPasswordValid(password)) {
+            userParameters.replace(PASSWORD, WRONG_MEANING);
+            logger.debug("Password is not correct");
+            result = false;
+        } else if (!password.equals(passwordRepeat)) {
+            userParameters.replace(PASSWORD_REPEAT, WRONG_MEANING);
+            logger.debug("Passwords are not the same");
+            result = false;
+        } else {
+            try {
+                PasswordEncryptor encryptor = PasswordEncryptor.getInstance();
+                String encryptedOldPass = encryptor.encryptPassword(password);
+                Optional<User> user = userDao.findByIdAndPassword(id, encryptedOldPass);
+                String newPassword = userParameters.get(NEW_PASSWORD);
+                if (user.isEmpty()) {
+                    userParameters.replace(PASSWORD, WRONG_MEANING);
+                    logger.debug("Password is wrong");
+                    result = false;
+                } else if (!validator.isPasswordValid(newPassword)) {
+                    userParameters.replace(NEW_PASSWORD, WRONG_MEANING);
+                    logger.debug("New password is not correct");
+                    result = false;
+                } else {
+                    String encryptedNewPass = encryptor.encryptPassword(newPassword);
+                    result = userDao.updateUserPassword(id, encryptedNewPass);
+                }
+            } catch (DaoException e) {
+                String message = "User can't be updated by password.";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
             }
-            String encryptedNewPass = encryptor.encryptPassword(newPassword);
-            return userDao.updateUserPassword(id, encryptedNewPass);
-        } catch (DaoException e) {
-            String message = "User can't be updated by password.";
-            logger.error(message, e);
-            throw new ServiceException(message, e);
         }
+        return result;
     }
 
     @Override

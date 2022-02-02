@@ -197,6 +197,37 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public boolean updateMenu(long id, Map<String, String> menuParameters) throws ServiceException {
+        boolean result = false;
+        FormValidator formValidator = FormValidatorImpl.getInstance();
+        if (formValidator.isMenuParametersValid(menuParameters)) {
+            PictureLoader pictureLoader = PictureLoader.getInstance();
+            String menuName = menuParameters.get(MENU_NAME);
+            Menu.FoodType menuType = Menu.FoodType.valueOf(menuParameters.get(MENU_TYPE).toUpperCase());
+            String description = menuParameters.get(MENU_DESCRIPTION);
+            BigDecimal price = new BigDecimal(menuParameters.get(MENU_PRICE));
+            int quantityInStock = Integer.parseInt(menuParameters.get(MENU_QUANTITY_IN_STOCK));
+            byte[] image = pictureLoader.loadPicture(menuParameters.get(MENU_IMAGE));
+            Menu menu = new Menu.MenuBuilder()
+                    .setName(menuName)
+                    .setType(menuType)
+                    .setDescription(description)
+                    .setPrice(price)
+                    .setQuantityInStock(quantityInStock)
+                    .setFoodImage(image)
+                    .build();
+            try {
+                result = menuDao.update(id, menu);
+            } catch (DaoException e) {
+                String message = "Menu can't be updated by several parameters";
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public boolean updateMenuName(long id, String name) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
@@ -264,7 +295,7 @@ public class MenuServiceImpl implements MenuService {
     public boolean increaseQuantityInStock(long id, String quantity) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
-        if(validator.isNumberValid(quantity)) {
+        if (validator.isNumberValid(quantity)) {
             try {
                 result = menuDao.increaseQuantityInStock(id, Integer.parseInt(quantity));
             } catch (DaoException e) {
@@ -280,7 +311,7 @@ public class MenuServiceImpl implements MenuService {
     public boolean reduceQuantityInStock(long id, String quantity) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
-        if(validator.isNumberValid(quantity)) {
+        if (validator.isNumberValid(quantity)) {
             try {
                 result = menuDao.reduceQuantityInStock(id, Integer.parseInt(quantity));
             } catch (DaoException e) {

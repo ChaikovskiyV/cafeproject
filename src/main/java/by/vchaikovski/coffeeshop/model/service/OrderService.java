@@ -38,6 +38,10 @@ public interface OrderService {
 
     boolean updateGoodsNumberInCart(long orderId, long menuId, String goodsNumber) throws ServiceException;
 
+    boolean updateComment(long orderId, String comment) throws ServiceException;
+
+    boolean updateEvaluation(long orderId, String evaluation) throws ServiceException;
+
     int createOrderCart(long orderId, Map<Menu, Integer> cart) throws ServiceException;
 
     boolean deleteOrderCartByOrderId(long orderId) throws ServiceException;

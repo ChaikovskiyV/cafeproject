@@ -291,6 +291,39 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public boolean updateComment(long orderId, String comment) throws ServiceException {
+        boolean result = false;
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if (validator.isTextValid(comment) && isOrderUncompleted(orderId)) {
+            try {
+                result = orderDao.updateComment(orderId, comment);
+            } catch (DaoException e) {
+                String message = "FoodOrders can't be updated by comment=" + comment;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean updateEvaluation(long orderId, String evaluation) throws ServiceException {
+        boolean result = false;
+        DataValidator validator = DataValidatorImpl.getInstance();
+        if (validator.isEnumContains(evaluation, FoodOrder.OrderEvaluation.class) && isOrderUncompleted(orderId)) {
+            FoodOrder.OrderEvaluation orderEvaluation = FoodOrder.OrderEvaluation.valueOf(evaluation.toUpperCase());
+            try {
+                result = orderDao.updateEvaluation(orderId, orderEvaluation);
+            } catch (DaoException e) {
+                String message = "FoodOrders can't be updated by evaluation=" + evaluation;
+                logger.error(message, e);
+                throw new ServiceException(message, e);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public int createOrderCart(long orderId, Map<Menu, Integer> cart) throws ServiceException {
         int rowNumber = 0;
         if (isOrderUncompleted(orderId)) {

@@ -130,7 +130,7 @@ public class DiscountServiceImpl implements DiscountService {
     public boolean updateDiscountRate(long id, String rate) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isNumberValid(rate)) {
+        if (validator.isDiscountRateValid(rate)) {
             try {
                 result = discountDao.updateDiscountRate(id, Integer.parseInt(rate));
             } catch (DaoException e) {
