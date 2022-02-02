@@ -3,9 +3,7 @@ package by.vchaikovski.coffeeshop.controller.command;
 import by.vchaikovski.coffeeshop.controller.command.impl.common.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.DefaultCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.go.*;
-import by.vchaikovski.coffeeshop.controller.command.impl.user.admin.FindUserCommand;
-import by.vchaikovski.coffeeshop.controller.command.impl.user.admin.UpdateUserRoleCommand;
-import by.vchaikovski.coffeeshop.controller.command.impl.user.admin.UpdateUserStatusCommand;
+import by.vchaikovski.coffeeshop.controller.command.impl.user.admin.*;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.barista.ChangeOrderStatusCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.user.client.SignOutCommand;
 import by.vchaikovski.coffeeshop.controller.command.impl.card.*;
@@ -46,6 +44,10 @@ public enum CommandType {
     GO_TO_ORDERS(new GoToOrdersCommand(), List.of(CLIENT)),
     GO_TO_ORDER_INFO(new GoToOrderInfoCommand(), List.of(CLIENT, BARISTA, ADMIN)),
     SHOW_USER_ORDERS(new ShowUserOrdersCommand(), List.of(CLIENT)),
+    UPDATE_ORDER_EVALUATION(new UpdateOrderEvaluationCommand(), List.of(CLIENT)),
+    UPDATE_ORDER_COMMENT(new UpdateOrderCommentCommand(), List.of(CLIENT, ADMIN)),
+    CHANGE_PASSWORD(new ChangePasswordCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+
 
     FIND_ORDER(new FindOrderCommand(), List.of(BARISTA, ADMIN)),
     CHANGE_ORDER_STATUS(new ChangeOrderStatusCommand(), List.of(ADMIN, BARISTA)),
@@ -53,10 +55,14 @@ public enum CommandType {
     FIND_USER(new FindUserCommand(), List.of(ADMIN)),
     UPDATE_USER_STATUS(new UpdateUserStatusCommand(), List.of(ADMIN)),
     UPDATE_USER_ROLE(new UpdateUserRoleCommand(), List.of(ADMIN)),
-
-
-
-
+    GO_TO_USER_INFO(new GoToUserInfoCommand(), List.of(ADMIN)),
+    UPDATE_USER_DISCOUNT(new UpdateUserDiscountCommand(), List.of(ADMIN)),
+    UPDATE_MENU(new UpdateMenuCommand(), List.of(ADMIN)),
+    REPLENISH_MENU_STOCK(new ReplenishMenuStockCommand(), List.of(ADMIN)),
+    DELETE_MENU(new DeleteMenuCommand(), List.of(ADMIN)),
+    DELETE_USER(new DeleteUserCommand(), List.of(ADMIN)),
+    DELETE_ORDER(new DeleteOrderCommand(), List.of(ADMIN)),
+    DELETE_DISCOUNT(new DeleteDiscountCommand(), List.of(ADMIN)),
     ;
     private BaseCommand command;
     private List<User.Role> usersRole;

@@ -36,6 +36,7 @@ public enum RequestParameter {
     /* E */
     public static final String EMAIL = "email";
     public static final String EMAIL_CHECK = "email_check";
+    public static final String EVALUATION_CHECK = "evaluation_check";
     public static final String EVALUATION = "evaluation";
     public static final String EMPTY_CART_MESSAGE = "empty_cart_message";
     /* F */
@@ -52,6 +53,10 @@ public enum RequestParameter {
     public static final String IS_FOUND = "is_found";
     public static final String IS_UPDATED_USER_STATUS = "is_updated_user_status";
     public static final String IS_UPDATED_USER_ROLE = "is_updated_user_role";
+    public static final String IS_UPDATED_PASSWORD = "is_updated_password";
+    public static final String IS_UPDATED_DISCOUNT = "is_updated_discount";
+    public static final String IS_UPDATED_MENU = "is_updated_menu";
+    public static final String IS_DELETED = "is_deleted";
     /* L */
     public static final String LOGIN = "login";
     public static final String LOGIN_CHECK = "login_check";
@@ -59,17 +64,27 @@ public enum RequestParameter {
     public static final String LAST_NAME_CHECK = "last_name_check";
 
     /* M */
+    public static final String MENU = "menu";
     public static final String MENU_NAME = "menu_name";
+    public static final String MENU_NAME_CHECK = "menu_name_check";
     public static final String MENU_TYPE = "menu_type";
+    public static final String MENU_TYPE_CHECK = "menu_type_check";
     public static final String MENU_PRICE = "menu_price";
+    public static final String MENU_PRICE_CHECK = "menu_price_check";
     public static final String MENU_DESCRIPTION = "menu_description";
+    public static final String MENU_DESCRIPTION_CHECK = "menu_description_check";
     public static final String MENU_QUANTITY_IN_STOCK = "menu_quantity_in_stock";
+    public static final String MENU_QUANTITY_IN_STOCK_CHECK = "menu_quantity_in_stock_check";
     public static final String MENU_QUANTITY = "menu_quantity";
     public static final String MENU_QUANTITY_CHECK = "menu_quantity_check";
     public static final String MENU_IMAGE = "menu_image";
+    public static final String MENU_IMAGE_CHECK = "menu_image_check";
     public static final String MENU_LIST = "menu_list";
+    public static final String MENU_ID = "menu_id";
+
     /* N */
     public static final String NEW_PASSWORD = "new_password";
+    public static final String NEW_PASSWORD_CHECK = "new_password_check";
     public static final String NOT_UNIQUE_MEANING = "not_unique_meaning";
     /* O */
     public static final String OLD_PASSWORD = "old_password";

@@ -36,6 +36,7 @@ public enum PagePath {
     public static final String MENU_CREATION_PAGE = "/jsp/menu_creation.jsp";
     public static final String MENU_UPDATING_PAGE = "/jsp/menu_updating.jsp";
     public static final String USER_RESEARCH_PAGE = "/jsp/user_research.jsp";
+    public static final String DISCOUNT_RESEARCH_PAGE = "/jsp/discount_research.jsp";
     /* barista pages */
     public static final String ACTIVE_ORDERS_PAGE = "/jsp/active_orders.jsp";
     public static final String ORDER_STATUS_UPDATING_PAGE = "/jsp/order_status_updating.jps";
