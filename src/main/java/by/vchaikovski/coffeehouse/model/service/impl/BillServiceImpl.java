@@ -1,39 +1,47 @@
-package by.vchaikovski.coffeeshop.model.service.impl;
+package by.vchaikovski.coffeehouse.model.service.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.exception.ServiceException;
-import by.vchaikovski.coffeeshop.model.dao.BillDao;
-import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
-import by.vchaikovski.coffeeshop.model.entity.Bill;
-import by.vchaikovski.coffeeshop.model.entity.Discount;
-import by.vchaikovski.coffeeshop.model.service.BillService;
-import by.vchaikovski.coffeeshop.model.service.DiscountService;
-import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
-import by.vchaikovski.coffeeshop.util.validator.DataValidator;
-import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.dao.BillDao;
+import by.vchaikovski.coffeehouse.model.dao.DaoProvider;
+import by.vchaikovski.coffeehouse.model.entity.Bill;
+import by.vchaikovski.coffeehouse.model.entity.Discount;
+import by.vchaikovski.coffeehouse.model.service.BillService;
+import by.vchaikovski.coffeehouse.model.service.DiscountService;
+import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
+import by.vchaikovski.coffeehouse.util.validator.DataValidator;
+import by.vchaikovski.coffeehouse.util.validator.impl.DataValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
-import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.USER_ID;
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeehouse.controller.command.SessionParameter.USER_ID;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Bill service.
+ */
 public class BillServiceImpl implements BillService {
     private static final Logger logger = LogManager.getLogger();
     private static final BillDao billDao = DaoProvider.getInstance().getBillDao();
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:ss";
     private static BillService instance;
 
     private BillServiceImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static BillService getInstance() {
         if (instance == null) {
             instance = new BillServiceImpl();
@@ -52,11 +60,10 @@ public class BillServiceImpl implements BillService {
         if (validator.isNumberValid(totalPrice) && validator.isEnumContains(billStatus, Bill.BillStatus.class)) {
             Bill.BillStatus status = Bill.BillStatus.valueOf(billStatus.toUpperCase());
             BigDecimal price = findPriceWithDiscount(new BigDecimal(totalPrice), userId);
-            LocalDateTime date = null;
+            LocalDate date = null;
             if (status == Bill.BillStatus.PAID) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-                date = validator.isDateTimeValid(paymentDate) ? LocalDateTime.parse(paymentDate)
-                        : LocalDateTime.parse(LocalDateTime.now().format(formatter));
+                date = validator.isDateValid(paymentDate) ? LocalDate.parse(paymentDate)
+                        : LocalDate.now();
             }
             Bill bill = new Bill(status, date, price);
             try {
@@ -136,10 +143,9 @@ public class BillServiceImpl implements BillService {
     public List<Bill> findBillByPaymentTime(String paymentTime) throws ServiceException {
         List<Bill> bills = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isDateTimeValid(paymentTime)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+        if (validator.isDateValid(paymentTime)) {
             try {
-                bills = billDao.findByPaymentDate(LocalDateTime.parse(paymentTime, formatter));
+                bills = billDao.findByPaymentDate(LocalDate.parse(paymentTime));
             } catch (DaoException e) {
                 String message = "Bills can't be found by payment time=" + paymentTime;
                 logger.error(message, e);
@@ -153,11 +159,10 @@ public class BillServiceImpl implements BillService {
     public List<Bill> findBillByPaymentPeriod(String startPeriod, String endPeriod) throws ServiceException {
         List<Bill> bills = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isDateTimeValid(startPeriod) && validator.isDateTimeValid(endPeriod)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+        if (validator.isDateValid(startPeriod) && validator.isDateValid(endPeriod)) {
             try {
-                LocalDateTime start = LocalDateTime.parse(startPeriod, formatter);
-                LocalDateTime finish = LocalDateTime.parse(endPeriod, formatter);
+                LocalDate start = LocalDate.parse(startPeriod);
+                LocalDate finish = LocalDate.parse(endPeriod);
                 bills = billDao.findByPaymentDate(start, finish);
             } catch (DaoException e) {
                 String message = "Bills can't be found by payment time range=" + startPeriod + " - " + endPeriod;
@@ -194,11 +199,10 @@ public class BillServiceImpl implements BillService {
         if (validator.isNumberValid(totalPrice) && validator.isEnumContains(billStatus, Bill.BillStatus.class)) {
             Bill.BillStatus status = Bill.BillStatus.valueOf(billStatus.toUpperCase());
             BigDecimal price = new BigDecimal(totalPrice);
-            LocalDateTime date = null;
+            LocalDate date = null;
             if (status == Bill.BillStatus.PAID) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-                date = validator.isDateTimeValid(paymentDate) ? LocalDateTime.parse(paymentDate)
-                        : LocalDateTime.parse(LocalDateTime.now().format(formatter));
+                date = validator.isDateValid(paymentDate) ? LocalDate.parse(paymentDate)
+                        : LocalDate.now();
             }
             Bill bill = new Bill(status, date, price);
             try {
@@ -236,10 +240,9 @@ public class BillServiceImpl implements BillService {
     public boolean updateBillPaymentTime(long billId, String paymentDate) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isDateTimeValid(paymentDate)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+        if (validator.isDateValid(paymentDate)) {
             try {
-                LocalDateTime dateTime = LocalDateTime.parse(paymentDate, formatter);
+                LocalDate dateTime = LocalDate.parse(paymentDate);
                 result = billDao.updateBillPaymentDate(billId, dateTime);
             } catch (DaoException e) {
                 String message = "Bill can't be updated by payment date=" + paymentDate;

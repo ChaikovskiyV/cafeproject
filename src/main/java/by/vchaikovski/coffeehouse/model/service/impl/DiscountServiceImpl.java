@@ -1,15 +1,15 @@
-package by.vchaikovski.coffeeshop.model.service.impl;
+package by.vchaikovski.coffeehouse.model.service.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.exception.ServiceException;
-import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
-import by.vchaikovski.coffeeshop.model.dao.DiscountDao;
-import by.vchaikovski.coffeeshop.model.entity.Discount;
-import by.vchaikovski.coffeeshop.model.service.DiscountService;
-import by.vchaikovski.coffeeshop.util.validator.DataValidator;
-import by.vchaikovski.coffeeshop.util.validator.FormValidator;
-import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
-import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.dao.DaoProvider;
+import by.vchaikovski.coffeehouse.model.dao.DiscountDao;
+import by.vchaikovski.coffeehouse.model.entity.Discount;
+import by.vchaikovski.coffeehouse.model.service.DiscountService;
+import by.vchaikovski.coffeehouse.util.validator.DataValidator;
+import by.vchaikovski.coffeehouse.util.validator.FormValidator;
+import by.vchaikovski.coffeehouse.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeehouse.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,9 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.DISCOUNT_ID;
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.DISCOUNT_RATE;
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.DISCOUNT_ID;
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.DISCOUNT_RATE;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Discount service.
+ */
 public class DiscountServiceImpl implements DiscountService {
     private static final Logger logger = LogManager.getLogger();
     private static DiscountService instance;
@@ -30,6 +35,11 @@ public class DiscountServiceImpl implements DiscountService {
         discountDao = DaoProvider.getInstance().getDiscountDao();
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static DiscountService getInstance() {
         if (instance == null) {
             instance = new DiscountServiceImpl();
@@ -97,7 +107,7 @@ public class DiscountServiceImpl implements DiscountService {
         List<Discount> discounts = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
         if (validator.isEnumContains(discountType, Discount.DiscountType.class)) {
-            Discount.DiscountType type = Discount.DiscountType.valueOf(discountType);
+            Discount.DiscountType type = Discount.DiscountType.valueOf(discountType.toUpperCase());
             try {
                 discounts = discountDao.findByType(type);
             } catch (DaoException e) {

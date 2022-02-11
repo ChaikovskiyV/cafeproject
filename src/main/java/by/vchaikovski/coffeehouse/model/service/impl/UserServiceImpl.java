@@ -1,20 +1,20 @@
-package by.vchaikovski.coffeeshop.model.service.impl;
+package by.vchaikovski.coffeehouse.model.service.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.exception.ServiceException;
-import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
-import by.vchaikovski.coffeeshop.model.dao.DiscountDao;
-import by.vchaikovski.coffeeshop.model.dao.UserDao;
-import by.vchaikovski.coffeeshop.model.entity.Discount;
-import by.vchaikovski.coffeeshop.model.entity.User;
-import by.vchaikovski.coffeeshop.model.service.DiscountService;
-import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
-import by.vchaikovski.coffeeshop.model.service.UserService;
-import by.vchaikovski.coffeeshop.util.PasswordEncryptor;
-import by.vchaikovski.coffeeshop.util.validator.DataValidator;
-import by.vchaikovski.coffeeshop.util.validator.FormValidator;
-import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
-import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.dao.DaoProvider;
+import by.vchaikovski.coffeehouse.model.dao.DiscountDao;
+import by.vchaikovski.coffeehouse.model.dao.UserDao;
+import by.vchaikovski.coffeehouse.model.entity.Discount;
+import by.vchaikovski.coffeehouse.model.entity.User;
+import by.vchaikovski.coffeehouse.model.service.DiscountService;
+import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
+import by.vchaikovski.coffeehouse.model.service.UserService;
+import by.vchaikovski.coffeehouse.util.PasswordEncryptor;
+import by.vchaikovski.coffeehouse.util.validator.DataValidator;
+import by.vchaikovski.coffeehouse.util.validator.FormValidator;
+import by.vchaikovski.coffeehouse.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeehouse.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,8 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type User service.
+ */
 public class UserServiceImpl implements UserService {
     private static final Logger logger = LogManager.getLogger();
     private static UserServiceImpl instance;
@@ -34,6 +39,11 @@ public class UserServiceImpl implements UserService {
         userDao = DaoProvider.getInstance().getUserDao();
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static UserServiceImpl getInstance() {
         if (instance == null) {
             instance = new UserServiceImpl();
@@ -251,7 +261,7 @@ public class UserServiceImpl implements UserService {
                 users = users.stream().filter(user -> user.getStatus() == status).toList();
             }
             if (validator.isEnumContains(userRole, User.Role.class)) {
-                User.Role role = User.Role.valueOf(userRole);
+                User.Role role = User.Role.valueOf(userRole.toUpperCase());
                 users = users.stream().filter(user -> user.getRole() == role).toList();
             }
             DiscountService discountService = ServiceProvider.getInstance().getDiscountService();
@@ -283,13 +293,14 @@ public class UserServiceImpl implements UserService {
         DataValidator validator = DataValidatorImpl.getInstance();
         boolean result;
         String password = userParameters.get(PASSWORD);
+        String newPassword = userParameters.get(NEW_PASSWORD);
         String passwordRepeat = userParameters.get(PASSWORD_REPEAT);
         if (!validator.isPasswordValid(password)) {
             userParameters.replace(PASSWORD, WRONG_MEANING);
             logger.debug("Password is not correct");
             result = false;
-        } else if (!password.equals(passwordRepeat)) {
-            userParameters.replace(PASSWORD_REPEAT, WRONG_MEANING);
+        } else if (!validator.isPasswordValid(newPassword)) {
+            userParameters.replace(NEW_PASSWORD, WRONG_MEANING);
             logger.debug("Passwords are not the same");
             result = false;
         } else {
@@ -297,13 +308,12 @@ public class UserServiceImpl implements UserService {
                 PasswordEncryptor encryptor = PasswordEncryptor.getInstance();
                 String encryptedOldPass = encryptor.encryptPassword(password);
                 Optional<User> user = userDao.findByIdAndPassword(id, encryptedOldPass);
-                String newPassword = userParameters.get(NEW_PASSWORD);
                 if (user.isEmpty()) {
                     userParameters.replace(PASSWORD, WRONG_MEANING);
                     logger.debug("Password is wrong");
                     result = false;
-                } else if (!validator.isPasswordValid(newPassword)) {
-                    userParameters.replace(NEW_PASSWORD, WRONG_MEANING);
+                } else if (!newPassword.equals(passwordRepeat)) {
+                    userParameters.replace(PASSWORD_REPEAT, WRONG_MEANING);
                     logger.debug("New password is not correct");
                     result = false;
                 } else {

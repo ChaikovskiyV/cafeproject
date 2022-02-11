@@ -1,16 +1,16 @@
-package by.vchaikovski.coffeeshop.model.service.impl;
+package by.vchaikovski.coffeehouse.model.service.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.exception.ServiceException;
-import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
-import by.vchaikovski.coffeeshop.model.dao.MenuDao;
-import by.vchaikovski.coffeeshop.model.entity.Menu;
-import by.vchaikovski.coffeeshop.model.service.MenuService;
-import by.vchaikovski.coffeeshop.util.PictureLoader;
-import by.vchaikovski.coffeeshop.util.validator.DataValidator;
-import by.vchaikovski.coffeeshop.util.validator.FormValidator;
-import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
-import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.dao.DaoProvider;
+import by.vchaikovski.coffeehouse.model.dao.MenuDao;
+import by.vchaikovski.coffeehouse.model.entity.Menu;
+import by.vchaikovski.coffeehouse.model.service.MenuService;
+import by.vchaikovski.coffeehouse.util.PictureLoader;
+import by.vchaikovski.coffeehouse.util.validator.DataValidator;
+import by.vchaikovski.coffeehouse.util.validator.FormValidator;
+import by.vchaikovski.coffeehouse.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeehouse.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,8 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Menu service.
+ */
 public class MenuServiceImpl implements MenuService {
     private static final Logger logger = LogManager.getLogger();
     private static MenuService instance;
@@ -34,6 +39,11 @@ public class MenuServiceImpl implements MenuService {
         menuDao = DaoProvider.getInstance().getMenuDao();
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static MenuService getInstance() {
         if (instance == null) {
             instance = new MenuServiceImpl();
@@ -52,7 +62,7 @@ public class MenuServiceImpl implements MenuService {
             String quantityInStock = menuParameters.get(MENU_QUANTITY_IN_STOCK);
             String description = menuParameters.get(MENU_DESCRIPTION);
             String imagePath = menuParameters.get(MENU_IMAGE);
-            Menu.FoodType foodType = Menu.FoodType.valueOf(type);
+            Menu.FoodType foodType = Menu.FoodType.valueOf(type.toUpperCase());
             PictureLoader pictureLoader = PictureLoader.getInstance();
             byte[] image;
             if (imagePath != null) {
@@ -291,7 +301,7 @@ public class MenuServiceImpl implements MenuService {
         DataValidator validator = DataValidatorImpl.getInstance();
         if (validator.isEnumContains(foodType, Menu.FoodType.class)) {
             try {
-                result = menuDao.updateMenuFoodType(id, Menu.FoodType.valueOf(foodType));
+                result = menuDao.updateMenuFoodType(id, Menu.FoodType.valueOf(foodType.toUpperCase()));
             } catch (DaoException e) {
                 String message = "Menu can't be updated by food type=" + foodType;
                 logger.error(message, e);

@@ -1,15 +1,15 @@
-package by.vchaikovski.coffeeshop.model.service.impl;
+package by.vchaikovski.coffeehouse.model.service.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.exception.ServiceException;
-import by.vchaikovski.coffeeshop.model.dao.BankCardDao;
-import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
-import by.vchaikovski.coffeeshop.model.entity.BankCard;
-import by.vchaikovski.coffeeshop.model.service.BankCardService;
-import by.vchaikovski.coffeeshop.util.validator.DataValidator;
-import by.vchaikovski.coffeeshop.util.validator.FormValidator;
-import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
-import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.dao.BankCardDao;
+import by.vchaikovski.coffeehouse.model.dao.DaoProvider;
+import by.vchaikovski.coffeehouse.model.entity.BankCard;
+import by.vchaikovski.coffeehouse.model.service.BankCardService;
+import by.vchaikovski.coffeehouse.util.validator.DataValidator;
+import by.vchaikovski.coffeehouse.util.validator.FormValidator;
+import by.vchaikovski.coffeehouse.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeehouse.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,8 +19,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Bank card service.
+ */
 public class BankCardServiceImpl implements BankCardService {
     private static final Logger logger = LogManager.getLogger();
     private static BankCardServiceImpl instance = new BankCardServiceImpl();
@@ -30,6 +35,11 @@ public class BankCardServiceImpl implements BankCardService {
         cardDao = DaoProvider.getInstance().getBankCardDao();
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static BankCardServiceImpl getInstance() {
         if (instance == null) {
             instance = new BankCardServiceImpl();

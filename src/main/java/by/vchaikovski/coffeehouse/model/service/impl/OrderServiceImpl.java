@@ -1,37 +1,38 @@
-package by.vchaikovski.coffeeshop.model.service.impl;
+package by.vchaikovski.coffeehouse.model.service.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.exception.ServiceException;
-import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
-import by.vchaikovski.coffeeshop.model.dao.OrderDao;
-import by.vchaikovski.coffeeshop.model.entity.Bill;
-import by.vchaikovski.coffeeshop.model.entity.Delivery;
-import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
-import by.vchaikovski.coffeeshop.model.entity.Menu;
-import by.vchaikovski.coffeeshop.model.service.BillService;
-import by.vchaikovski.coffeeshop.model.service.DeliveryService;
-import by.vchaikovski.coffeeshop.model.service.OrderService;
-import by.vchaikovski.coffeeshop.model.service.ServiceProvider;
-import by.vchaikovski.coffeeshop.util.validator.DataValidator;
-import by.vchaikovski.coffeeshop.util.validator.FormValidator;
-import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
-import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.dao.DaoProvider;
+import by.vchaikovski.coffeehouse.model.dao.OrderDao;
+import by.vchaikovski.coffeehouse.model.entity.*;
+import by.vchaikovski.coffeehouse.model.service.BillService;
+import by.vchaikovski.coffeehouse.model.service.DeliveryService;
+import by.vchaikovski.coffeehouse.model.service.OrderService;
+import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
+import by.vchaikovski.coffeehouse.util.validator.DataValidator;
+import by.vchaikovski.coffeehouse.util.validator.FormValidator;
+import by.vchaikovski.coffeehouse.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeehouse.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
-import static by.vchaikovski.coffeeshop.controller.command.SessionParameter.USER_ID;
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeehouse.controller.command.SessionParameter.USER_ID;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Order service.
+ */
 public class OrderServiceImpl implements OrderService {
     private static final Logger logger = LogManager.getLogger();
-    private static final String DATA_TIME_FORMAT = "yyyy-MM-dd HH:ss";
     private static OrderServiceImpl instance;
     private final OrderDao orderDao;
 
@@ -39,6 +40,11 @@ public class OrderServiceImpl implements OrderService {
         orderDao = DaoProvider.getInstance().getOrderDao();
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static OrderServiceImpl getInstance() {
         if (instance == null) {
             instance = new OrderServiceImpl();
@@ -54,6 +60,13 @@ public class OrderServiceImpl implements OrderService {
         if (validator.isOrderParameterValid(orderParameters)) {
             String userIdStr = orderParameters.get(USER_ID);
             String comment = orderParameters.get(COMMENT);
+            int discountRate = 0;
+            long userId = Long.parseLong(userIdStr);
+            Optional<Discount> optionalDiscount = serviceProvider.getDiscountService().findDiscountByUserId(userId);
+            if (optionalDiscount.isPresent()) {
+                discountRate = optionalDiscount.get().getRate();
+            }
+            orderParameters.put(TOTAL_PRICE, findTotalPrice(cart, discountRate).toString());
             long deliveryId = serviceProvider.getDeliveryService().createDelivery(orderParameters);
             long billId = serviceProvider.getBillService().createBill(orderParameters);
             FoodOrder order = new FoodOrder.FoodOrderBuilder()
@@ -135,10 +148,9 @@ public class OrderServiceImpl implements OrderService {
     public List<FoodOrder> findOrderByCreationDate(String creationDate) throws ServiceException {
         List<FoodOrder> orders = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isDateTimeValid(creationDate)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_TIME_FORMAT);
+        if (validator.isDateValid(creationDate)) {
             try {
-                orders = orderDao.findByCreationDate(LocalDateTime.parse(creationDate, formatter));
+                orders = orderDao.findByCreationDate(LocalDate.parse(creationDate));
             } catch (DaoException e) {
                 String message = "FoodOrders can't be found by creation date=" + creationDate;
                 logger.error(message, e);
@@ -152,11 +164,10 @@ public class OrderServiceImpl implements OrderService {
     public List<FoodOrder> findOrderByCreationPeriod(String startPeriod, String endPeriod) throws ServiceException {
         List<FoodOrder> orders = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isDateTimeValid(startPeriod) && validator.isDateTimeValid(endPeriod)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_TIME_FORMAT);
+        if (validator.isDateValid(startPeriod) && validator.isDateValid(endPeriod)) {
             try {
-                LocalDateTime start = LocalDateTime.parse(startPeriod, formatter);
-                LocalDateTime finish = LocalDateTime.parse(endPeriod, formatter);
+                LocalDate start = LocalDate.parse(startPeriod);
+                LocalDate finish = LocalDate.parse(endPeriod);
                 orders = orderDao.findByCreationDate(start, finish);
             } catch (DaoException e) {
                 String message = "FoodOrders can't be found by creation period=" + startPeriod + " - " + endPeriod;
@@ -229,7 +240,7 @@ public class OrderServiceImpl implements OrderService {
         if (orderParameters != null && !orderParameters.isEmpty()) {
             String billStatus = orderParameters.get(BILL_STATUS);
             String paymentDate = orderParameters.get(PAYMENT_DATE);
-            String creationDate = orderParameters.get(CREATION_DATE);
+            String creationDate = orderParameters.get(CREATION_DATE).replace('T', ' ');
             String deliveryTime = orderParameters.get(DELIVERY_TIME);
             String deliveryType = orderParameters.get(DELIVERY_TYPE);
             String userId = orderParameters.get(USER_ID);
@@ -242,10 +253,9 @@ public class OrderServiceImpl implements OrderService {
             orders = filterOrdersByDelivery(deliveryService.findDeliveryByType(deliveryType), orders);
             orders = filterOrdersByDelivery(deliveryService.findDeliveryByDate(deliveryTime), orders);
 
-            if (validator.isDateTimeValid(creationDate)) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATA_TIME_FORMAT);
-                LocalDateTime dateTime = LocalDateTime.parse(creationDate, formatter);
-                orders = orders.stream().filter(order -> order.getCreationDate().isEqual(dateTime)).toList();
+            if (validator.isDateValid(creationDate)) {
+                LocalDate date = LocalDate.parse(creationDate);
+                orders = orders.stream().filter(order -> order.getCreationDate().isEqual(date)).toList();
             }
             if (validator.isEnumContains(orderStatus, FoodOrder.OrderStatus.class)) {
                 FoodOrder.OrderStatus status = FoodOrder.OrderStatus.valueOf(orderStatus.toUpperCase());
@@ -264,7 +274,7 @@ public class OrderServiceImpl implements OrderService {
         DataValidator validator = DataValidatorImpl.getInstance();
         if (validator.isEnumContains(orderStatus, FoodOrder.OrderStatus.class) && isOrderUncompleted(id)) {
             try {
-                result = orderDao.updateOrderStatus(id, FoodOrder.OrderStatus.valueOf(orderStatus));
+                result = orderDao.updateOrderStatus(id, FoodOrder.OrderStatus.valueOf(orderStatus.toUpperCase()));
             } catch (DaoException e) {
                 String message = "FoodOrders can't be updated by order status=" + orderStatus;
                 logger.error(message, e);
@@ -399,5 +409,17 @@ public class OrderServiceImpl implements OrderService {
             orders = orders.stream().filter(order -> deliveriesId.contains(order.getDeliveryId())).toList();
         }
         return orders;
+    }
+
+    private BigDecimal findTotalPrice(Map<Menu, Integer> cart, int discountRate) {
+        BigDecimal totalPrice = new BigDecimal(0);
+        for (var entryCart : cart.entrySet()) {
+            Menu menu = entryCart.getKey();
+            int quantity = entryCart.getValue();
+            BigDecimal price = menu.getPrice().subtract(new BigDecimal(quantity));
+            totalPrice = totalPrice.add(price);
+        }
+        BigDecimal discount = totalPrice.multiply(new BigDecimal(discountRate / 100));
+        return totalPrice.subtract(discount);
     }
 }

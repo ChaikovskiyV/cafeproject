@@ -1,40 +1,52 @@
-package by.vchaikovski.coffeeshop.model.service.impl;
+package by.vchaikovski.coffeehouse.model.service.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.exception.ServiceException;
-import by.vchaikovski.coffeeshop.model.dao.AddressDeliveryDao;
-import by.vchaikovski.coffeeshop.model.dao.DaoProvider;
-import by.vchaikovski.coffeeshop.model.dao.DeliveryDao;
-import by.vchaikovski.coffeeshop.model.entity.AddressDelivery;
-import by.vchaikovski.coffeeshop.model.entity.Delivery;
-import by.vchaikovski.coffeeshop.model.service.DeliveryService;
-import by.vchaikovski.coffeeshop.util.validator.DataValidator;
-import by.vchaikovski.coffeeshop.util.validator.FormValidator;
-import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
-import by.vchaikovski.coffeeshop.util.validator.impl.FormValidatorImpl;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.dao.AddressDeliveryDao;
+import by.vchaikovski.coffeehouse.model.dao.DaoProvider;
+import by.vchaikovski.coffeehouse.model.dao.DeliveryDao;
+import by.vchaikovski.coffeehouse.model.entity.AddressDelivery;
+import by.vchaikovski.coffeehouse.model.entity.Delivery;
+import by.vchaikovski.coffeehouse.model.service.DeliveryService;
+import by.vchaikovski.coffeehouse.util.validator.DataValidator;
+import by.vchaikovski.coffeehouse.util.validator.FormValidator;
+import by.vchaikovski.coffeehouse.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeehouse.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import static by.vchaikovski.coffeeshop.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Delivery service.
+ */
 public class DeliveryServiceImpl implements DeliveryService {
     private static final Logger logger = LogManager.getLogger();
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm";
     private static DeliveryService instance;
     private final DeliveryDao deliveryDao;
     private final AddressDeliveryDao addressDao;
 
+    /**
+     * Instantiates a new Delivery service.
+     */
     public DeliveryServiceImpl() {
         deliveryDao = DaoProvider.getInstance().getDeliveryDao();
         addressDao = DaoProvider.getInstance().getAddressDeliveryDao();
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static DeliveryService getInstance() {
         if (instance == null) {
             instance = new DeliveryServiceImpl();
@@ -49,12 +61,11 @@ public class DeliveryServiceImpl implements DeliveryService {
         String deliveryType = deliveryParameters.get(DELIVERY_TYPE);
         String deliveryTime = deliveryParameters.get(DELIVERY_TIME);
         if (validator.isEnumContains(deliveryType, Delivery.DeliveryType.class)
-                && validator.isDateTimeValid(deliveryTime)) {
+                && validator.isDateValid(deliveryTime)) {
             Delivery.DeliveryType type = Delivery.DeliveryType.valueOf(deliveryType.toUpperCase());
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-            LocalDateTime time = LocalDateTime.parse(deliveryTime, formatter);
+            LocalDate date = LocalDate.parse(deliveryTime);
             long addressId = createAddress(deliveryParameters);
-            Delivery delivery = new Delivery(type, time, addressId);
+            Delivery delivery = new Delivery(type, date, addressId);
             try {
                 deliveryId = deliveryDao.create(delivery);
             } catch (DaoException e) {
@@ -66,7 +77,7 @@ public class DeliveryServiceImpl implements DeliveryService {
             if (!validator.isEnumContains(deliveryType, Delivery.DeliveryType.class)) {
                 deliveryParameters.replace(DELIVERY_TYPE, WRONG_MEANING);
             }
-            if (!validator.isDateTimeValid(deliveryTime)) {
+            if (!validator.isDateValid(deliveryTime)) {
                 deliveryParameters.replace(DELIVERY_TIME, WRONG_MEANING);
             }
         }
@@ -131,6 +142,32 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
+    public Optional<Delivery> findDeliveryById(long id) throws ServiceException {
+        Optional<Delivery> delivery;
+        try {
+            delivery = deliveryDao.findById(id);
+        } catch (DaoException e) {
+            String message = "Delivery can't be found by id=" + id;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return delivery;
+    }
+
+    @Override
+    public Optional<AddressDelivery> findAddressById(long id) throws ServiceException {
+        Optional<AddressDelivery> address;
+        try {
+            address = addressDao.findById(id);
+        } catch (DaoException e) {
+            String message = "Address can't be found by id=" + id;
+            logger.error(message, e);
+            throw new ServiceException(message, e);
+        }
+        return address;
+    }
+
+    @Override
     public List<Delivery> findDeliveryByAddressId(long addressId) throws ServiceException {
         List<Delivery> deliveryList;
         try {
@@ -147,11 +184,10 @@ public class DeliveryServiceImpl implements DeliveryService {
     public List<Delivery> findDeliveryByDate(String timeDelivery) throws ServiceException {
         List<Delivery> deliveryList = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isDateTimeValid(timeDelivery)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-            LocalDateTime dateTime = LocalDateTime.parse(timeDelivery, formatter);
+        if (validator.isDateValid(timeDelivery)) {
+            LocalDate time = LocalDate.parse(timeDelivery);
             try {
-                deliveryList = deliveryDao.findByDateDelivery(dateTime);
+                deliveryList = deliveryDao.findByDateDelivery(time);
             } catch (DaoException e) {
                 String message = "Delivery can't be found by delivery time=" + timeDelivery;
                 logger.error(message, e);
@@ -165,10 +201,10 @@ public class DeliveryServiceImpl implements DeliveryService {
     public List<Delivery> findDeliveryByPeriod(String startPeriod, String endPeriod) throws ServiceException {
         List<Delivery> deliveryList = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isDateTimeValid(startPeriod) && validator.isDateTimeValid(endPeriod)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-            LocalDateTime start = LocalDateTime.parse(startPeriod, formatter);
-            LocalDateTime end = LocalDateTime.parse(endPeriod, formatter);
+        if (validator.isDateValid(startPeriod) && validator.isDateValid(endPeriod)) {
+
+            LocalDate start = LocalDate.parse(startPeriod);
+            LocalDate end = LocalDate.parse(endPeriod);
             try {
                 deliveryList = deliveryDao.findByDateDelivery(start, end);
             } catch (DaoException e) {
@@ -217,11 +253,10 @@ public class DeliveryServiceImpl implements DeliveryService {
     public boolean updateDeliveryDate(long id, String timeDelivery) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
-        if (validator.isDateTimeValid(timeDelivery)) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-            LocalDateTime dateTime = LocalDateTime.parse(timeDelivery, formatter);
+        if (validator.isDateValid(timeDelivery)) {
+            LocalDate time = LocalDate.parse(timeDelivery);
             try {
-                result = deliveryDao.updateDeliveryDate(id, dateTime);
+                result = deliveryDao.updateDeliveryDate(id, time);
             } catch (DaoException e) {
                 String message = "Delivery can't be updated by delivery time=" + timeDelivery;
                 logger.error(message, e);
