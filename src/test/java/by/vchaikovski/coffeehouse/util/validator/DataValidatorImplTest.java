@@ -1,7 +1,7 @@
-package by.vchaikovski.coffeeshop.util.validator;
+package by.vchaikovski.coffeehouse.util.validator;
 
-import by.vchaikovski.coffeeshop.model.entity.User;
-import by.vchaikovski.coffeeshop.util.validator.impl.DataValidatorImpl;
+import by.vchaikovski.coffeehouse.model.entity.User;
+import by.vchaikovski.coffeehouse.util.validator.impl.DataValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
@@ -48,7 +48,7 @@ class DataValidatorImplTest {
         login = "Developer123";
         password = "D12jk96GH15";
         cardNumber = "1234567890123456";
-        dateString = "2022-01-07 00:00:00";
+        dateString = "2022-01-07";
         discountRate = "99";
         email = "hello_everyone@hi.com";
         numberString = "12398";
