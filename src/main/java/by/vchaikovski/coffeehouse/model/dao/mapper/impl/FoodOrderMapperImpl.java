@@ -1,18 +1,24 @@
-package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
+package by.vchaikovski.coffeehouse.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
-import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
-import by.vchaikovski.coffeeshop.model.entity.Menu;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeehouse.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeehouse.model.entity.FoodOrder;
+import by.vchaikovski.coffeehouse.model.entity.Menu;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
+import static by.vchaikovski.coffeehouse.model.dao.ColumnTable.*;
+
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Food order mapper.
+ */
 
 public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
     private static final FoodOrderMapperImpl instance = new FoodOrderMapperImpl();
@@ -20,6 +26,11 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
     private FoodOrderMapperImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static FoodOrderMapperImpl getInstance() {
         return instance;
     }
@@ -30,13 +41,13 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
         try {
             long id = resultSet.getLong(ORDER_ID);
             FoodOrder.OrderStatus status = FoodOrder.OrderStatus.valueOf(resultSet.getString(ORDER_STATUS).toUpperCase());
-            LocalDateTime creationDate = LocalDateTime.parse(resultSet.getDate(ORDER_CREATION_DATE).toString());
+            LocalDate creationDate = LocalDate.parse(resultSet.getDate(ORDER_CREATION_DATE).toString());
             String comment = resultSet.getString(ORDER_COMMENT);
             FoodOrder.OrderEvaluation evaluation = FoodOrder.OrderEvaluation
                     .valueOf(resultSet.getString(ORDER_EVALUATION).toUpperCase());
-            long userId = resultSet.getLong(USER_ID);
-            long billId = resultSet.getLong(BILL_ID);
-            long deliveryId = resultSet.getLong(DELIVERY_ID);
+            long userId = resultSet.getLong(ORDER_USER_ID);
+            long billId = resultSet.getLong(ORDER_BILL_ID);
+            long deliveryId = resultSet.getLong(ORDER_DELIVERY_ID);
             Map<Menu, Integer> cart = createCart(resultSet);
             FoodOrder.FoodOrderBuilder orderBuilder = new FoodOrder.FoodOrderBuilder();
             order = orderBuilder.setId(id)
@@ -50,7 +61,7 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
                     .setCart(cart)
                     .build();
         } catch (SQLException e) {
-            String message = "Bill can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";
+            String message = "Order can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";
             logger.error(message, e);
             throw new DaoException(message, e);
         }
@@ -61,6 +72,9 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
         Map<Menu, Integer> cart = new HashMap<>();
         while (!resultSet.isAfterLast()) {
             Menu menu = MapperProvider.getInstance().getMenuMapper().createEntity(resultSet);
+            if (cart.containsKey(menu)) {
+                break;
+            }
             int quantity = resultSet.getInt(CART_QUANTITY);
             cart.put(menu, quantity);
         }

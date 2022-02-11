@@ -1,15 +1,21 @@
-package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
+package by.vchaikovski.coffeehouse.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.model.entity.BankCard;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeehouse.model.entity.BankCard;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
+import static by.vchaikovski.coffeehouse.model.dao.ColumnTable.*;
+
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Bank card mapper.
+ */
 
 public class BankCardMapperImpl implements BaseMapper<BankCard> {
     private static final BankCardMapperImpl instance = new BankCardMapperImpl();
@@ -17,6 +23,11 @@ public class BankCardMapperImpl implements BaseMapper<BankCard> {
     private BankCardMapperImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static BankCardMapperImpl getInstance() {
         return instance;
     }

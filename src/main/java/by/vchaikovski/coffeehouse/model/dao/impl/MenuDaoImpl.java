@@ -1,12 +1,11 @@
-package by.vchaikovski.coffeeshop.model.dao.impl;
+package by.vchaikovski.coffeehouse.model.dao.impl;
 
-import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.ColumnTable;
-import by.vchaikovski.coffeeshop.model.dao.MenuDao;
-import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
-import by.vchaikovski.coffeeshop.model.entity.Menu;
-import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.ColumnTable;
+import by.vchaikovski.coffeehouse.model.dao.MenuDao;
+import by.vchaikovski.coffeehouse.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeehouse.model.entity.Menu;
+import by.vchaikovski.coffeehouse.model.pool.ConnectionPool;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,6 +15,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Menu dao.
+ */
 
 public class MenuDaoImpl implements MenuDao {
     private static final Logger logger = LogManager.getLogger();
@@ -33,7 +38,7 @@ public class MenuDaoImpl implements MenuDao {
     private static final String CREATE_MENU = "INSERT INTO menu" +
             "(name, product_type, description, price, quantity_in_stock, image) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_MENU_ALL_PARAM = "UPDATE menu SET " +
-            "name=?, product_name=?, description=?, price=?, quantity_in_stock=?, image=? WHERE menu_id=?";
+            "name=?, product_type=?, description=?, price=?, quantity_in_stock=?, image=? WHERE menu_id=?";
     private static final String UPDATE_MENU_NAME = "UPDATE menu SET name=? WHERE menu_id=?";
     private static final String UPDATE_MENU_PRODUCT_TYPE = "UPDATE menu SET product_type=? WHERE menu_id=?";
     private static final String UPDATE_MENU_PRICE = "UPDATE menu SET price=? WHERE menu_id=?";
@@ -46,6 +51,11 @@ public class MenuDaoImpl implements MenuDao {
     private MenuDaoImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static MenuDao getInstance() {
         if (instance == null) {
             instance = new MenuDaoImpl();
@@ -63,7 +73,7 @@ public class MenuDaoImpl implements MenuDao {
                 Menu menu = mapperProvider.getMenuMapper().createEntity(resultSet);
                 menuList.add(menu);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find all menu\" is failed. DataBase connection error.";
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -73,12 +83,14 @@ public class MenuDaoImpl implements MenuDao {
 
     @Override
     public Optional<Menu> findById(long id) throws DaoException {
-        Menu menu;
+        Menu menu = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID)) {
-            menu = mapperProvider.getMenuMapper().createEntity(resultSet);
-        } catch (SQLException | ConnectionPoolException e) {
+             ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID + id)) {
+            if (resultSet.next()) {
+                menu = mapperProvider.getMenuMapper().createEntity(resultSet);
+            }
+        } catch (SQLException e) {
             String message = "The query \"find menu by id=" + id + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -98,7 +110,7 @@ public class MenuDaoImpl implements MenuDao {
                     menuList.add(menu);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find menu by name=" + name + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -116,7 +128,7 @@ public class MenuDaoImpl implements MenuDao {
                 Menu menu = mapperProvider.getMenuMapper().createEntity(resultSet);
                 menuList.add(menu);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find menu by product type=" + productType + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -134,7 +146,7 @@ public class MenuDaoImpl implements MenuDao {
                 Menu menu = mapperProvider.getMenuMapper().createEntity(resultSet);
                 menuList.add(menu);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find menu by price=" + price + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -155,7 +167,7 @@ public class MenuDaoImpl implements MenuDao {
                     menuList.add(menu);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find menu by price range=" + minPrice + " - " + maxPrice + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -173,7 +185,7 @@ public class MenuDaoImpl implements MenuDao {
                 Menu menu = mapperProvider.getMenuMapper().createEntity(resultSet);
                 menuList.add(menu);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find menu by quantity in stock=" + quantityInStock + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -194,7 +206,7 @@ public class MenuDaoImpl implements MenuDao {
                     menuList.add(menu);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find menu by quantity in stock range=" + minQuantity + " - " + maxQuantity + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -217,7 +229,7 @@ public class MenuDaoImpl implements MenuDao {
             statement.setBlob(SIXTH_PARAMETER_INDEX, blob);
             statement.setLong(SEVENTH_PARAMETER_INDEX, id);
             result = statement.execute();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"update menu by all parameters: \n" + menu + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -233,7 +245,7 @@ public class MenuDaoImpl implements MenuDao {
             statement.setString(FIRST_PARAMETER_INDEX, name);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             result = statement.execute();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"update menu by name=" + name + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -249,7 +261,7 @@ public class MenuDaoImpl implements MenuDao {
             statement.setString(FIRST_PARAMETER_INDEX, productType.name());
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             result = statement.execute();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"update menu by product type=" + productType + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -265,7 +277,7 @@ public class MenuDaoImpl implements MenuDao {
             statement.setBigDecimal(FIRST_PARAMETER_INDEX, price);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             result = statement.execute();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"update menu by price=" + price + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -281,7 +293,7 @@ public class MenuDaoImpl implements MenuDao {
             statement.setInt(FIRST_PARAMETER_INDEX, quantityInStock);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             result = statement.execute();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"update menu by quantity in stock=" + quantityInStock + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -297,23 +309,24 @@ public class MenuDaoImpl implements MenuDao {
             connection = ConnectionPool.getInstance().getConnection();
             connection.setAutoCommit(false);
             try (Statement statement = connection.createStatement();
-                 ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID);
+                 ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID + id);
                  PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_MENU_QUANTITY_IN_STOCK)) {
-                int quantityInStock = resultSet.getInt(ColumnTable.MENU_QUANTITY_IN_STOCK);
+                int quantityInStock = 0;
+                if (resultSet.next()) {
+                    quantityInStock = resultSet.getInt(ColumnTable.MENU_QUANTITY_IN_STOCK);
+                }
                 int newQuantity = quantityInStock + quantity;
                 preparedStatement.setInt(FIRST_PARAMETER_INDEX, newQuantity);
                 preparedStatement.setLong(SECOND_PARAMETER_INDEX, id);
                 result = preparedStatement.execute();
                 connection.commit();
             }
-        } catch (SQLException | ConnectionPoolException e) {
-            if (connection != null) {
+        } catch (SQLException e) {
                 try {
                     connection.rollback();
                 } catch (SQLException ex) {
                     logger.warn("Rollback can't be completed", ex);
                 }
-            }
             String message = "The query \"increase quantity in stock on number=" + quantity + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -338,9 +351,12 @@ public class MenuDaoImpl implements MenuDao {
             connection = ConnectionPool.getInstance().getConnection();
             connection.setAutoCommit(false);
             try (Statement statement = connection.createStatement();
-                 ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID);
+                 ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID + id);
                  PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_MENU_QUANTITY_IN_STOCK)) {
-                int quantityInStock = resultSet.getInt(ColumnTable.MENU_QUANTITY_IN_STOCK);
+                int quantityInStock = 0;
+                if (resultSet.next()) {
+                    quantityInStock = resultSet.getInt(ColumnTable.MENU_QUANTITY_IN_STOCK);
+                }
                 if (quantityInStock >= quantity) {
                     int newQuantity = quantityInStock - quantity;
                     preparedStatement.setInt(FIRST_PARAMETER_INDEX, newQuantity);
@@ -351,14 +367,12 @@ public class MenuDaoImpl implements MenuDao {
                     result = false;
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
-            if (connection != null) {
+        } catch (SQLException e) {
                 try {
                     connection.rollback();
                 } catch (SQLException ex) {
                     logger.warn("Rollback can't be completed", ex);
                 }
-            }
             String message = "The query \"increase quantity in stock on number=" + quantity + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -383,7 +397,7 @@ public class MenuDaoImpl implements MenuDao {
             statement.setString(FIRST_PARAMETER_INDEX, description);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             result = statement.execute();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"update menu by description=" + description + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -400,7 +414,7 @@ public class MenuDaoImpl implements MenuDao {
             statement.setBlob(FIRST_PARAMETER_INDEX, imageBlob);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             result = statement.execute();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"update menu by image\"" + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -420,6 +434,7 @@ public class MenuDaoImpl implements MenuDao {
             byte[] imageBytes = menu.getImage();
             Blob blob = new SerialBlob(imageBytes);
             statement.setBlob(SIXTH_PARAMETER_INDEX, blob);
+            statement.executeUpdate();
             try (ResultSet resultSet = statement.getGeneratedKeys()) {
                 long menuId = 0;
                 if (resultSet.next()) {
@@ -427,7 +442,7 @@ public class MenuDaoImpl implements MenuDao {
                 }
                 return menuId;
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"insert menu in database: \n" + menu + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -440,7 +455,7 @@ public class MenuDaoImpl implements MenuDao {
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             result = statement.execute(DELETE_MENU_BY_ID + id);
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"delete menu by id=" + id + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);

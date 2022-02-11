@@ -1,13 +1,19 @@
-package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
+package by.vchaikovski.coffeehouse.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.model.entity.AddressDelivery;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeehouse.model.entity.AddressDelivery;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
+import static by.vchaikovski.coffeehouse.model.dao.ColumnTable.*;
+
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Address delivery mapper.
+ */
 
 public class AddressDeliveryMapperImpl implements BaseMapper<AddressDelivery> {
     private static final AddressDeliveryMapperImpl instance = new AddressDeliveryMapperImpl();
@@ -15,6 +21,11 @@ public class AddressDeliveryMapperImpl implements BaseMapper<AddressDelivery> {
     private AddressDeliveryMapperImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static AddressDeliveryMapperImpl getInstance() {
         return instance;
     }

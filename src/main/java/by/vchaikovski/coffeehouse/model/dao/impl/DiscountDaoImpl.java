@@ -1,37 +1,47 @@
-package by.vchaikovski.coffeeshop.model.dao.impl;
+package by.vchaikovski.coffeehouse.model.dao.impl;
 
-import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.DiscountDao;
-import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
-import by.vchaikovski.coffeeshop.model.entity.Discount;
-import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.DiscountDao;
+import by.vchaikovski.coffeehouse.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeehouse.model.entity.Discount;
+import by.vchaikovski.coffeehouse.model.pool.ConnectionPool;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Discount dao.
+ */
+
 public class DiscountDaoImpl implements DiscountDao {
     private static final DiscountDaoImpl instance = new DiscountDaoImpl();
     private static final MapperProvider mapperProvider = MapperProvider.getInstance();
     private static final String FAILED_MESSAGE = "\" is failed. DataBase connection error.";
     private static final String UPDATE_MESSAGE = "The query \"update discount with id=";
-    private static final String FIND_ALL_DISCOUNTS = "SELECT discount_id, discount_type, rate FROM discounts";
+    private static final String FIND_ALL_DISCOUNTS = "SELECT discount_id, type, rate FROM discounts";
     private static final String BY_ID = " WHERE discount_id=";
-    private static final String BY_TYPE_AND_RATE = " WHERE discount_type=? AND rate=?";
-    private static final String BY_TYPE = " WHERE discount_type=?";
+    private static final String BY_TYPE_AND_RATE = " WHERE type=? AND rate=?";
+    private static final String BY_TYPE = " WHERE type=?";
     private static final String BY_RATE = " WHERE rate=";
     private static final String FIND_DISCOUNT_BY_USER_ID = "SELECT user_id FROM users" +
             "JOIN discounts ON fk_discount_id=discount_id WHERE user_id=";
-    private static final String UPDATE_DISCOUNT_TYPE = "UPDATE discounts SET discount_type=? WHERE discount_id=?";
+    private static final String UPDATE_DISCOUNT_TYPE = "UPDATE discounts SET type=? WHERE discount_id=?";
     private static final String UPDATE_DISCOUNT_RATE = "UPDATE discounts SET rate=? WHERE discount_id=?";
-    private static final String CREATE_DISCOUNT = "INSERT INTO discounts(discount_type, rate) VALUES (?, ?)";
+    private static final String CREATE_DISCOUNT = "INSERT INTO discounts(type, rate) VALUES (?, ?)";
     private static final String DELETE_DISCOUNT_BY_ID = "DELETE FROM discounts WHERE id=";
 
     private DiscountDaoImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static DiscountDaoImpl getInstance() {
         return instance;
     }
@@ -46,7 +56,7 @@ public class DiscountDaoImpl implements DiscountDao {
                 Discount discount = mapperProvider.getDiscountMapper().createEntity(resultSet);
                 discounts.add(discount);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find all discounts\" is failed. DataBase connection error.";
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -63,7 +73,7 @@ public class DiscountDaoImpl implements DiscountDao {
             if (resultSet.next()) {
                 discount = mapperProvider.getDiscountMapper().createEntity(resultSet);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find discount by id=" + id + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -89,7 +99,7 @@ public class DiscountDaoImpl implements DiscountDao {
                     discount = mapperProvider.getDiscountMapper().createEntity(resultSet);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find discount by discount type=" + discountType +
                     " and rate=" + rate + FAILED_MESSAGE;
             logger.error(message, e);
@@ -110,7 +120,7 @@ public class DiscountDaoImpl implements DiscountDao {
                     discounts.add(discount);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find discounts\" by discount type=" + discountType + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -128,7 +138,7 @@ public class DiscountDaoImpl implements DiscountDao {
                 Discount discount = mapperProvider.getDiscountMapper().createEntity(resultSet);
                 discounts.add(discount);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find discounts\" by discount rate=" + rate + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -145,7 +155,7 @@ public class DiscountDaoImpl implements DiscountDao {
             if (resultSet.next()) {
                 discount = mapperProvider.getDiscountMapper().createEntity(resultSet);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find discount by userId=" + userId + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -161,7 +171,7 @@ public class DiscountDaoImpl implements DiscountDao {
             statement.setString(FIRST_PARAMETER_INDEX, discountType.name());
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + id + " by type=" + discountType + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -178,7 +188,7 @@ public class DiscountDaoImpl implements DiscountDao {
             statement.setInt(FIRST_PARAMETER_INDEX, rate);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + id + " by rate=" + rate + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -200,7 +210,7 @@ public class DiscountDaoImpl implements DiscountDao {
                 }
                 return discountId;
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"create discount " + discount + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -213,7 +223,7 @@ public class DiscountDaoImpl implements DiscountDao {
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             rowsNumber = statement.executeUpdate(DELETE_DISCOUNT_BY_ID + id);
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"delete discount with id=" + id + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);

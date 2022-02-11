@@ -1,14 +1,20 @@
-package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
+package by.vchaikovski.coffeehouse.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.model.entity.Delivery;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeehouse.model.entity.Delivery;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
-import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
+import static by.vchaikovski.coffeehouse.model.dao.ColumnTable.*;
+
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Delivery mapper.
+ */
 
 public class DeliveryMapperImpl implements BaseMapper<Delivery> {
     private static final DeliveryMapperImpl instance = new DeliveryMapperImpl();
@@ -16,6 +22,11 @@ public class DeliveryMapperImpl implements BaseMapper<Delivery> {
     private DeliveryMapperImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static DeliveryMapperImpl getInstance() {
         return instance;
     }
@@ -26,9 +37,9 @@ public class DeliveryMapperImpl implements BaseMapper<Delivery> {
         try {
             long id = resultSet.getLong(DELIVERY_ID);
             Delivery.DeliveryType type = Delivery.DeliveryType.valueOf(resultSet.getString(DELIVERY_TYPE).toUpperCase());
-            LocalDateTime deliveryTime = LocalDateTime.parse(resultSet.getTimestamp(DELIVERY_TIME).toString());
+            LocalDate deliveryDate = LocalDate.parse(resultSet.getDate(DELIVERY_TIME).toString());
             long addressId = resultSet.getLong(ADDRESS_ID);
-            delivery = new Delivery(type, deliveryTime, addressId);
+            delivery = new Delivery(type, deliveryDate, addressId);
             delivery.setId(id);
         } catch (SQLException e) {
             String message = "Delivery can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";

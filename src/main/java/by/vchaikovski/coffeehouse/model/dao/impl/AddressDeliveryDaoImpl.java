@@ -1,16 +1,21 @@
-package by.vchaikovski.coffeeshop.model.dao.impl;
+package by.vchaikovski.coffeehouse.model.dao.impl;
 
-import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.AddressDeliveryDao;
-import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
-import by.vchaikovski.coffeeshop.model.entity.AddressDelivery;
-import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.AddressDeliveryDao;
+import by.vchaikovski.coffeehouse.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeehouse.model.entity.AddressDelivery;
+import by.vchaikovski.coffeehouse.model.pool.ConnectionPool;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Address delivery dao.
+ */
 
 public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
     private static final AddressDeliveryDaoImpl instance = new AddressDeliveryDaoImpl();
@@ -19,8 +24,8 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
     private static final String UPDATE_MESSAGE = "The query \"update addressDelivery with id=";
     private static final String FIND_ALL = "SELECT address_id, street_name, house_number, building_number, " +
             "flat_number FROM address";
-    private static final String FIND_ADDRESS_BY_ID = " WHERE address_id=";
-    private static final String FIND_ADDRESS_BY_STREET_NAME = " WHERE street_name=?";
+    private static final String BY_ID = " WHERE address_id=";
+    private static final String BY_STREET_NAME = " WHERE street_name=?";
     private static final String UPDATE_ADDRESS_STREET_NAME = "UPDATE address SET street_name=? WHERE address_id=?";
     private static final String UPDATE_ADDRESS_HOUSE_NUMBER = "UPDATE address SET house_number=? WHERE address_id=?";
     private static final String UPDATE_ADDRESS_BUILDING_NUMBER = "UPDATE address SET building_number=? WHERE address_id=?";
@@ -32,6 +37,11 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
     private AddressDeliveryDaoImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static AddressDeliveryDaoImpl getInstance() {
         return instance;
     }
@@ -46,7 +56,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
                 AddressDelivery addressDelivery = mapperProvider.getAddressDeliveryMapper().createEntity(resultSet);
                 addressDeliveries.add(addressDelivery);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find all addressDelivery\" is failed. DataBase connection error.";
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -59,12 +69,12 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
         AddressDelivery addressDelivery = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(FIND_ALL + FIND_ADDRESS_BY_ID + id)) {
+             ResultSet resultSet = statement.executeQuery(FIND_ALL + BY_ID + id)) {
 
             if (resultSet.next()) {
                 addressDelivery = mapperProvider.getAddressDeliveryMapper().createEntity(resultSet);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find delivery by id=" + id + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -76,7 +86,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
     public List<AddressDelivery> findByStreetName(String streetName) throws DaoException {
         List<AddressDelivery> addressDeliveries = new ArrayList<>();
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL + FIND_ADDRESS_BY_STREET_NAME)) {
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL + BY_STREET_NAME)) {
             statement.setString(FIRST_PARAMETER_INDEX, streetName);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -84,7 +94,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
                     addressDeliveries.add(addressDelivery);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find delivery by streetName=" + streetName + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -105,7 +115,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
             statement.setString(FIRST_PARAMETER_INDEX, streetName);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + id + " by streetName=" + streetName + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -121,7 +131,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
             statement.setString(FIRST_PARAMETER_INDEX, houseNumber);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + id + " by houseNumber=" + houseNumber + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -137,7 +147,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
             statement.setInt(FIRST_PARAMETER_INDEX, buildingNumber);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + id + " by buildingNumber=" + buildingNumber + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -153,7 +163,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
             statement.setInt(FIRST_PARAMETER_INDEX, flatNumber);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + id + " by flatNumber=" + flatNumber + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -163,6 +173,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
 
     @Override
     public long create(AddressDelivery addressDelivery) throws DaoException {
+        long addressId = 0;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_ADDRESS, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(FIRST_PARAMETER_INDEX, addressDelivery.getStreetName());
@@ -171,17 +182,16 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
             statement.setInt(FOURTH_PARAMETER_INDEX, addressDelivery.getFlatNumber());
             statement.executeUpdate();
             try (ResultSet resultSet = statement.getGeneratedKeys()) {
-                long addressId = 0;
                 if (resultSet.next()) {
                     addressId = resultSet.getLong(FIRST_PARAMETER_INDEX);
                 }
-                return addressId;
             }
-        } catch (SQLException | ConnectionPoolException e) {
-            String message = "The query \"create addressDelivery " + addressDelivery + FAILED_MESSAGE;
+        } catch (SQLException e) {
+            String message = "The query \"create addressDelivery" + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
+        return addressId;
     }
 
     @Override
@@ -190,7 +200,7 @@ public class AddressDeliveryDaoImpl implements AddressDeliveryDao {
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             rowsNumber = statement.executeUpdate(DELETE_ADDRESS_BY_ID + id);
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"delete addressDelivery with id=" + id + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);

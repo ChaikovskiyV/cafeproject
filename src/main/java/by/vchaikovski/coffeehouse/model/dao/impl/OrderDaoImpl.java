@@ -1,43 +1,47 @@
-package by.vchaikovski.coffeeshop.model.dao.impl;
+package by.vchaikovski.coffeehouse.model.dao.impl;
 
-import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.OrderDao;
-import by.vchaikovski.coffeeshop.model.dao.mapper.MapperProvider;
-import by.vchaikovski.coffeeshop.model.entity.Bill;
-import by.vchaikovski.coffeeshop.model.entity.FoodOrder;
-import by.vchaikovski.coffeeshop.model.entity.Menu;
-import by.vchaikovski.coffeeshop.model.pool.ConnectionPool;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.OrderDao;
+import by.vchaikovski.coffeehouse.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeehouse.model.entity.Bill;
+import by.vchaikovski.coffeehouse.model.entity.FoodOrder;
+import by.vchaikovski.coffeehouse.model.entity.Menu;
+import by.vchaikovski.coffeehouse.model.pool.ConnectionPool;
 
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Order dao.
+ */
 public class OrderDaoImpl implements OrderDao {
     private static final OrderDaoImpl instance = new OrderDaoImpl();
     private static final MapperProvider mapperProvider = MapperProvider.getInstance();
     private static final String UPDATE_MESSAGE = "The query \"update order with id=";
     private static final String FIND_ALL_ORDERS = "SELECT order_id, order_status, creation_date, comment, " +
-            "fk_user_id, fk_bill_id, fk_delivery_id, evaluation FROM orders " +
+            "fk_user_id, fk_bill_id, fk_delivery_id, evaluation, menu_id, name, product_type, description, price, " +
+            "quantity_in_stock, image, quantity FROM orders " +
             "JOIN users ON fk_user_id=user_id " +
-            "JOIN discounts ON fk_discount_id = discount_id " +
+            "JOIN discounts ON fk_discount_id=discount_id " +
             "JOIN bills ON fk_bill_id=bill_id " +
             "JOIN deliveries ON fk_delivery_id=delivery_id " +
-            "JOIN address ON fk_address_id=address_id" +
+            "JOIN address ON fk_address_id=address_id " +
             "JOIN order_cart ON fk_order_id=order_id " +
-            "JOIN menu ON fk_menu_id=menu_id ";
-    private static final String FIND_ORDER_BY_ID = " WHERE order_id=";
-    private static final String FIND_ORDER_BY_STATUS = " WHERE order_status=?";
-    private static final String FIND_ORDER_BY_CREATION_DATE = " WHERE creation_date=?";
-    private static final String FIND_ORDER_BY_CREATION_PERIOD = " WHERE creation_date>=? AND creation_date<=?";
-    private static final String FIND_ORDER_BY_EVALUATION = " WHERE evaluation=?";
-    private static final String FIND_ORDER_BY_DELIVERY = " WHERE delivery_id=";
-    private static final String FIND_ORDER_BY_BILL = " WHERE bill_id=";
-    private static final String FIND_ORDER_BY_USER = " WHERE user_id=";
+            "JOIN menu ON fk_menu_id=menu_id";
+    private static final String BY_ID = " WHERE order_id=";
+    private static final String BY_STATUS = " WHERE order_status=?";
+    private static final String BY_CREATION_DATE = " WHERE creation_date=?";
+    private static final String BY_CREATION_PERIOD = " WHERE creation_date>=? AND creation_date<=?";
+    private static final String BY_EVALUATION = " WHERE evaluation=?";
+    private static final String BY_DELIVERY = " WHERE delivery_id=";
+    private static final String BY_BILL = " WHERE bill_id=";
+    private static final String BY_USER = " WHERE user_id=";
 
     private static final String UPDATE_ORDER_STATUS = "UPDATE orders SET order_status=? WHERE order_id=?";
     private static final String UPDATE_ORDER_GOODS_NUMBER_IN_CART = "UPDATE order_cart SET quantity=? " +
@@ -56,6 +60,11 @@ public class OrderDaoImpl implements OrderDao {
     private OrderDaoImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static OrderDaoImpl getInstance() {
         return instance;
     }
@@ -70,7 +79,7 @@ public class OrderDaoImpl implements OrderDao {
                 FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
                 orders.add(order);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find all orders\" is failed. DataBase connection error.";
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -83,11 +92,11 @@ public class OrderDaoImpl implements OrderDao {
         FoodOrder order = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + FIND_ORDER_BY_ID + id)) {
+             ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_ID + id)) {
             if (resultSet.next()) {
                 order = mapperProvider.getFoodMapper().createEntity(resultSet);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find an order by id=" + id + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -99,7 +108,7 @@ public class OrderDaoImpl implements OrderDao {
     public List<FoodOrder> findByOrderStatus(FoodOrder.OrderStatus orderStatus) throws DaoException {
         List<FoodOrder> orders = new ArrayList<>();
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL_ORDERS + FIND_ORDER_BY_STATUS)) {
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_ORDERS + BY_STATUS)) {
             statement.setString(FIRST_PARAMETER_INDEX, orderStatus.name());
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -107,7 +116,7 @@ public class OrderDaoImpl implements OrderDao {
                     orders.add(order);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find orders by status=" + orderStatus + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -116,20 +125,19 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public List<FoodOrder> findByCreationDate(LocalDateTime creationDate) throws DaoException {
+    public List<FoodOrder> findByCreationDate(LocalDate creationDate) throws DaoException {
         List<FoodOrder> orders = new ArrayList<>();
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL_ORDERS + FIND_ORDER_BY_CREATION_DATE)) {
-            statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(creationDate.format(timeFormatter)));
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_ORDERS + BY_CREATION_DATE)) {
+            statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(creationDate));
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
                     orders.add(order);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
-            String message = "The query \"find orders by creationDate=" + creationDate.format(timeFormatter) + FAILED_MESSAGE;
+        } catch (SQLException e) {
+            String message = "The query \"find orders by creationDate=" + creationDate + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
@@ -137,22 +145,21 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public List<FoodOrder> findByCreationDate(LocalDateTime startPeriod, LocalDateTime endPeriod) throws DaoException {
+    public List<FoodOrder> findByCreationDate(LocalDate startPeriod, LocalDate endPeriod) throws DaoException {
         List<FoodOrder> orders = new ArrayList<>();
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL_ORDERS + FIND_ORDER_BY_CREATION_PERIOD)) {
-            statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(startPeriod.format(timeFormatter)));
-            statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(endPeriod.format(timeFormatter)));
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_ORDERS + BY_CREATION_PERIOD)) {
+            statement.setDate(FIRST_PARAMETER_INDEX, Date.valueOf(startPeriod));
+            statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(endPeriod));
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
                     orders.add(order);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
-            String message = "The query \"find orders by paymentPeriod from " + startPeriod.format(timeFormatter) +
-                    " to " + endPeriod.format(timeFormatter) + FAILED_MESSAGE;
+        } catch (SQLException e) {
+            String message = "The query \"find orders by paymentPeriod from " + startPeriod +
+                    " to " + endPeriod + FAILED_MESSAGE;
             throw new DaoException(message, e);
         }
         return orders;
@@ -162,7 +169,7 @@ public class OrderDaoImpl implements OrderDao {
     public List<FoodOrder> findByEvaluation(FoodOrder.OrderEvaluation orderEvaluation) throws DaoException {
         List<FoodOrder> orders = new ArrayList<>();
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(FIND_ALL_ORDERS + FIND_ORDER_BY_EVALUATION)) {
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_ORDERS + BY_EVALUATION)) {
             statement.setString(FIRST_PARAMETER_INDEX, orderEvaluation.name());
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -170,7 +177,7 @@ public class OrderDaoImpl implements OrderDao {
                     orders.add(order);
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find orders by evaluation=" + orderEvaluation + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -183,12 +190,12 @@ public class OrderDaoImpl implements OrderDao {
         List<FoodOrder> orders = new ArrayList<>();
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + FIND_ORDER_BY_DELIVERY + deliveryId)) {
+             ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_DELIVERY + deliveryId)) {
             while (resultSet.next()) {
                 FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
                 orders.add(order);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find orders by deliveryId=" + deliveryId + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -201,11 +208,11 @@ public class OrderDaoImpl implements OrderDao {
         FoodOrder order = null;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + FIND_ORDER_BY_BILL + billId)) {
+             ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_BILL + billId)) {
             if (resultSet.next()) {
                 order = mapperProvider.getFoodMapper().createEntity(resultSet);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find orders by billId=" + billId + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -220,14 +227,14 @@ public class OrderDaoImpl implements OrderDao {
              Statement statement = connection.createStatement()) {
             for (Bill bill : bills) {
                 long billId = bill.getId();
-                try (ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + FIND_ORDER_BY_BILL + billId)) {
+                try (ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_BILL + billId)) {
                     if (resultSet.next()) {
                         FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
                         orders.add(order);
                     }
                 }
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find orders by bills list=" + bills + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -241,12 +248,12 @@ public class OrderDaoImpl implements OrderDao {
         List<FoodOrder> orders = new ArrayList<>();
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + FIND_ORDER_BY_USER + userId)) {
+             ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_USER + userId)) {
             while (resultSet.next()) {
                 FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
                 orders.add(order);
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"find orders by userId=" + userId + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -267,7 +274,7 @@ public class OrderDaoImpl implements OrderDao {
             statement.setString(FIRST_PARAMETER_INDEX, orderStatus.name());
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + id + " by status=" + orderStatus.name() + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -284,7 +291,7 @@ public class OrderDaoImpl implements OrderDao {
             statement.setLong(SECOND_PARAMETER_INDEX, orderId);
             statement.setLong(THIRD_PARAMETER_INDEX, menuId);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + menuId + " by goodsNumber in cart=" + goodsNumber + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -297,7 +304,7 @@ public class OrderDaoImpl implements OrderDao {
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE_ORDER, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(FIRST_PARAMETER_INDEX, order.getStatus().name());
-            statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(order.getCreationDate().toLocalDate()));
+            statement.setDate(SECOND_PARAMETER_INDEX, Date.valueOf(order.getCreationDate()));
             statement.setString(THIRD_PARAMETER_INDEX, order.getComment());
             statement.setString(FOURTH_PARAMETER_INDEX, order.getEvaluation().name());
             statement.setLong(FIFTH_PARAMETER_INDEX, order.getUserId());
@@ -311,7 +318,7 @@ public class OrderDaoImpl implements OrderDao {
                 }
                 return orderId;
             }
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"create foodOrder " + order + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -324,7 +331,7 @@ public class OrderDaoImpl implements OrderDao {
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             rowsNumber = statement.executeUpdate(DELETE_ORDER_BY_ID + id);
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"delete order with id=" + id + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -333,7 +340,7 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public int createOrderCart(long orderId, Map<Menu, Integer> cart) throws DaoException { //TODO Change this method
+    public int createOrderCart(long orderId, Map<Menu, Integer> cart) throws DaoException {
         int rowNumber = 0;
         Connection connection = null;
         try {
@@ -348,11 +355,9 @@ public class OrderDaoImpl implements OrderDao {
                 }
             }
             connection.commit();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             try {
-                if (connection != null) {
-                    connection.rollback();
-                }
+                connection.rollback();
             } catch (SQLException ex) {
                 String message = "The rollback method wasn't completed";
                 logger.error(message, ex);
@@ -381,7 +386,7 @@ public class OrderDaoImpl implements OrderDao {
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              Statement statement = connection.createStatement()) {
             rowsNumber = statement.executeUpdate(DELETE_ORDER_CART_BY_ORDER_ID + orderId);
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"delete orderCart by orderId=" + orderId + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -397,7 +402,7 @@ public class OrderDaoImpl implements OrderDao {
             statement.setLong(FIRST_PARAMETER_INDEX, orderId);
             statement.setLong(SECOND_PARAMETER_INDEX, menuId);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = "The query \"delete orderCart by orderId=" + orderId + " and menuId=" + menuId + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -413,7 +418,7 @@ public class OrderDaoImpl implements OrderDao {
             statement.setString(FIRST_PARAMETER_INDEX, comment);
             statement.setLong(SECOND_PARAMETER_INDEX, orderId);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + orderId + " by comment=" + comment + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
@@ -429,7 +434,7 @@ public class OrderDaoImpl implements OrderDao {
             statement.setString(FIRST_PARAMETER_INDEX, evaluation.name());
             statement.setLong(SECOND_PARAMETER_INDEX, orderId);
             rowsNumber = statement.executeUpdate();
-        } catch (SQLException | ConnectionPoolException e) {
+        } catch (SQLException e) {
             String message = UPDATE_MESSAGE + orderId + " by status=" + evaluation.name() + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);

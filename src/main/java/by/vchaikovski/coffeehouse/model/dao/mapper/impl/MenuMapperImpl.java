@@ -1,15 +1,21 @@
-package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
+package by.vchaikovski.coffeehouse.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.model.entity.Menu;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeehouse.model.entity.Menu;
 
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
+import static by.vchaikovski.coffeehouse.model.dao.ColumnTable.*;
+
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Menu mapper.
+ */
 
 public class MenuMapperImpl implements BaseMapper<Menu> {
     private static final MenuMapperImpl instance = new MenuMapperImpl();
@@ -17,6 +23,11 @@ public class MenuMapperImpl implements BaseMapper<Menu> {
     private MenuMapperImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static MenuMapperImpl getInstance() {
         return instance;
     }

@@ -1,13 +1,19 @@
-package by.vchaikovski.coffeeshop.model.dao.mapper.impl;
+package by.vchaikovski.coffeehouse.model.dao.mapper.impl;
 
-import by.vchaikovski.coffeeshop.exception.DaoException;
-import by.vchaikovski.coffeeshop.model.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeeshop.model.entity.Discount;
+import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.mapper.BaseMapper;
+import by.vchaikovski.coffeehouse.model.entity.Discount;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static by.vchaikovski.coffeeshop.model.dao.ColumnTable.*;
+import static by.vchaikovski.coffeehouse.model.dao.ColumnTable.*;
+
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Discount mapper.
+ */
 
 public class DiscountMapperImpl implements BaseMapper<Discount> {
     private static final DiscountMapperImpl instance = new DiscountMapperImpl();
@@ -15,6 +21,11 @@ public class DiscountMapperImpl implements BaseMapper<Discount> {
     private DiscountMapperImpl() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static DiscountMapperImpl getInstance() {
         return instance;
     }
