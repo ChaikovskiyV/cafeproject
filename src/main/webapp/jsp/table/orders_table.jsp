@@ -4,8 +4,13 @@
 
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
+<c:set var="orders" value="${requestScope.order_list}"/>
+<c:set var="users" value="${requestScope.user_list}"/>
+<c:set var="bills" value="${requestScope.bill_list}"/>
+<c:set var="deliveries" value="${requestScope.delivery_list}"/>
+<c:set var="address_list" value="${requestScope.address_list}"/>
 
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
@@ -40,50 +45,71 @@
     <title>${result}</title>
 </head>
 <body>
-<table class="table" style="background: #86b7fe; width: 1200px">
-    <caption></caption>
-    <thead>
-    <tr>
-        <th scope="col">${id}</th>
-        <th scope="col">${creation_date}</th>
-        <th scope="col">${status}</th>
-        <th scope="col">${price}</th>
-        <th scope="col">${bill_status}</th>
-        <th scope="col">${delivary_type}</th>
-        <th scope="col">${delivary_time}</th>
-        <th scope="col">${product_list}</th>
-        <th scope="col">${action}</th>
-    </tr>
-    </thead>
-    <tbody>
-    <c:forEach var="order" items="${requestScope.order_list}">
-        <tr>
-        <th scope="row">${order.id}</th>
-        <td>${order.creationDate}</td>
-        <td>${order.status}</td>
-        <td>${requestScope.bill_list[order.userId].totalPrice}</td>
-        <td>${requestScope.bill_list[order.userId].status}</td>
-        <td>${requestScope.delivery_list[order.userId].deliveryType}</td>
-        <td>${requestScope.delivery_list[order.userId].deliveryTime}</td>
-        <td>
-        <c:forEach var="food" items="${order.cart}">
+<div class="container">
+    <div class="dataTables_paginate">
+        <table class="table table-striped table-hover" style="background: #86b7fe; width: 1100px; margin-top: 50px">
+            <caption></caption>
+            <thead>
             <tr>
-                <td>${food.key.name}</td>
-                <td>${food.value}</td>
+                <th scope="col">${id}</th>
+                <th scope="col">${creation_date}</th>
+                <th scope="col">${status}</th>
+                <th scope="col">${price}</th>
+                <th scope="col">${bill_status}</th>
+                <th scope="col">${delivary_type}</th>
+                <th scope="col">${delivary_time}</th>
+                <th scope="col">${product_list}</th>
+                <th scope="col">${action}</th>
             </tr>
-        </c:forEach>
-        <td>
-            <form method="post" action="${path}/controller">
-                <input type="hidden" name="command" value="go_to_user_info">
-                <div class="container text-lg-start">
-                    <button type="submit" class="btn btn-secondary">
-                            ${details}
-                    </button>
-                </div>
-            </form>
-        </td>
-    </c:forEach>
-    </tbody>
-</table>
+            </thead>
+            <tbody class="nav-list-search">
+            <c:forEach var="order" items="${orders}">
+            <tr class="alert-danger">
+                <th scope="row">${order.id}</th>
+                <td>${order.creationDate}</td>
+                <td>${order.status}</td>
+                <td>${bills[order.userId].totalPrice}</td>
+                <td>${bills[order.userId].status}</td>
+                <td>${deliveries[order.userId].deliveryType}</td>
+                <td>${deliveries[order.userId].deliveryTime}</td>
+                <td>
+                    <div>
+                        <c:forEach var="food" items="${order.cart}">
+                            <p>
+                                    ${food.key.name}: ${food.value}
+                            </p>
+                        </c:forEach>
+                    </div>
+                <td>
+                    <form method="post" action="${path}/controller">
+                        <input type="hidden" name="command" value="go_to_order_info">
+                        <input type="hidden" name="current_order_id" value="${order.id}">
+                        <div class="container text-lg-start">
+                            <button type="submit" class="btn btn-secondary">
+                                    ${details}
+                            </button>
+                        </div>
+                    </form>
+                </td>
+                </c:forEach>
+            </tbody>
+        </table>
+    </div>
+    <link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
+    <script src="//cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#orders_table').DataTable({
+                renderer: {
+                    "header": "jqueryui",
+                    "pageButton": "bootstrap"
+                },
+                "pageLength": 5,
+                "lengthMenu": [ 5, 10, 20, 25]
+            });
+        });
+    </script>
+</div>
 </body>
 </html>

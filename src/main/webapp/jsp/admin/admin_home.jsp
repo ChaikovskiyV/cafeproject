@@ -1,10 +1,12 @@
-<%@ page isErrorPage="true" contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
-
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
+<fmt:setBundle basename="pagecontent"/>
+
+<fmt:message key="admin_home.title" var="title"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -20,28 +22,16 @@
     <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
     <link href="${path}/css/background.css" rel="stylesheet"/>
-    <title>Error 400</title>
+    <title>${title}</title>
 </head>
 <body>
-<div style="background: #86b7fe; margin-left: 200px; margin-top: 50px; width: 400px">
-    <table class="table align-content-center">
-        <caption></caption>
-        <thead>
-        <tr>
-            <th scope="col">Error 400 </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>
-                <br>Request from ${pageContext.errorData.requestURI} is failed
-                <br> Servlet name: ${pageContext.errorData.servletName}
-                <br>Status code: ${pageContext.errorData.statusCode}
-                <br>Message: Command is absent
-            </td>
-        </tr>
-        </tbody>
-    </table>
+<div>
+    <c:if test="${requestScope.show_profile == true}">
+        <jsp:include page="../common/user_profile.jsp"/>
+    </c:if>
+    <c:if test="${requestScope.show_card == true}">
+        <jsp:include page="../common/card_info.jsp"/>
+    </c:if>
 </div>
 <footer>
     <jsp:include page="../footer/footer.jsp"/>

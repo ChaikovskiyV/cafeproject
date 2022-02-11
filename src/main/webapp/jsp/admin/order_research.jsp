@@ -5,7 +5,7 @@
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="pagecontent"/>
 
 <fmt:message key="user_research.title" var="title"/>
@@ -40,6 +40,9 @@
 
 <!DOCTYPE html>
 <html lang="en">
+<header>
+    <jsp:include page="../header/header.jsp"/>
+</header>
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -50,14 +53,19 @@
     <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
     <link href="${path}/css/background.css" rel="stylesheet"/>
     <title>${find}</title>
+    <style>
+        .order_research {
+            width: 400px;
+            color: #0c4128;
+            margin-left: 80px;
+            margin-top: 20px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body>
-<div class="main_title" style="color: #0c4128; margin: 50px">
-    <h2>
-        ${main_title}
-    </h2>
-</div>
-<div>
+<div class="order_research">
     <div class="container px-5" style="width: 1200px">
         <h4>
             ${title}
@@ -162,24 +170,17 @@
             </button>
         </div>
     </form>
-    <div class="row gx-2" style="width: 500px; padding-left: 120px">
-        <div class="col">
-            <a href="${path}/controller?command=go_to_home"
-               style="color: #1a1e21; font-size: 20px; font-weight: bold">${home}</a>
-        </div>
-        <div class="col">
-            <a href="${path}/controller?command=go_to_main"
-               style="color: #1a1e21; font-size: 20px; font-weight: bold">${back_main}</a>
-        </div>
-    </div>
 </div>
 <div class="research result" style="width: 1200px">
     <c:if test="${requestScope.result == false}">
         <h4>${not_found}</h4>
     </c:if>
     <c:if test="${requestScope.result == true}">
-        <jsp:include page="table/orders_table.jsp"/>
+        <jsp:include page="../table/orders_table.jsp"/>
     </c:if>
 </div>
+<footer>
+    <jsp:include page="../footer/footer.jsp"/>
+</footer>
 </body>
 </html>

@@ -4,8 +4,9 @@
 
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
+<c:set var="image_map" value="${sessionScope.menu_images}"/>
 
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
@@ -60,40 +61,12 @@
                 <td>${menu.key.type}</td>
                 <td>${menu.key.description}</td>
                 <td>${menu.key.price}</td>
-                <td>${menu.key.image}</td>
                 <td>
-                    <div class="container px-2">
-                        <div class="row gx-2">
-                            <div class="col">
-                                    ${menu.value}
-                            </div>
-                        </div>
-                        <div class="row gx-2">
-                            <div class="col">
-                                <form method="post" action="${path}/controller">
-                                    <input type="hidden" name="command" value="reduce_quantity_in_cart">
-                                    <input type="hidden" name="current_menu_id" value="${menu.key.id}">
-                                    <div class="container text-lg-start">
-                                        <button type="submit" class="btn btn-secondary">
-                                                ${reduce}
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="col">
-                                <form method="post" action="${path}/controller">
-                                    <input type="hidden" name="command" value="increase_quantity_in_cart">
-                                    <input type="hidden" name="current_menu_id" value="${menu.key.id}">
-                                    <div class="container text-lg-start">
-                                        <button type="submit" class="btn btn-secondary">
-                                                ${increase}
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                    <div>
+                        <img src="${image_map[menu.key.id]}" width="50" class="rounded-circle" alt="no image"/>
                     </div>
                 </td>
+                <td>${menu.value}</td>
                 <td>
                     <form method="post" action="${path}/controller">
                         <input type="hidden" name="command" value="delete_from_cart">

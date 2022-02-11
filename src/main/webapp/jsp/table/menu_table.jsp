@@ -2,9 +2,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<c:set var="path" value="${pageContext.request.contextPath}"/>
 
-<fmt:setLocale value="${sessionScope.locale}"/>
+<c:set var="path" value="${pageContext.request.contextPath}"/>
+<c:set var="image_map" value="${sessionScope.menu_images}"/>
+<c:set var="menus" value="${sessionScope.menu_list}"/>
+
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
@@ -30,10 +33,29 @@
         crossorigin="anonymous">
   <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#my_table').DataTable({
+        renderer: {
+          "header": "jqueryui",
+          "pageButton": "bootstrap"
+        },
+        "pageLength": 4,
+        "lengthMenu": [ 5, 10, 20, 25]
+      });
+    });
+  </script>
+  <link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
+  <script src="//cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
   <title>${result}</title>
 </head>
 <body>
-<table class="table" style="background: #86b7fe; margin-left: 50px">
+<div class="container">
+    <div class="dataTables_paginate">
+        <table class="table table-striped table-hover" style="background: #86b7fe; width: 1200px; margin-left: 50px">
+
+
   <caption></caption>
   <thead>
   <tr>
@@ -49,20 +71,25 @@
     </c:if>
   </tr>
   </thead>
-  <tbody>
-  <c:forEach var="menu" items="${sessionScope.menu_list}">
-    <tr>
+  <tbody class="nav-list-search">
+  <c:forEach var="menu" items="${menus}">
+    <tr class="table-danger">
       <th scope="row">${menu.id}</th>
       <td>${menu.name}</td>
       <td>${menu.type}</td>
       <td>${menu.description}</td>
       <td>${menu.price}</td>
-      <td>${menu.image}</td>
+      <td>
+          <div>
+            <img src="${image_map[menu.id]}" class="img-thumbnail" width="50" alt="no image"/>
+          </div>
+         </td>
       <td>${menu.quantityInStock}</td>
       <c:if test="${sessionScope.user_role == 'ADMIN' or sessionScope.user_role == 'BARISTA'}">
         <td>
           <form method="post" action="${path}/controller">
-            <input type="hidden" name="command" value="go_to_user_info">
+            <input type="hidden" name="command" value="show_menu_info">
+            <input type="hidden" name="menu_id" value="${menu.id}"/>
             <div class="container text-lg-start">
               <button type="submit" class="btn btn-secondary">
                   ${details}
@@ -88,5 +115,7 @@
   </c:forEach>
   </tbody>
 </table>
+    </div>
+</div>
 </body>
 </html>

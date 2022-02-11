@@ -4,8 +4,9 @@
 
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
+<c:set var="discounts" value="${requestScope.discount_list}"/>
 
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
@@ -33,8 +34,17 @@
     <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
     <title>${result}</title>
+
 </head>
 <body>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#table').DataTable();
+    });
+</script>
+<link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
+<script src="//cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
 <table class="table" style="background: #86b7fe; margin: 50px">
     <caption></caption>
     <thead>
@@ -63,8 +73,8 @@
             <td>${user.phoneNumber}</td>
             <td>${user.role}</td>
             <td>${user.status}</td>
-            <td>${requestScope.discount_list[user.id].type}</td>
-            <td>${requestScope.discount_list[user.id].rate}</td>
+            <td>${discounts[user.id].type}</td>
+            <td>${discounts[user.id].rate}</td>
             <td>
                 <form method="post" action="${path}/controller">
                     <input type="hidden" name="command" value="go_to_user_info">

@@ -3,10 +3,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
-<c:set var="user" value="${requestScope.current_user}"/>
-<c:set var="discount" value="${requestScope.discount}"/>
+<c:set var="user" value="${sessionScope.current_user}"/>
+<c:set var="discount" value="${sessionScope.discount}"/>
 
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="pagecontent"/>
 
 <fmt:message key="user_info.title" var="title"/>
@@ -36,6 +36,9 @@
 
 <!DOCTYPE html>
 <html lang="en">
+<header>
+    <jsp:include page="../header/header.jsp"/>
+</header>
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -165,29 +168,13 @@
                             </div>
                         </div>
                     </form>
-                    <div class="col">
-                        <form method="post" action="${path}/controller">
-                            <input type="hidden" name="command" value="delete_user">
-                            <input type="hidden" name="user_id" value="${user.id}">
-                            <button type="submit" class="btn btn-secondary">
-                                ${delete}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="row gx-5">
-                <div class="col">
-                    <a href="${path}/controller?command=go_to_home"
-                       style="color: #1a1e21; font-size: 20px; font-weight: bold">${go_home}</a>
-                </div>
-                <div class="col">
-                    <a href="${path}/controller?command=go_to_find_user"
-                       style="color: #1a1e21; font-size: 20px; font-weight: bold">${go_find_user}</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<footer>
+    <jsp:include page="../footer/footer.jsp"/>
+</footer>
 </body>
 </html>

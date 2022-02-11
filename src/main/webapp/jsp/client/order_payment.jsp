@@ -8,7 +8,7 @@
 <c:set var="bill" value="${sessionScope.bill}"/>
 <c:set var="order_parameters" value="${sessionScope.order_parameters}"/>
 
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
@@ -39,6 +39,7 @@
           crossorigin="anonymous">
     <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
+    <link href="${path}/css/background.css" rel="stylesheet"/>
     <title>${result}</title>
 </head>
 <body>
@@ -65,26 +66,29 @@
         <td>${order.status}</td>
         <td>
             <c:forEach var="food" items="${order.cart}">
-    <tr>
-        <td>${food.key.name}</td>
-        <td>${food.value}</td>
-    </tr>
-    </c:forEach>
-    <td>${order_parameters.delivery_type}</td>
-    <td>${order_parameters.delivery_time}</td>
-    <td>
-    <td>${order_parameters.street}</td>
-    <td>
-        ${order_parameters.house_number} -
-        ${order_parameters.building_number} -
-        ${order_parameters.flat_number}
-    </td>
-    <td>${bill.status}</td>
-    <td>${bill.totalPrice}</td>
+            <div>
+                    ${food.key.name}: ${food.value}
+            </div>
+            </c:forEach>
+        <td>${order_parameters.delivery_type}</td>
+        <td>${order_parameters.delivery_time}</td>
+        <td>
+            <div>
+                ${order_parameters.street}
+            </div>
+            <div>
+                ${order_parameters.house_number} -
+                ${order_parameters.building_number} -
+                ${order_parameters.flat_number}
+            </div>
+        </td>
+        <td>${bill.status}</td>
+        <td>${bill.totalPrice}</td>
     </tbody>
 </table>
 <form method="post" action="${path}/controller">
     <input type="hidden" name="command" value="pay">
+    <input type="hidden" name="total_price" value="${sessionScope.order_parameters.total_price}">
     <div class="container px-2" style="margin: 20px">
         <div class="row gx-2">
             <div class="col">

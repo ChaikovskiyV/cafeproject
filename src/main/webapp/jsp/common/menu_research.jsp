@@ -5,7 +5,7 @@
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="pagecontent"/>
 
 <fmt:message key="user_research.title" var="title"/>
@@ -16,16 +16,16 @@
 <fmt:message key="menu_creation.type_coffee" var="coffee"/>
 <fmt:message key="menu_creation.type_tea" var="tea"/>
 <fmt:message key="menu_creation.type_pastry" var="pastry"/>
-<fmt:message key="main.title" var="main_title"/>
 <fmt:message key="menu_creation.price" var="price"/>
 <fmt:message key="menu_creation.quantity_in_stock" var="quantity"/>
 <fmt:message key="reference.go_home" var="home"/>
 <fmt:message key="reference.back_main" var="back_main"/>
-<fmt:message key="language.en" var="en"/>
-<fmt:message key="language.ru" var="ru"/>
 
 <!DOCTYPE html>
 <html lang="en">
+<header>
+    <jsp:include page="../header/header.jsp"/>
+</header>
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,16 +38,11 @@
     <title>${find}</title>
 </head>
 <body>
-<div class="main_title" style="color: #0c4128; margin: 50px">
-    <h2>
-        ${main_title}
-    </h2>
-</div>
 <div>
     <form method="post" action="${path}/controller">
-        <input type="hidden" name="command" value="show_menu">
+        <input type="hidden" name="command" value="find_menu">
         <div class="container px-5" style="width: 1200px">
-            <h4>
+            <h4 style="color: #0c4128; font-weight: bold">
                 ${title}
             </h4>
             <div class="row gx-5">
@@ -92,23 +87,16 @@
         </div>
     </form>
 </div>
-<div class="row gx-2" style="width: 500px; padding-left: 120px">
-    <div class="col">
-        <a href="${path}/controller?command=go_to_home"
-           style="color: #1a1e21; font-size: 20px; font-weight: bold">${home}</a>
-    </div>
-    <div class="col">
-        <a href="${path}/controller?command=go_to_main"
-           style="color: #1a1e21; font-size: 20px; font-weight: bold">${back_main}</a>
-    </div>
-</div>
 <div class="research result" style="width: 1200px">
     <c:if test="${requestScope.result == false}">
         <h4>${not_found}</h4>
     </c:if>
     <c:if test="${requestScope.result == true or empty requestScope.result}">
-        <jsp:include page="table/menu_table.jsp"/>
+        <jsp:include page="../table/menu_table.jsp"/>
     </c:if>
 </div>
+<footer>
+    <jsp:include page="../footer/footer.jsp"/>
+</footer>
 </body>
 </html>

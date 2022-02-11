@@ -43,16 +43,17 @@
     <style>
         .card_panel {
             width: 300px;
-            color: #0a58ca;
+            color: #0c4128;
             font-size: 20px;
             font-weight: bold;
             margin: 100px;
+            white-space: nowrap;
         }
     </style>
 </head>
 <body>
 <div class="card_panel">
-    <h4 style="color: #0a58ca; font-size: 20px; font-weight: bold">
+    <h4 style="color: #0c4128; font-size: 20px; font-weight: bold; margin-left: 50px">
         ${title}
     </h4>
     <c:if test="${requestScope.register_card == true}">
@@ -119,7 +120,7 @@
         </div>
         <div>
             <a href="${path}/controller?command=go_to_card_info"
-               style="color: #0a58ca; font-size: 20px; font-weight: bold">${find_card}</a>
+               style="color: #0c4128; font-size: 20px; font-weight: bold">${find_card}</a>
         </div>
     </c:if>
     <c:if test="${empty requestScope.register_card and empty requestScope.is_found}">
@@ -144,7 +145,7 @@
         </form>
         <div>
             <a href="${path}/controller?command=go_to_registration_card"
-               style="color: #0a58ca; font-size: 20px; font-weight: bold">${register_card}</a>
+               style="color: #0c4128; font-size: 20px; font-weight: bold; white-space: nowrap">${register_card}</a>
         </div>
     </c:if>
     <c:if test="${requestScope.is_found == true}">
@@ -215,19 +216,23 @@
     </div>
     <div>
         <a href="${path}/controller?command=go_to_registration_card"
-           style="color: #0a58ca; font-size: 20px; font-weight: bold">${register_card}</a>
+           style="color: #0c4128; font-size: 20px; font-weight: bold">${register_card}</a>
         <a href="${path}/controller?command=go_to_card_info"
-           style="color: #0a58ca; font-size: 20px; font-weight: bold">${find_card}</a>
+           style="color: #0c4128; font-size: 20px; font-weight: bold">${find_card}</a>
     </div>
 </div>
 </c:if>
 <c:if test="${requestScope.is_found == false}">
     ${not_found}
-    <div>
-        <a href="${path}/controller?command=go_to_registration_card"
-           style="color: #0a58ca; font-size: 20px; font-weight: bold">${register_card}</a>
-        <a href="${path}/controller?command=go_to_card_info"
-           style="color: #0a58ca; font-size: 20px; font-weight: bold">${find_card}</a>
+    <div class="row gx-5">
+        <div class="col">
+            <a href="${path}/controller?command=go_to_registration_card"
+               style="color: #0c4128; font-size: 20px; font-weight: bold; white-space: nowrap">${register_card}</a>
+        </div>
+        <div class="col">
+            <a href="${path}/controller?command=go_to_card_info"
+               style="color: #0c4128; font-size: 20px; font-weight: bold">${find_card}</a>
+        </div>
     </div>
 </c:if>
 </body>

@@ -5,7 +5,7 @@
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
-<fmt:setLocale value="${sessionScope.locale}"/>
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="pagecontent"/>
 
 <fmt:message key="user_research.title" var="title"/>
@@ -40,6 +40,9 @@
 
 <!DOCTYPE html>
 <html lang="en">
+<header>
+    <jsp:include page="../header/header.jsp"/>
+</header>
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -52,23 +55,19 @@
     <title>${find}</title>
 </head>
 <body>
-<div class="main_title" style="color: #0c4128; margin: 50px">
-    <h2>
-        ${main_title}
-    </h2>
-</div>
 <div>
-    <h4>
+    <h4 style="color: #0c4128; margin-left: 80px; white-space: nowrap">
         ${title}
     </h4>
-    <div class="container px-1" style="width: 1200px">
+    <div class="container px-1" style="width: 1300px; margin-left: 10px">
         <div class="row gx-1">
             <div class="col">
                 <form method="post" action="${path}/controller">
                     <input type="hidden" name="command" value="find_user">
-                    <div class="input-group mb-3" >
+                    <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon1">${login}</span>
-                        <input type="text" class="form-control" placeholder="${login}" name="login" value="" pattern="\w{5,20}"
+                        <input type="text" class="form-control" placeholder="${login}" name="login" value=""
+                               pattern="\w{5,20}"
                                aria-label="${login}" aria-describedby="basic-addon1">
                         <button type="submit" class="btn btn-secondary">
                             ${find_login}
@@ -76,13 +75,14 @@
                     </div>
                 </form>
             </div>
-            <div class="col" >
+            <div class="col">
                 <form method="post" action="${path}/controller">
                     <input type="hidden" name="command" value="find_user">
-                    <div class="input-group mb-3" >
+                    <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon2">${email}</span>
                         <input type="text" class="form-control" placeholder="${email}" name="email" value=""
-                               pattern="\w+[._-]?\w+@\p{Alpha}+\.\p{Alpha}+" aria-label="${email}" aria-describedby="basic-addon1">
+                               pattern="\w+[._-]?\w+@\p{Alpha}+\.\p{Alpha}+" aria-label="${email}"
+                               aria-describedby="basic-addon1">
                         <button type="submit" class="btn btn-secondary">
                             ${find_email}
                         </button>
@@ -94,7 +94,8 @@
                     <input type="hidden" name="command" value="find_user">
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon3">${phone_number}</span>
-                        <input type="text" class="form-control" placeholder="${phone_number}" name="phone_number" value=""
+                        <input type="text" class="form-control" placeholder="${phone_number}" name="phone_number"
+                               value=""
                                pattern="+\d{12}" aria-label=${phone_number} aria-describedby="basic-addon1">
                         <button type="submit" class="btn btn-secondary">
                             ${find_phone}
@@ -108,7 +109,7 @@
     <form method="post" action="${path}/controller">
         <input type="hidden" name="command" value="find_user">
         <div class="container px-5" style="width: 1200px">
-            <div class="row gx-5" >
+            <div class="row gx-5">
                 <div class="col">
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon4">${first_name}</span>
@@ -125,20 +126,6 @@
                 </div>
                 <div class="col">
                     <div class="input-group mb-3">
-                        <select class="form-select" required name="discount_type" aria-label="Personal">
-                            <option selected>${disc_type}</option>
-                            <option value="Zero">${discount_zero}</option>
-                            <option value="Staff">${discount_staff}</option>
-                            <option value="Personal">${discount_personal}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="container px-5" style="width: 1200px" >
-            <div class="row gx-5" style="width: fit-content">
-                <div class="col">
-                    <div class="input-group mb-3">
                         <select class="form-select" required name="user_role" aria-label="Client">
                             <option selected>${user_role}</option>
                             <option value="Admin">${user_admin}</option>
@@ -147,12 +134,26 @@
                         </select>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="container px-5" style="width: 1200px">
+            <div class="row gx-5" style="width: fit-content">
                 <div class="col">
                     <div class="input-group mb-3">
                         <select class="form-select" required name="user_status" aria-label="Unbanned">
                             <option selected>${user_status}</option>
                             <option value="Banned">${user_banned}</option>
                             <option value="Unbanned">${user_unbanned}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <select class="form-select" required name="discount_type" aria-label="Personal">
+                            <option selected>${disc_type}</option>
+                            <option value="Zero">${discount_zero}</option>
+                            <option value="Staff">${discount_staff}</option>
+                            <option value="Personal">${discount_personal}</option>
                         </select>
                     </div>
                 </div>
@@ -171,26 +172,17 @@
             </button>
         </div>
     </form>
-<div class="container px-2" >
-    <div class="row gx-2">
-        <div class="col">
-            <a href="${path}/controller?command=go_to_home"
-               style="color: #1a1e21; font-size: 20px; font-weight: bold">${home}</a>
-        </div>
-        <div class="col">
-            <a href="${path}/controller?command=go_to_main"
-               style="color: #1a1e21; font-size: 20px; font-weight: bold">${back_main}</a>
-        </div>
-    </div>
-</div>
 </div>
 <div class="research result" style="width: 1200px">
     <c:if test="${requestScope.result == false}">
         <h4>${not_found}</h4>
     </c:if>
     <c:if test="${requestScope.result == true}">
-        <jsp:include page="table/user_table.jsp"/>
+        <jsp:include page="../table/user_table.jsp"/>
     </c:if>
 </div>
+<footer>
+    <jsp:include page="../footer/footer.jsp"/>
+</footer>
 </body>
 </html>
