@@ -1,4 +1,4 @@
-package by.vchaikovski.coffeeshop.model.pool;
+package by.vchaikovski.coffeehouse.model.pool;
 
 
 import org.apache.logging.log4j.LogManager;
@@ -9,6 +9,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Connection factory.
+ */
 class ConnectionFactory {
     private static final Logger logger = LogManager.getLogger();
     private static final String DATABASE_PROPERTIES = "database";
@@ -39,6 +44,11 @@ class ConnectionFactory {
     private ConnectionFactory() {
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     static ConnectionFactory getInstance() {
         if (instance == null) {
             instance = new ConnectionFactory();
@@ -46,6 +56,11 @@ class ConnectionFactory {
         return instance;
     }
 
+    /**
+     * Gets connection.
+     *
+     * @return the connection
+     */
     Connection getConnection() {
         Connection connection = null;
         try {

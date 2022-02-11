@@ -1,36 +1,42 @@
-package by.vchaikovski.coffeeshop.model.pool;
-
-import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+package by.vchaikovski.coffeehouse.model.pool;
 
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Proxy connection.
+ */
 class ProxyConnection implements Connection {
-    private static final Logger logger = LogManager.getLogger();
     private Connection connection;
 
+    /**
+     * Instantiates a new Proxy connection.
+     *
+     * @param connection the connection
+     */
     ProxyConnection(Connection connection) {
         this.connection = connection;
     }
 
     @Override
     public void close() throws SQLException {
-        try {
-            if(!connection.getAutoCommit()) {
-                connection.setAutoCommit(true);
-            }
-            ConnectionPool.getInstance().releaseConnection(this);
-        } catch (ConnectionPoolException e) {
-            logger.error("Exception from close", e);
+        if (!connection.getAutoCommit()) {
+            connection.setAutoCommit(true);
         }
+        ConnectionPool.getInstance().releaseConnection(this);
     }
 
+    /**
+     * Really close.
+     *
+     * @throws SQLException the sql exception
+     */
     void reallyClose() throws SQLException {
-            connection.close();
+        connection.close();
     }
 
     @Override

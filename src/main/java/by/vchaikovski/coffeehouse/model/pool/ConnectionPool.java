@@ -1,6 +1,5 @@
-package by.vchaikovski.coffeeshop.model.pool;
+package by.vchaikovski.coffeehouse.model.pool;
 
-import by.vchaikovski.coffeeshop.exception.ConnectionPoolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,6 +11,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Connection pool.
+ */
 public class ConnectionPool {
     private static final Logger logger = LogManager.getLogger();
     private static final int POOL_SIZE = 8;
@@ -27,7 +31,7 @@ public class ConnectionPool {
         for (int i = 0; i < POOL_SIZE; i++) {
             Connection connection = ConnectionFactory.getInstance().getConnection();
             ProxyConnection proxyConnection = new ProxyConnection(connection);
-            freeConnections.offer(proxyConnection);
+            freeConnections.add(proxyConnection);
         }
         if (freeConnections.isEmpty()) {
             String message = "No connections were created";
@@ -36,6 +40,11 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * Gets instance.
+     *
+     * @return the instance
+     */
     public static ConnectionPool getInstance() {
         if (!isCreated.get()) {
             singletonLock.lock();
@@ -51,30 +60,44 @@ public class ConnectionPool {
         return instance;
     }
 
-    public Connection getConnection() throws ConnectionPoolException {
-        ProxyConnection connection;
+    /**
+     * Gets connection.
+     *
+     * @return the connection
+     */
+    public Connection getConnection() {
+        ProxyConnection connection = null;
         try {
             connection = freeConnections.take();
-            givenConnection.offer(connection);
+            givenConnection.add(connection);
         } catch (InterruptedException e) {
             String message = "The getConnection method can't be completed";
             logger.error(message, e);
-            throw new ConnectionPoolException(message, e);
+            Thread.currentThread().interrupt();
         }
         return connection;
     }
 
-    public void releaseConnection(Connection connection) throws ConnectionPoolException {
-        if (connection instanceof ProxyConnection) {
-            givenConnection.remove(connection);
-            freeConnections.offer((ProxyConnection) connection);
-        } else {
-            String message = "Unknown connection: " + connection;
-            logger.error(message);
-            throw new ConnectionPoolException(message);
+    /**
+     * Release connection.
+     *
+     * @param connection the connection
+     */
+    public void releaseConnection(Connection connection) {
+        try {
+            if (connection instanceof ProxyConnection proxyConnection && givenConnection.remove(connection)) {
+                freeConnections.put(proxyConnection);
+            }
+        } catch (InterruptedException e) {
+            String message = "The releaseConnection method can't be completed";
+            logger.error(message, e);
+            Thread.currentThread().interrupt();
         }
     }
 
+    /**
+     * Destroy pool.
+     */
     public void destroyPool() {
         while (!freeConnections.isEmpty() || !givenConnection.isEmpty()) {
             try {
@@ -91,12 +114,18 @@ public class ConnectionPool {
         deregisterDrivers();
     }
 
+    /**
+     * Destroy pool take.
+     * <p>
+     * This method is not used.
+     */
     public void destroyPoolTake() {
         for (int i = 0; i < POOL_SIZE; i++) {
             try {
                 freeConnections.take().reallyClose();
             } catch (InterruptedException | SQLException e) {
                 logger.error("The destroyPoolTake method can't be completed", e);
+                Thread.currentThread().interrupt();
             }
         }
         deregisterDrivers();
