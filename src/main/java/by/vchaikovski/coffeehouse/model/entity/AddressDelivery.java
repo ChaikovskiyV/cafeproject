@@ -1,5 +1,10 @@
-package by.vchaikovski.coffeeshop.model.entity;
+package by.vchaikovski.coffeehouse.model.entity;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Address delivery.
+ */
 public class AddressDelivery extends AbstractEntity {
     private String streetName;
     private String houseNumber;
@@ -14,34 +19,74 @@ public class AddressDelivery extends AbstractEntity {
         flatNumber = builder.flatNumber;
     }
 
+    /**
+     * Gets street name.
+     *
+     * @return the street name
+     */
     public String getStreetName() {
         return streetName;
     }
 
+    /**
+     * Sets street name.
+     *
+     * @param streetName the street name
+     */
     public void setStreetName(String streetName) {
         this.streetName = streetName;
     }
 
+    /**
+     * Gets house number.
+     *
+     * @return the house number
+     */
     public String getHouseNumber() {
         return houseNumber;
     }
 
+    /**
+     * Sets house number.
+     *
+     * @param houseNumber the house number
+     */
     public void setHouseNumber(String houseNumber) {
         this.houseNumber = houseNumber;
     }
 
+    /**
+     * Gets building number.
+     *
+     * @return the building number
+     */
     public int getBuildingNumber() {
         return buildingNumber;
     }
 
+    /**
+     * Sets building number.
+     *
+     * @param buildingNumber the building number
+     */
     public void setBuildingNumber(int buildingNumber) {
         this.buildingNumber = buildingNumber;
     }
 
+    /**
+     * Gets flat number.
+     *
+     * @return the flat number
+     */
     public int getFlatNumber() {
         return flatNumber;
     }
 
+    /**
+     * Sets flat number.
+     *
+     * @param flatNumber the flat number
+     */
     public void setFlatNumber(int flatNumber) {
         this.flatNumber = flatNumber;
     }
@@ -84,6 +129,9 @@ public class AddressDelivery extends AbstractEntity {
                 .toString();
     }
 
+    /**
+     * The type Address delivery builder.
+     */
     public static class AddressDeliveryBuilder {
         private long id;
         private String streetName;
@@ -91,31 +139,66 @@ public class AddressDelivery extends AbstractEntity {
         private int buildingNumber;
         private int flatNumber;
 
+        /**
+         * Sets id.
+         *
+         * @param id the id
+         * @return the id
+         */
         public AddressDeliveryBuilder setId(long id) {
             this.id = id;
             return this;
         }
 
+        /**
+         * Sets street name.
+         *
+         * @param streetName the street name
+         * @return the street name
+         */
         public AddressDeliveryBuilder setStreetName(String streetName) {
             this.streetName = streetName;
             return this;
         }
 
+        /**
+         * Sets house number.
+         *
+         * @param houseNumber the house number
+         * @return the house number
+         */
         public AddressDeliveryBuilder setHouseNumber(String houseNumber) {
             this.houseNumber = houseNumber;
             return this;
         }
 
+        /**
+         * Sets building number.
+         *
+         * @param buildingNumber the building number
+         * @return the building number
+         */
         public AddressDeliveryBuilder setBuildingNumber(int buildingNumber) {
             this.buildingNumber = buildingNumber;
             return this;
         }
 
+        /**
+         * Sets flat number.
+         *
+         * @param flatNumber the flat number
+         * @return the flat number
+         */
         public AddressDeliveryBuilder setFlatNumber(int flatNumber) {
             this.flatNumber = flatNumber;
             return this;
         }
 
+        /**
+         * Build address delivery.
+         *
+         * @return the address delivery
+         */
         public AddressDelivery build() {
             return new AddressDelivery(this);
         }

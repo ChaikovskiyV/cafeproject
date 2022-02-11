@@ -1,9 +1,46 @@
-package by.vchaikovski.coffeeshop.model.entity;
+package by.vchaikovski.coffeehouse.model.entity;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type User.
+ */
 public class User extends AbstractEntity {
-    public enum Role {ADMIN, CLIENT, GUEST, BARISTA}
+    /**
+     * The enum Role.
+     */
+    public enum Role {
+        /**
+         * Admin role.
+         */
+        ADMIN,
+        /**
+         * Client role.
+         */
+        CLIENT,
+        /**
+         * Guest role.
+         */
+        GUEST,
+        /**
+         * Barista role.
+         */
+        BARISTA
+    }
 
-    public enum Status {BANNED, UNBANNED}
+    /**
+     * The enum Status.
+     */
+    public enum Status {
+        /**
+         * Banned status.
+         */
+        BANNED,
+        /**
+         * Unbanned status.
+         */
+        UNBANNED
+    }
 
     private String login;
     private String firstName;
@@ -14,6 +51,11 @@ public class User extends AbstractEntity {
     private Status status;
     private long discountId;
 
+    /**
+     * Instantiates a new User.
+     *
+     * @param builder the builder
+     */
     public User(UserBuilder builder) {
         super.setId(builder.id);
         login = builder.login;
@@ -26,66 +68,146 @@ public class User extends AbstractEntity {
         discountId = builder.discountId;
     }
 
+    /**
+     * Gets login.
+     *
+     * @return the login
+     */
     public String getLogin() {
         return login;
     }
 
+    /**
+     * Sets login.
+     *
+     * @param login the login
+     */
     public void setLogin(String login) {
         this.login = login;
     }
 
+    /**
+     * Gets first name.
+     *
+     * @return the first name
+     */
     public String getFirstName() {
         return firstName;
     }
 
+    /**
+     * Sets first name.
+     *
+     * @param firstName the first name
+     */
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
+    /**
+     * Gets last name.
+     *
+     * @return the last name
+     */
     public String getLastName() {
         return lastName;
     }
 
+    /**
+     * Sets last name.
+     *
+     * @param lastName the last name
+     */
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
+    /**
+     * Gets email.
+     *
+     * @return the email
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Sets email.
+     *
+     * @param email the email
+     */
     public void setEmail(String email) {
         this.email = email;
     }
 
+    /**
+     * Gets phone number.
+     *
+     * @return the phone number
+     */
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
+    /**
+     * Sets phone number.
+     *
+     * @param phoneNumber the phone number
+     */
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
+    /**
+     * Gets role.
+     *
+     * @return the role
+     */
     public Role getRole() {
         return role;
     }
 
+    /**
+     * Sets role.
+     *
+     * @param role the role
+     */
     public void setRole(Role role) {
         this.role = role;
     }
 
+    /**
+     * Gets status.
+     *
+     * @return the status
+     */
     public Status getStatus() {
         return status;
     }
 
+    /**
+     * Sets status.
+     *
+     * @param status the status
+     */
     public void setStatus(Status status) {
         this.status = status;
     }
 
+    /**
+     * Gets discount id.
+     *
+     * @return the discount id
+     */
     public long getDiscountId() {
         return discountId;
     }
 
+    /**
+     * Sets discount id.
+     *
+     * @param discountId the discount id
+     */
     public void setDiscountId(long discountId) {
         this.discountId = discountId;
     }
@@ -143,6 +265,9 @@ public class User extends AbstractEntity {
                 .toString();
     }
 
+    /**
+     * The type User builder.
+     */
     public static class UserBuilder {
         private long id;
         private String login;
@@ -154,51 +279,110 @@ public class User extends AbstractEntity {
         private Status status;
         private long discountId;
 
+        /**
+         * Sets id.
+         *
+         * @param id the id
+         * @return the id
+         */
         public UserBuilder setId(long id) {
             this.id = id;
             return this;
         }
 
+        /**
+         * Sets login.
+         *
+         * @param login the login
+         * @return the login
+         */
         public UserBuilder setLogin(String login) {
             this.login = login;
             return this;
         }
 
+        /**
+         * Sets first name.
+         *
+         * @param firstName the first name
+         * @return the first name
+         */
         public UserBuilder setFirstName(String firstName) {
             this.firstName = firstName;
             return this;
         }
 
+        /**
+         * Sets last name.
+         *
+         * @param lastName the last name
+         * @return the last name
+         */
         public UserBuilder setLastName(String lastName) {
             this.lastName = lastName;
             return this;
         }
 
+        /**
+         * Sets email.
+         *
+         * @param email the email
+         * @return the email
+         */
         public UserBuilder setEmail(String email) {
             this.email = email;
             return this;
         }
 
+        /**
+         * Sets phone number.
+         *
+         * @param phoneNumber the phone number
+         * @return the phone number
+         */
         public UserBuilder setPhoneNumber(String phoneNumber) {
             this.phoneNumber = phoneNumber;
             return this;
         }
 
+        /**
+         * Sets role.
+         *
+         * @param role the role
+         * @return the role
+         */
         public UserBuilder setRole(Role role) {
             this.role = role;
             return this;
         }
 
+        /**
+         * Sets status.
+         *
+         * @param status the status
+         * @return the status
+         */
         public UserBuilder setStatus(Status status) {
             this.status = status;
             return this;
         }
 
+        /**
+         * Sets discount id.
+         *
+         * @param discountId the discount id
+         * @return the discount id
+         */
         public UserBuilder setDiscountId(long discountId) {
             this.discountId = discountId;
             return this;
         }
 
+        /**
+         * Build user.
+         *
+         * @return the user
+         */
         public User build() {
             return new User(this);
         }

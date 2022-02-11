@@ -1,28 +1,75 @@
-package by.vchaikovski.coffeeshop.model.entity;
+package by.vchaikovski.coffeehouse.model.entity;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Discount.
+ */
 public class Discount extends AbstractEntity {
-    public enum DiscountType {ZERO, STAFF, PERSONAL}
+    /**
+     * The enum Discount type.
+     */
+    public enum DiscountType {
+        /**
+         * Zero discount type.
+         */
+        ZERO,
+        /**
+         * Staff discount type.
+         */
+        STAFF,
+        /**
+         * Personal discount type.
+         */
+        PERSONAL
+    }
 
     private DiscountType type;
     private int rate;
 
+    /**
+     * Instantiates a new Discount.
+     *
+     * @param type the type
+     * @param rate the rate
+     */
     public Discount(DiscountType type, int rate) {
         this.type = type != null ? type : DiscountType.ZERO;
         this.rate = rate;
     }
 
+    /**
+     * Gets type.
+     *
+     * @return the type
+     */
     public DiscountType getType() {
         return type;
     }
 
+    /**
+     * Sets type.
+     *
+     * @param type the type
+     */
     public void setType(DiscountType type) {
         this.type = type;
     }
 
+    /**
+     * Gets rate.
+     *
+     * @return the rate
+     */
     public int getRate() {
         return rate;
     }
 
+    /**
+     * Sets rate.
+     *
+     * @param rate the rate
+     */
     public void setRate(int rate) {
         this.rate = Math.max(rate, 0);
     }

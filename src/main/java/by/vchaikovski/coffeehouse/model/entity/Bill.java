@@ -1,46 +1,105 @@
-package by.vchaikovski.coffeeshop.model.entity;
+package by.vchaikovski.coffeehouse.model.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Bill.
+ */
 public class Bill extends AbstractEntity {
-    public enum BillStatus {PAID, NOT_PAID}
+    /**
+     * The enum Bill status.
+     */
+    public enum BillStatus {
+        /**
+         * Paid bill status.
+         */
+        PAID,
+        /**
+         * Not paid bill status.
+         */
+        NOT_PAID
+    }
 
     private BigDecimal totalPrice;
-    private LocalDateTime paymentDate;
+    private LocalDate paymentDate;
     private BillStatus status;
 
-    public Bill(BillStatus status, LocalDateTime paymentDate, BigDecimal totalPrice) {
+    /**
+     * Instantiates a new Bill.
+     *
+     * @param status      the status
+     * @param paymentDate the payment date
+     * @param totalPrice  the total price
+     */
+    public Bill(BillStatus status, LocalDate paymentDate, BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
         this.paymentDate = paymentDate;
         this.status = status != null ? status : BillStatus.NOT_PAID;
     }
 
+    /**
+     * Instantiates a new Bill.
+     *
+     * @param totalPrice the total price
+     */
     public Bill(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
         this.status = BillStatus.NOT_PAID;
     }
 
+    /**
+     * Gets total price.
+     *
+     * @return the total price
+     */
     public BigDecimal getTotalPrice() {
         return totalPrice;
     }
 
+    /**
+     * Sets total price.
+     *
+     * @param totalPrice the total price
+     */
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
 
-    public LocalDateTime getPaymentDate() {
+    /**
+     * Gets payment date.
+     *
+     * @return the payment date
+     */
+    public LocalDate getPaymentDate() {
         return paymentDate;
     }
 
-    public void setPaymentDate(LocalDateTime paymentDate) {
+    /**
+     * Sets payment date.
+     *
+     * @param paymentDate the payment date
+     */
+    public void setPaymentDate(LocalDate paymentDate) {
         this.paymentDate = paymentDate;
     }
 
+    /**
+     * Gets status.
+     *
+     * @return the status
+     */
     public BillStatus getStatus() {
         return status;
     }
 
+    /**
+     * Sets status.
+     *
+     * @param status the status
+     */
     public void setStatus(BillStatus status) {
         this.status = status;
     }

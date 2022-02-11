@@ -1,41 +1,83 @@
-package by.vchaikovski.coffeeshop.model.entity;
+package by.vchaikovski.coffeehouse.model.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Bank card.
+ */
 public class BankCard extends AbstractEntity {
     private String cardNumber;
     private LocalDate expirationDate;
     private BigDecimal amount;
 
+    /**
+     * Instantiates a new Bank card.
+     *
+     * @param cardNumber     the card number
+     * @param expirationDate the expiration date
+     * @param amount         the amount
+     */
     public BankCard(String cardNumber, LocalDate expirationDate, BigDecimal amount) {
         this.cardNumber = cardNumber;
         this.expirationDate = expirationDate;
         this.amount = amount;
     }
 
+    /**
+     * Gets card number.
+     *
+     * @return the card number
+     */
     public String getCardNumber() {
         return cardNumber;
     }
 
+    /**
+     * Sets card number.
+     *
+     * @param cardNumber the card number
+     */
     public void setCardNumber(String cardNumber) {
         this.cardNumber = cardNumber;
     }
 
+    /**
+     * Gets amount.
+     *
+     * @return the amount
+     */
     public BigDecimal getAmount() {
         return amount;
     }
 
+    /**
+     * Sets amount.
+     *
+     * @param amount the amount
+     */
     public void setAmount(BigDecimal amount) {
         if (amount != null) {
             this.amount = amount;
         }
     }
 
+    /**
+     * Gets expiration date.
+     *
+     * @return the expiration date
+     */
     public LocalDate getExpirationDate() {
         return expirationDate;
     }
 
+    /**
+     * Sets expiration date.
+     *
+     * @param expirationDate the expiration date
+     */
     public void setExpirationDate(LocalDate expirationDate) {
         this.expirationDate = expirationDate;
     }
