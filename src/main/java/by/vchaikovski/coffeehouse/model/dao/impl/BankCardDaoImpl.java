@@ -29,7 +29,8 @@ public class BankCardDaoImpl implements BankCardDao {
     private static final String BY_NUMBER = " WHERE number=?";
     private static final String BY_NUMBER_AND_DATE = " WHERE number=? AND card_expiration_date=?";
     private static final String CREATE_CARD = "INSERT INTO cards(number, card_expiration_date, amount) VALUES (?, ?, ?)";
-    private static final String UPDATE_CARD_AMOUNT = "UPDATE cards SET amount=? WHERE card_id=?";
+    private static final String INCREASE_CARD_AMOUNT = "UPDATE cards SET amount=amount+? WHERE card_id=?";
+    private static final String REDUCE_CARD_AMOUNT = "UPDATE cards SET amount=amount-? WHERE card_id=? and amount>=?";
     private static final String DELETE_CARD_BY_ID = "DELETE FROM cards WHERE card_id=";
 
     private BankCardDaoImpl() {
@@ -125,10 +126,10 @@ public class BankCardDaoImpl implements BankCardDao {
     }
 
     @Override
-    public boolean updateBankCardAmount(long id, BigDecimal amount) throws DaoException {
+    public boolean increaseBankCardAmount(long id, BigDecimal amount) throws DaoException {
         int rowsNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             PreparedStatement statement = connection.prepareStatement(UPDATE_CARD_AMOUNT)) {
+             PreparedStatement statement = connection.prepareStatement(INCREASE_CARD_AMOUNT)) {
             statement.setBigDecimal(FIRST_PARAMETER_INDEX, amount);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             rowsNumber = statement.executeUpdate();
@@ -139,6 +140,24 @@ public class BankCardDaoImpl implements BankCardDao {
         }
         return rowsNumber != 0;
     }
+
+    @Override
+    public boolean reduceBankCardAmount(long id, BigDecimal amount) throws DaoException {
+        int rowsNumber;
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(REDUCE_CARD_AMOUNT)) {
+            statement.setBigDecimal(FIRST_PARAMETER_INDEX, amount);
+            statement.setLong(SECOND_PARAMETER_INDEX, id);
+            statement.setBigDecimal(THIRD_PARAMETER_INDEX, amount);
+            rowsNumber = statement.executeUpdate();
+        } catch (SQLException e) {
+            String message = UPDATE_MESSAGE + id + " by amount=" + amount + FAILED_MESSAGE;
+            logger.error(message, e);
+            throw new DaoException(message, e);
+        }
+        return rowsNumber != 0;
+    }
+
 
     @Override
     public long create(BankCard bankCard) throws DaoException {

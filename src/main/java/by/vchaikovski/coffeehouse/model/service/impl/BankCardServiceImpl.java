@@ -152,7 +152,6 @@ public class BankCardServiceImpl implements BankCardService {
     @Override
     public boolean topUpCard(long id, String amountStr) throws ServiceException {
         DataValidator validator = DataValidatorImpl.getInstance();
-        boolean result = false;
         if (validator.isNumberValid(amountStr)) {
             try {
                 Optional<BankCard> optionalCard = cardDao.findById(id);
@@ -161,17 +160,15 @@ public class BankCardServiceImpl implements BankCardService {
                 }
                 BigDecimal amount = new BigDecimal(amountStr);
                 BankCard card = optionalCard.get();
-                BigDecimal oldAmount = card.getAmount();
                 LocalDate expirationDate = card.getExpirationDate();
-                result = validator.isDateLaterCurrently(expirationDate) &&
-                        cardDao.updateBankCardAmount(id, oldAmount.add(amount));
+                return validator.isDateLaterCurrently(expirationDate) && cardDao.increaseBankCardAmount(id, amount);
             } catch (DaoException e) {
                 String message = "Bank card can't be top up.";
                 logger.error(message, e);
                 throw new ServiceException(message, e);
             }
         }
-        return result;
+        return false;
     }
 
     @Override
@@ -185,11 +182,9 @@ public class BankCardServiceImpl implements BankCardService {
                 }
                 BigDecimal amount = new BigDecimal(amountStr);
                 BankCard card = optionalCard.get();
-                BigDecimal oldAmount = card.getAmount();
                 LocalDate expirationDate = card.getExpirationDate();
 
-                return validator.isDateLaterCurrently(expirationDate) && oldAmount.compareTo(amount) >= 0 &&
-                        cardDao.updateBankCardAmount(id, oldAmount.subtract(amount));
+                return validator.isDateLaterCurrently(expirationDate) && cardDao.reduceBankCardAmount(id, amount);
             } catch (DaoException e) {
                 String message = "Impossible to withdraw money from bank card.";
                 logger.error(message, e);

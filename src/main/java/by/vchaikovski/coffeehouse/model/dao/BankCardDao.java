@@ -1,7 +1,7 @@
 package by.vchaikovski.coffeehouse.model.dao;
 
-import by.vchaikovski.coffeehouse.model.entity.BankCard;
 import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.entity.BankCard;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,12 +33,22 @@ public interface BankCardDao extends BaseDao<BankCard> {
     Optional<BankCard> findByCardNumberAndDate(String cardNumber, LocalDate expirationDate) throws DaoException;
 
     /**
-     * Update bank card amount boolean.
+     * Increase bank card amount boolean.
      *
      * @param id      the id
      * @param decimal the decimal
      * @return the boolean
      * @throws DaoException the dao exception
      */
-    boolean updateBankCardAmount(long id, BigDecimal decimal) throws DaoException;
+    boolean increaseBankCardAmount(long id, BigDecimal decimal) throws DaoException;
+
+    /**
+     * Reduce bank card amount boolean.
+     *
+     * @param id      the id
+     * @param decimal the decimal
+     * @return the boolean
+     * @throws DaoException the dao exception
+     */
+    boolean reduceBankCardAmount(long id, BigDecimal decimal) throws DaoException;
 }

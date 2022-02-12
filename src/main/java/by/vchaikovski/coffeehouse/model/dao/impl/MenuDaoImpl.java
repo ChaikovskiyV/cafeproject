@@ -1,7 +1,6 @@
 package by.vchaikovski.coffeehouse.model.dao.impl;
 
 import by.vchaikovski.coffeehouse.exception.DaoException;
-import by.vchaikovski.coffeehouse.model.dao.ColumnTable;
 import by.vchaikovski.coffeehouse.model.dao.MenuDao;
 import by.vchaikovski.coffeehouse.model.dao.mapper.MapperProvider;
 import by.vchaikovski.coffeehouse.model.entity.Menu;
@@ -44,6 +43,8 @@ public class MenuDaoImpl implements MenuDao {
     private static final String UPDATE_MENU_PRICE = "UPDATE menu SET price=? WHERE menu_id=?";
     private static final String UPDATE_MENU_DESCRIPTION = "UPDATE menu SET description=? WHERE menu_id=?";
     private static final String UPDATE_MENU_QUANTITY_IN_STOCK = "UPDATE menu SET quantity_in_stock=? WHERE menu_id=?";
+    private static final String INCREASE_MENU_QUANTITY_IN_STOCK = "UPDATE menu SET quantity_in_stock=quantity_in_stock+? WHERE menu_id=?";
+    private static final String REDUCE_MENU_QUANTITY_IN_STOCK = "UPDATE menu SET quantity_in_stock=quantity_in_stock-? WHERE menu_id=? AND quantity_in_stock>=?";
     private static final String UPDATE_MENU_IMAGE = "UPDATE menu SET image=? WHERE menu_id=?";
     private static final String DELETE_MENU_BY_ID = "DELETE FROM menu WHERE menu_id=";
     private static MenuDao instance;
@@ -304,41 +305,15 @@ public class MenuDaoImpl implements MenuDao {
     @Override
     public boolean increaseQuantityInStock(long id, int quantity) throws DaoException {
         boolean result;
-        Connection connection = null;
-        try {
-            connection = ConnectionPool.getInstance().getConnection();
-            connection.setAutoCommit(false);
-            try (Statement statement = connection.createStatement();
-                 ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID + id);
-                 PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_MENU_QUANTITY_IN_STOCK)) {
-                int quantityInStock = 0;
-                if (resultSet.next()) {
-                    quantityInStock = resultSet.getInt(ColumnTable.MENU_QUANTITY_IN_STOCK);
-                }
-                int newQuantity = quantityInStock + quantity;
-                preparedStatement.setInt(FIRST_PARAMETER_INDEX, newQuantity);
-                preparedStatement.setLong(SECOND_PARAMETER_INDEX, id);
-                result = preparedStatement.execute();
-                connection.commit();
-            }
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(INCREASE_MENU_QUANTITY_IN_STOCK)) {
+            statement.setInt(FIRST_PARAMETER_INDEX, quantity);
+            statement.setLong(SECOND_PARAMETER_INDEX, id);
+            result = statement.execute();
         } catch (SQLException e) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    logger.warn("Rollback can't be completed", ex);
-                }
             String message = "The query \"increase quantity in stock on number=" + quantity + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                    connection.close();
-                } catch (SQLException e) {
-                    logger.warn("Close connection can't be completed", e);
-                }
-            }
         }
         return result;
     }
@@ -346,45 +321,16 @@ public class MenuDaoImpl implements MenuDao {
     @Override
     public boolean reduceQuantityInStock(long id, int quantity) throws DaoException {
         boolean result;
-        Connection connection = null;
-        try {
-            connection = ConnectionPool.getInstance().getConnection();
-            connection.setAutoCommit(false);
-            try (Statement statement = connection.createStatement();
-                 ResultSet resultSet = statement.executeQuery(FIND_ALL_MENU + BY_ID + id);
-                 PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_MENU_QUANTITY_IN_STOCK)) {
-                int quantityInStock = 0;
-                if (resultSet.next()) {
-                    quantityInStock = resultSet.getInt(ColumnTable.MENU_QUANTITY_IN_STOCK);
-                }
-                if (quantityInStock >= quantity) {
-                    int newQuantity = quantityInStock - quantity;
-                    preparedStatement.setInt(FIRST_PARAMETER_INDEX, newQuantity);
-                    preparedStatement.setLong(SECOND_PARAMETER_INDEX, id);
-                    result = preparedStatement.execute();
-                    connection.commit();
-                } else {
-                    result = false;
-                }
-            }
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             PreparedStatement statement = connection.prepareStatement(REDUCE_MENU_QUANTITY_IN_STOCK)) {
+            statement.setInt(FIRST_PARAMETER_INDEX, quantity);
+            statement.setLong(SECOND_PARAMETER_INDEX, id);
+            statement.setInt(THIRD_PARAMETER_INDEX, quantity);
+            result = statement.execute();
         } catch (SQLException e) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    logger.warn("Rollback can't be completed", ex);
-                }
-            String message = "The query \"increase quantity in stock on number=" + quantity + FAILED_MESSAGE;
+            String message = "The query \"reduce quantity in stock on number=" + quantity + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.setAutoCommit(true);
-                    connection.close();
-                } catch (SQLException e) {
-                    logger.warn("Close connection can't be completed", e);
-                }
-            }
         }
         return result;
     }
