@@ -1,19 +1,19 @@
 package by.vchaikovski.coffeehouse.model.dao.impl;
 
 import by.vchaikovski.coffeehouse.exception.DaoException;
+import by.vchaikovski.coffeehouse.model.dao.ColumnTable;
 import by.vchaikovski.coffeehouse.model.dao.OrderDao;
 import by.vchaikovski.coffeehouse.model.dao.mapper.MapperProvider;
+import by.vchaikovski.coffeehouse.model.dao.mapper.impl.MenuMapperImpl;
 import by.vchaikovski.coffeehouse.model.entity.Bill;
 import by.vchaikovski.coffeehouse.model.entity.FoodOrder;
 import by.vchaikovski.coffeehouse.model.entity.Menu;
 import by.vchaikovski.coffeehouse.model.pool.ConnectionPool;
 
+import java.sql.Date;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author VChaikovski
@@ -25,15 +25,14 @@ public class OrderDaoImpl implements OrderDao {
     private static final MapperProvider mapperProvider = MapperProvider.getInstance();
     private static final String UPDATE_MESSAGE = "The query \"update order with id=";
     private static final String FIND_ALL_ORDERS = "SELECT order_id, order_status, creation_date, comment, " +
-            "fk_user_id, fk_bill_id, fk_delivery_id, evaluation, menu_id, name, product_type, description, price, " +
-            "quantity_in_stock, image, quantity FROM orders " +
+            "fk_user_id, fk_bill_id, fk_delivery_id, evaluation FROM orders " +
             "JOIN users ON fk_user_id=user_id " +
             "JOIN discounts ON fk_discount_id=discount_id " +
             "JOIN bills ON fk_bill_id=bill_id " +
             "JOIN deliveries ON fk_delivery_id=delivery_id " +
-            "JOIN address ON fk_address_id=address_id " +
-            "JOIN order_cart ON fk_order_id=order_id " +
-            "JOIN menu ON fk_menu_id=menu_id";
+            "JOIN address ON fk_address_id=address_id";
+    private static final String FIND_MENU_FROM_CART_BY_ORDER_ID = "SELECT quantity, menu_id, name, product_type, description, price, " +
+            " quantity_in_stock, image FROM order_cart JOIN menu ON fk_menu_id=menu_id WHERE fk_order_id=";
     private static final String BY_ID = " WHERE order_id=";
     private static final String BY_STATUS = " WHERE order_status=?";
     private static final String BY_CREATION_DATE = " WHERE creation_date=?";
@@ -77,6 +76,7 @@ public class OrderDaoImpl implements OrderDao {
              ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS)) {
             while (resultSet.next()) {
                 FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                createCartAndSet(order);
                 orders.add(order);
             }
         } catch (SQLException e) {
@@ -95,6 +95,7 @@ public class OrderDaoImpl implements OrderDao {
              ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_ID + id)) {
             if (resultSet.next()) {
                 order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                createCartAndSet(order);
             }
         } catch (SQLException e) {
             String message = "The query \"find an order by id=" + id + FAILED_MESSAGE;
@@ -113,6 +114,7 @@ public class OrderDaoImpl implements OrderDao {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                    createCartAndSet(order);
                     orders.add(order);
                 }
             }
@@ -133,6 +135,7 @@ public class OrderDaoImpl implements OrderDao {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                    createCartAndSet(order);
                     orders.add(order);
                 }
             }
@@ -154,6 +157,7 @@ public class OrderDaoImpl implements OrderDao {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                    createCartAndSet(order);
                     orders.add(order);
                 }
             }
@@ -174,6 +178,7 @@ public class OrderDaoImpl implements OrderDao {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                    createCartAndSet(order);
                     orders.add(order);
                 }
             }
@@ -193,6 +198,7 @@ public class OrderDaoImpl implements OrderDao {
              ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_DELIVERY + deliveryId)) {
             while (resultSet.next()) {
                 FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                createCartAndSet(order);
                 orders.add(order);
             }
         } catch (SQLException e) {
@@ -211,6 +217,7 @@ public class OrderDaoImpl implements OrderDao {
              ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_BILL + billId)) {
             if (resultSet.next()) {
                 order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                createCartAndSet(order);
             }
         } catch (SQLException e) {
             String message = "The query \"find orders by billId=" + billId + FAILED_MESSAGE;
@@ -230,6 +237,7 @@ public class OrderDaoImpl implements OrderDao {
                 try (ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_BILL + billId)) {
                     if (resultSet.next()) {
                         FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                        createCartAndSet(order);
                         orders.add(order);
                     }
                 }
@@ -251,6 +259,7 @@ public class OrderDaoImpl implements OrderDao {
              ResultSet resultSet = statement.executeQuery(FIND_ALL_ORDERS + BY_USER + userId)) {
             while (resultSet.next()) {
                 FoodOrder order = mapperProvider.getFoodMapper().createEntity(resultSet);
+                createCartAndSet(order);
                 orders.add(order);
             }
         } catch (SQLException e) {
@@ -440,5 +449,20 @@ public class OrderDaoImpl implements OrderDao {
             throw new DaoException(message, e);
         }
         return rowsNumber != 0;
+    }
+
+    private void createCartAndSet(FoodOrder order) throws SQLException, DaoException {
+        Map<Menu, Integer> cart = new HashMap<>();
+        try (Connection connection = ConnectionPool.getInstance().getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(FIND_MENU_FROM_CART_BY_ORDER_ID + order.getId())) {
+            MenuMapperImpl menuMapper = mapperProvider.getMenuMapper();
+            while (resultSet.next()) {
+                int quantity = resultSet.getInt(ColumnTable.CART_QUANTITY);
+                Menu menu = menuMapper.createEntity(resultSet);
+                cart.put(menu, quantity);
+            }
+        }
+        order.setCart(cart);
     }
 }

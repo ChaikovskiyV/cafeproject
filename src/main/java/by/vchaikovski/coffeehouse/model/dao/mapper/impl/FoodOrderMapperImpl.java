@@ -2,15 +2,11 @@ package by.vchaikovski.coffeehouse.model.dao.mapper.impl;
 
 import by.vchaikovski.coffeehouse.exception.DaoException;
 import by.vchaikovski.coffeehouse.model.dao.mapper.BaseMapper;
-import by.vchaikovski.coffeehouse.model.dao.mapper.MapperProvider;
 import by.vchaikovski.coffeehouse.model.entity.FoodOrder;
-import by.vchaikovski.coffeehouse.model.entity.Menu;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 import static by.vchaikovski.coffeehouse.model.dao.ColumnTable.*;
 
@@ -48,7 +44,6 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
             long userId = resultSet.getLong(ORDER_USER_ID);
             long billId = resultSet.getLong(ORDER_BILL_ID);
             long deliveryId = resultSet.getLong(ORDER_DELIVERY_ID);
-            Map<Menu, Integer> cart = createCart(resultSet);
             FoodOrder.FoodOrderBuilder orderBuilder = new FoodOrder.FoodOrderBuilder();
             order = orderBuilder.setId(id)
                     .setStatus(status)
@@ -58,7 +53,6 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
                     .setBillId(billId)
                     .setDeliveryId(deliveryId)
                     .setEvaluation(evaluation)
-                    .setCart(cart)
                     .build();
         } catch (SQLException e) {
             String message = "Order can't be created. The resultSet " + resultSet + " doesn't contain required parameters.";
@@ -66,18 +60,5 @@ public class FoodOrderMapperImpl implements BaseMapper<FoodOrder> {
             throw new DaoException(message, e);
         }
         return order;
-    }
-
-    private Map<Menu, Integer> createCart(ResultSet resultSet) throws SQLException, DaoException {
-        Map<Menu, Integer> cart = new HashMap<>();
-        while (!resultSet.isAfterLast()) {
-            Menu menu = MapperProvider.getInstance().getMenuMapper().createEntity(resultSet);
-            if (cart.containsKey(menu)) {
-                break;
-            }
-            int quantity = resultSet.getInt(CART_QUANTITY);
-            cart.put(menu, quantity);
-        }
-        return cart;
     }
 }
