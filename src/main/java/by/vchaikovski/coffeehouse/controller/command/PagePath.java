@@ -72,4 +72,8 @@ public enum PagePath {
      * The constant BARISTA_HOME_PAGE.
      */
     public static final String BARISTA_HOME_PAGE = "/jsp/barista/barista_home.jsp";
+    /**
+     * The constant CARD_INFO_PAGE.
+     */
+    public static final String CARD_INFO_PAGE = "/jsp/common/card_info.jsp";
 }

@@ -2,7 +2,6 @@ package by.vchaikovski.coffeehouse.controller.command.impl.client;
 
 import by.vchaikovski.coffeehouse.controller.Router;
 import by.vchaikovski.coffeehouse.controller.command.BaseCommand;
-import by.vchaikovski.coffeehouse.controller.command.PagePath;
 import by.vchaikovski.coffeehouse.exception.CommandException;
 import by.vchaikovski.coffeehouse.exception.ServiceException;
 import by.vchaikovski.coffeehouse.model.entity.BankCard;
@@ -10,6 +9,7 @@ import by.vchaikovski.coffeehouse.model.entity.Bill;
 import by.vchaikovski.coffeehouse.model.entity.FoodOrder;
 import by.vchaikovski.coffeehouse.model.service.BankCardService;
 import by.vchaikovski.coffeehouse.model.service.BillService;
+import by.vchaikovski.coffeehouse.model.service.OrderService;
 import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -38,7 +38,7 @@ public class PayCommand implements BaseCommand {
         HttpSession session = request.getSession();
         String cardNumber = request.getParameter(CARD_NUMBER);
         String expirationDate = request.getParameter(CARD_EXPIRATION_DATE);
-        FoodOrder order = (FoodOrder) session.getAttribute(ORDER);
+        FoodOrder order = (FoodOrder) session.getAttribute(CURRENT_ORDER);
         try {
             Optional<BankCard> optionalCard = cardService.findCardByNumberAndDate(cardNumber, expirationDate);
             if (optionalCard.isPresent()) {
@@ -49,8 +49,11 @@ public class PayCommand implements BaseCommand {
                 FoodOrder.OrderStatus orderStatus = order.getStatus();
                 boolean isPayed = orderStatus != CANCELLED && orderStatus != COMPLETED &&
                         cardService.withdrawMoneyCard(cardId, amount);
-                if (isPayed) {
-                    payBill(order.getBillId());
+                if (isPayed && payBill(order.getBillId())) {
+                    session.removeAttribute(CART);
+                    OrderService orderService = ServiceProvider.getInstance().getOrderService();
+                    Optional<FoodOrder> updatedOrder = orderService.findOrderById(order.getId());
+                    updatedOrder.ifPresent(o -> session.setAttribute(ORDER, o));
                 }
                 session.setAttribute(IS_PAYED, isPayed);
                 String message = isPayed ? "The order was payed" : "The order wasn't payed";
@@ -63,15 +66,16 @@ public class PayCommand implements BaseCommand {
             logger.error(message, e);
             throw new CommandException(message, e);
         }
-        Router router = new Router(PagePath.ORDER_CREATION_PAGE);
+        String currentPage = (String) session.getAttribute(CURRENT_PAGE);
+        Router router = new Router(currentPage);
         router.setRouterType(Router.RouterType.REDIRECT);
 
         return router;
     }
 
-    private void payBill(long billId) throws ServiceException {
+    private boolean payBill(long billId) throws ServiceException {
         BillService billService = ServiceProvider.getInstance().getBillService();
-        billService.updateBillStatus(billId, Bill.BillStatus.PAID);
-        billService.updateBillPaymentTime(billId, LocalDate.now().toString());
+        return billService.updateBillStatus(billId, Bill.BillStatus.PAID) &&
+                billService.updateBillPaymentTime(billId, LocalDate.now().toString());
     }
 }

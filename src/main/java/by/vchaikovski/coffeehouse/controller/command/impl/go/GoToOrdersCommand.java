@@ -61,14 +61,14 @@ public class GoToOrdersCommand implements BaseCommand {
         for (FoodOrder order : orders) {
             long orderId = order.getId();
             Optional<Bill> optionalBill = billService.findBillById(order.getBillId());
-            Optional<Delivery> optionalDelivery = deliveryService.findDeliveryById(order.getDeliveryId());
-            Optional<AddressDelivery> optionalAddress = Optional.empty();
-            if (optionalDelivery.isPresent()) {
-                deliveries.put(orderId, optionalDelivery.get());
-                optionalAddress = deliveryService.findAddressById(optionalDelivery.get().getAddressId());
-            }
             optionalBill.ifPresent(bill -> bills.put(orderId, bill));
-            optionalAddress.ifPresent(address -> addressMap.put(orderId, address));
+            Optional<Delivery> optionalDelivery = deliveryService.findDeliveryById(order.getDeliveryId());
+            if (optionalDelivery.isPresent()) {
+                Delivery delivery = optionalDelivery.get();
+                deliveries.put(orderId, delivery);
+                Optional<AddressDelivery> optionalAddress = deliveryService.findAddressById(delivery.getAddressId());
+                optionalAddress.ifPresent(address -> addressMap.put(orderId, address));
+            }
         }
         request.setAttribute(BILL_LIST, bills);
         request.setAttribute(DELIVERY_LIST, deliveries);

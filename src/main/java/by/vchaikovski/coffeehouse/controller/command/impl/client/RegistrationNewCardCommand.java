@@ -3,10 +3,9 @@ package by.vchaikovski.coffeehouse.controller.command.impl.client;
 import by.vchaikovski.coffeehouse.controller.Router;
 import by.vchaikovski.coffeehouse.controller.command.BaseCommand;
 import by.vchaikovski.coffeehouse.controller.command.PagePath;
-import by.vchaikovski.coffeehouse.controller.command.SessionParameter;
+import by.vchaikovski.coffeehouse.controller.command.RequestParameter;
 import by.vchaikovski.coffeehouse.exception.CommandException;
 import by.vchaikovski.coffeehouse.exception.ServiceException;
-import by.vchaikovski.coffeehouse.model.entity.User;
 import by.vchaikovski.coffeehouse.model.service.BankCardService;
 import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +18,6 @@ import java.util.Map;
 
 import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
 import static by.vchaikovski.coffeehouse.controller.command.SessionParameter.CARD_ID;
-import static by.vchaikovski.coffeehouse.controller.command.SessionParameter.CARD_PARAMETERS;
 
 /**
  * @author VChaikovski
@@ -32,7 +30,7 @@ public class RegistrationNewCardCommand implements BaseCommand {
 
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
-        request.setAttribute(SHOW_CARD, true);
+        request.setAttribute(RequestParameter.REGISTER_CARD, true);
         BankCardService cardService = ServiceProvider.getInstance().getBankCardService();
         String cardNumber = request.getParameter(CARD_NUMBER);
         String expirationDate = request.getParameter(CARD_EXPIRATION_DATE);
@@ -43,7 +41,6 @@ public class RegistrationNewCardCommand implements BaseCommand {
         cardParameters.put(CARD_AMOUNT, amount);
         try {
             long cardId = cardService.createBankCard(cardParameters);
-            request.setAttribute(CARD_ID, cardId);
             if (cardId == 0) {
                 logger.debug("Card wasn't registered.");
                 request.setAttribute(CARD_PARAMETERS_REQ, cardParameters);
@@ -58,22 +55,15 @@ public class RegistrationNewCardCommand implements BaseCommand {
                     }
                 }
             } else {
-                request.setAttribute(CARD_PARAMETERS, cardParameters);
+                HttpSession session = request.getSession();
+                session.setAttribute(CARD_ID, cardId);
             }
         } catch (ServiceException e) {
             String message = "Registration new bank card can't be executed.";
             logger.error(message, e);
             throw new CommandException(message, e);
         }
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute(SessionParameter.USER);
-        User.Role userRole = user != null ? user.getRole() : User.Role.GUEST;
-        return switch (userRole) {
-            case ADMIN -> new Router(PagePath.ADMIN_HOME_PAGE);
-            case BARISTA -> new Router(PagePath.BARISTA_HOME_PAGE);
-            case CLIENT -> new Router(PagePath.CLIENT_HOME_PAGE);
-            default -> new Router(PagePath.MAIN_PAGE);
-        };
+        return new Router(PagePath.CARD_INFO_PAGE);
     }
 
     private void setWrongAttribute(String key, String value, HttpServletRequest request) {

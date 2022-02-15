@@ -86,6 +86,10 @@ public enum CommandType {
      */
     GO_TO_CARD_INFO(new GoToCardInfoCommand(), List.of(ADMIN, BARISTA, CLIENT)),
     /**
+     * The Go to find bank card.
+     */
+    GO_TO_FIND_BANK_CARD(new GoToFindBankCardCommand(), List.of(ADMIN, BARISTA, CLIENT)),
+    /**
      * The Registration new card.
      */
     REGISTRATION_NEW_CARD(new RegistrationNewCardCommand(), List.of(ADMIN, BARISTA, CLIENT)),

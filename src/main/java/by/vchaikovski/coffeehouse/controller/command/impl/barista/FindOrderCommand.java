@@ -79,17 +79,18 @@ public class FindOrderCommand implements BaseCommand {
         Map<Long, AddressDelivery> addressMap = new HashMap<>();
         for (FoodOrder order : orders) {
             long userId = order.getUserId();
+            long orderId = order.getId();
             Optional<User> optionalUs = userService.findUserById(userId);
+            optionalUs.ifPresent(user -> users.put(orderId, optionalUs.get()));
             Optional<Bill> optionalBill = billService.findBillById(order.getBillId());
+            optionalBill.ifPresent(bill -> bills.put(orderId, bill));
             Optional<Delivery> optionalDelivery = deliveryService.findDeliveryById(order.getDeliveryId());
-            Optional<AddressDelivery> optionalAddress = Optional.empty();
             if (optionalDelivery.isPresent()) {
-                deliveries.put(userId, optionalDelivery.get());
-                optionalAddress = deliveryService.findAddressById(optionalDelivery.get().getAddressId());
+                Delivery delivery = optionalDelivery.get();
+                deliveries.put(orderId, delivery);
+                Optional<AddressDelivery> optionalAddress = deliveryService.findAddressById(delivery.getAddressId());
+                optionalAddress.ifPresent(address -> addressMap.put(orderId, address));
             }
-            optionalBill.ifPresent(bill -> bills.put(userId, bill));
-            optionalUs.ifPresent(user -> users.put(userId, optionalUs.get()));
-            optionalAddress.ifPresent(address -> addressMap.put(userId, address));
         }
         request.setAttribute(USER_LIST, users);
         request.setAttribute(BILL_LIST, bills);

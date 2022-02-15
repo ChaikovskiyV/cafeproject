@@ -189,6 +189,10 @@ public enum RequestParameter {
      */
     public static final String FIRST_NAME = "first_name";
     /**
+     * The constant FIND_CARD.
+     */
+    public static final String FIND_CARD = "find_card";
+    /**
      * The constant FIRST_NAME_CHECK.
      */
     public static final String FIRST_NAME_CHECK = "first_name_check";
@@ -445,10 +449,6 @@ public enum RequestParameter {
      * The constant SHOW_CART.
      */
     public static final String SHOW_CART = "show_cart";
-    /**
-     * The constant SHOW_CARD.
-     */
-    public static final String SHOW_CARD = "show_card";
     /**
      * The constant TOTAL_PRICE.
      */

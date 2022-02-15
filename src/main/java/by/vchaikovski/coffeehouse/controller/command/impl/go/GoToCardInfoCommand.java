@@ -5,11 +5,18 @@ import by.vchaikovski.coffeehouse.controller.command.BaseCommand;
 import by.vchaikovski.coffeehouse.controller.command.PagePath;
 import by.vchaikovski.coffeehouse.controller.command.SessionParameter;
 import by.vchaikovski.coffeehouse.exception.CommandException;
-import by.vchaikovski.coffeehouse.model.entity.User;
+import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.entity.BankCard;
+import by.vchaikovski.coffeehouse.model.service.BankCardService;
+import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
+import java.util.Optional;
+
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.CARD;
 
 /**
  * @author VChaikovski
@@ -18,20 +25,24 @@ import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
  */
 
 public class GoToCardInfoCommand implements BaseCommand {
+    private static final Logger logger = LogManager.getLogger();
+
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
-        request.setAttribute(SHOW_CARD, true);
-        request.removeAttribute(IS_FOUND);
-        request.removeAttribute(REGISTER_CARD);
-        request.removeAttribute(REGISTERED_CARD);
         HttpSession session = request.getSession();
-        User user = (User) session.getAttribute(SessionParameter.USER);
-        User.Role userRole = user != null ? user.getRole() : User.Role.GUEST;
-        return switch (userRole) {
-            case ADMIN -> new Router(PagePath.ADMIN_HOME_PAGE);
-            case BARISTA -> new Router(PagePath.BARISTA_HOME_PAGE);
-            case CLIENT -> new Router(PagePath.CLIENT_HOME_PAGE);
-            default -> new Router(PagePath.MAIN_PAGE);
-        };
+        BankCard bankCard = (BankCard) session.getAttribute(CARD);
+        Long cardId = (Long) session.getAttribute(SessionParameter.CARD_ID);
+        if (bankCard == null && cardId != null) {
+            BankCardService cardService = ServiceProvider.getInstance().getBankCardService();
+            try {
+                Optional<BankCard> optionalCard = cardService.findCardById(cardId);
+                optionalCard.ifPresent(card -> session.setAttribute(CARD, card));
+            } catch (ServiceException e) {
+                String message = "Go to card info command can't be completed";
+                logger.error(message, e);
+                throw new CommandException(message, e);
+            }
+        }
+        return new Router(PagePath.CARD_INFO_PAGE);
     }
 }
