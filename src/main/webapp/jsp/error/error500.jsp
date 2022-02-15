@@ -5,7 +5,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="properties.pagecontent"/>
+<fmt:setBundle basename="properties.properties.pagecontent"/>
 
 
 <!DOCTYPE html>
@@ -25,7 +25,7 @@
     <title>Error 500</title>
 </head>
 <body>
-<div class="container"  style="background: #86b7fe; margin-left: 200px; margin-top: 50px; width: 400px">
+<div class="container"  style="background: #86b7fe; margin-left: 200px; margin-top: 50px; width: 600px">
     <table class="table align-content-center">
         <caption></caption>
         <thead>

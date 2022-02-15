@@ -6,7 +6,7 @@
 <c:set var="user" value="${sessionScope.user}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="client_home.title" var="title"/>
 <fmt:message key="client_home.profile" var="profile"/>
@@ -27,6 +27,7 @@
 <fmt:message key="client_home.update_data" var="update_data"/>
 <fmt:message key="client_home.update_password" var="update_password"/>
 <fmt:message key="client_home.change_password" var="change_password"/>
+<fmt:message key="client_home.password_updated" var="password_updated"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -246,6 +247,13 @@
                     </button>
                 </div>
             </form>
+            <div>
+                <c:if test="${requestScope.is_updated_password == false}">
+                    <h4 style="color: #0c4128; white-space: nowrap">
+                            ${password_updated}
+                    </h4>
+                </c:if>
+            </div>
         </div>
     </div>
 </div>

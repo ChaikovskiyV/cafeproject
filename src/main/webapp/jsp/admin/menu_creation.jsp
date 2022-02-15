@@ -6,7 +6,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="menu_creation.create" var="create"/>
 <fmt:message key="menu_creation.title" var="title"/>

@@ -11,7 +11,7 @@
 <c:set var="address_list" value="${requestScope.address_list}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
 <fmt:message key="user_research.result" var="result"/>
@@ -68,18 +68,14 @@
                 <th scope="row">${order.id}</th>
                 <td>${order.creationDate}</td>
                 <td>${order.status}</td>
-                <td>${bills[order.userId].totalPrice}</td>
-                <td>${bills[order.userId].status}</td>
-                <td>${deliveries[order.userId].deliveryType}</td>
-                <td>${deliveries[order.userId].deliveryTime}</td>
+                <td>${bills[order.id].totalPrice}</td>
+                <td>${bills[order.id].status}</td>
+                <td>${deliveries[order.id].deliveryType}</td>
+                <td>${deliveries[order.id].deliveryTime}</td>
                 <td>
-                    <div>
-                        <c:forEach var="food" items="${order.cart}">
-                            <p>
-                                    ${food.key.name}: ${food.value}
-                            </p>
-                        </c:forEach>
-                    </div>
+                    <c:forEach var="food" items="${order.cart}">
+                    <br>${food.key.name}: ${food.value}
+                    </c:forEach>
                 <td>
                     <form method="post" action="${path}/controller">
                         <input type="hidden" name="command" value="go_to_order_info">
@@ -99,14 +95,14 @@
     <script src="//cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#orders_table').DataTable({
                 renderer: {
                     "header": "jqueryui",
                     "pageButton": "bootstrap"
                 },
                 "pageLength": 5,
-                "lengthMenu": [ 5, 10, 20, 25]
+                "lengthMenu": [5, 10, 20, 25]
             });
         });
     </script>

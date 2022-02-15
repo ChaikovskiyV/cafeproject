@@ -6,7 +6,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="order_creation.cart_empty" var="cart_empty"/>
 <fmt:message key="client_home.create_order" var="create"/>
@@ -61,7 +61,8 @@
     </style>
 </head>
 <body>
-<c:if test="${sessionScope.cart.size() eq 0}">
+<c:if test="${sessionScope.cart.size() eq 0 or empty sessionScope.cart}">
+    <jsp:include page="../table/cart_table.jsp"/>
     <h4 style="color: #0c4128; margin-left: 200px; font-weight: bold">
             ${cart_empty}
     </h4>
@@ -217,8 +218,8 @@
         </div>
     </form>
 </c:if>
-<c:if test="${sessionScope.order_is_created == true}">
-    <h5 style="color: #0c4128; white-space: nowrap">
+<c:if test="${sessionScope.order_is_created == true and not empty sessionScope.cart}">
+    <h5 style="color: #0c4128; white-space: nowrap;margin-left: 40px">
             ${success}
     </h5>
     <jsp:include page="order_payment.jsp"/>

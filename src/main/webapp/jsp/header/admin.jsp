@@ -5,7 +5,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 <c:set var="user" value="${sessionScope.user}"/>
 
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="header.admin" var="title"/>
 <fmt:message key="header.back_main" var="back_main"/>

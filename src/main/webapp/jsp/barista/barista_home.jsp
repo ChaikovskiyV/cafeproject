@@ -5,7 +5,7 @@
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="barista_home.title" var="title"/>
 
@@ -29,9 +29,6 @@
 <div>
     <c:if test="${requestScope.show_profile == true}">
         <jsp:include page="../common/user_profile.jsp"/>
-    </c:if>
-    <c:if test="${requestScope.show_card == true}">
-        <jsp:include page="../common/card_info.jsp"/>
     </c:if>
 </div>
 <footer>

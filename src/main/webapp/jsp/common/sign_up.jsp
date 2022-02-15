@@ -6,7 +6,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 <c:set var="parameters" value="${requestScope.user_parameters}"/>
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="sign_up.title" var="title"/>
 <fmt:message key="main.title" var="main_title"/>

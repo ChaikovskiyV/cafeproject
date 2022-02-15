@@ -7,7 +7,7 @@
 <c:set var="discount" value="${sessionScope.discount}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="user_info.title" var="title"/>
 <fmt:message key="user_info.delete" var="delete"/>

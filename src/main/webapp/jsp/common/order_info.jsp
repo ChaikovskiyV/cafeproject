@@ -10,7 +10,7 @@
 <c:set var="address" value="${sessionScope.current_address}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="order_info.title" var="title"/>
 <fmt:message key="order_info.client_parameters" var="client"/>
@@ -46,6 +46,9 @@
 <fmt:message key="order_research.completed" var="order_completed"/>
 <fmt:message key="order_research.accepted" var="order_accepted"/>
 <fmt:message key="order_info.payment" var="payment"/>
+<fmt:message key="card.card_number" var="card_number"/>
+<fmt:message key="user_info.expiration_date" var="expiration_date"/>
+<fmt:message key="order_creation.pay_order" var="pay"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -58,9 +61,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
           crossorigin="anonymous">
-    <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
-    <link href="${path}/css/background.css" rel="stylesheet"/>
+    <link href="../${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="../${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
+    <link href="../${path}/css/background.css" rel="stylesheet"/>
     <title>${title}</title>
 </head>
 <body>
@@ -174,30 +177,65 @@
         <div class="row gx-5">
             <div class="col">
                 <c:if test="${sessionScope.user_role eq 'CLIENT'}">
-                    <form method="post" action="${path}/controller">
-                        <input type="hidden" name="command" value="update_order_evaluation">
-                        <input type="hidden" name="order_id" value="${order.id}">
-                        <div class="row gx-5">
-                            <div class="col">
-                                <div class="input-group mb-3">
-                                    <select class="form-select" required name="user_role"
-                                            aria-label="${order.evaluation}">
-                                        <option selected>${order.evaluation}</option>
-                                        <option value="no_evaluation">${order_not_evaluated}</option>
-                                        <option value="bad">${order_bad}</option>
-                                        <option value="nice">${order_nice}</option>
-                                        <option value="great">${order_great}</option>
-                                        <option value="brilliant">${order_brilliant}</option>
-                                    </select>
+                    <c:if test="${order.status.name() eq 'COMPLETED'}">
+                        <form method="post" action="${path}/controller">
+                            <input type="hidden" name="command" value="update_order_evaluation">
+                            <input type="hidden" name="order_id" value="${order.id}">
+                            <div class="row gx-5">
+                                <div class="col">
+                                    <div class="input-group mb-3">
+                                        <select class="form-select" required name="user_role"
+                                                aria-label="${order.evaluation}">
+                                            <option selected>${order.evaluation}</option>
+                                            <option value="no_evaluation">${order_not_evaluated}</option>
+                                            <option value="bad">${order_bad}</option>
+                                            <option value="nice">${order_nice}</option>
+                                            <option value="great">${order_great}</option>
+                                            <option value="brilliant">${order_brilliant}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <button type="submit" class="btn btn-secondary">
+                                            ${evaluate}
+                                    </button>
                                 </div>
                             </div>
-                            <div class="col">
-                                <button type="submit" class="btn btn-secondary">
-                                        ${evaluate}
-                                </button>
+                        </form>
+                    </c:if>
+                    <c:if test="${order.status.name() eq 'WAITING' and bill.status.name() eq 'NOT_PAID'}">
+                        <form method="post" action="${path}/controller">
+                            <input type="hidden" name="command" value="pay">
+                            <input type="hidden" name="total_price" value="${bill.totalPrice}">
+                            <div class="container px-2" style="margin: 20px">
+                                <div class="row gx-2">
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text" id="basic-addon1">${card_number}</span>
+                                            <input type="text" class="form-control" placeholder="${card_number}" required name="card_number"
+                                                   value=""
+                                                   pattern="\d{16}" aria-label="${card_number}" aria-describedby="basic-addon1">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text" id="basic-addon2">${expiration_date}</span>
+                                            <input type="date" class="form-control" placeholder="${expiration_date}" required name="card_expiration_date"
+                                                   value=""
+                                                   aria-label="${expiration_date}" aria-describedby="basic-addon2">
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="container text-lg-start">
+                                            <button type="submit" class="btn btn-secondary">
+                                                    ${pay}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </c:if>
                 </c:if>
             </div>
         </div>

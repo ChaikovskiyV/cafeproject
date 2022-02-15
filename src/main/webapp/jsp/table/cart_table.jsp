@@ -7,7 +7,7 @@
 <c:set var="image_map" value="${sessionScope.menu_images}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
 <fmt:message key="user_research.result" var="result"/>

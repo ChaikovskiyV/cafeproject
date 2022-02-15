@@ -7,7 +7,7 @@
 <c:set var="discounts" value="${requestScope.discount_list}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
 <fmt:message key="user_research.discount_rate" var="disc_rate"/>
@@ -73,7 +73,7 @@
             <td>${user.phoneNumber}</td>
             <td>${user.role}</td>
             <td>${user.status}</td>
-            <td>${discounts[user.id].type}</td>
+            <td>${discounts[user.id].type.name()}</td>
             <td>${discounts[user.id].rate}</td>
             <td>
                 <form method="post" action="${path}/controller">

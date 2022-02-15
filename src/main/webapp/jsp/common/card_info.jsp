@@ -5,7 +5,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 <c:set var="bank_card" value="${sessionScope.card}"/>
 
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="user_info.card_title" var="title"/>
 <fmt:message key="card.card_number" var="card_number"/>
@@ -30,6 +30,9 @@
 
 <!DOCTYPE html>
 <html lang="en">
+<header>
+    <jsp:include page="../header/header.jsp"/>
+</header>
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -39,10 +42,13 @@
     <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
     <link href="${path}/css/background.css" rel="stylesheet"/>
+    <link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
+    <script src="//cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <title>${title}</title>
     <style>
         .card_panel {
-            width: 300px;
+            width: 400px;
             color: #0c4128;
             font-size: 20px;
             font-weight: bold;
@@ -61,7 +67,7 @@
             <input type="hidden" name="command" value="registration_new_card">
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon1">${card_number}</span>
-                <c:if test="${empty requestScope.card_id or requestScope.card_id > 0 or (requestScope.card_id == 0 and not empty requestScope.card_number_check)}">
+                <c:if test="${empty sessionScope.card_id or sessionScope.card_id > 0 or (sessionScope.card_id == 0 and not empty requestScope.card_number_check)}">
                     <input type="text" class="form-control" placeholder="${card_number}" name="card_number" required
                            value="" pattern="\d{16}" aria-label=${card_number} aria-describedby="basic-addon1">
                     <c:if test="${not empty requestScope.card_number_check}">
@@ -70,13 +76,12 @@
                         </div>
                     </c:if>
                 </c:if>
-                <c:if test="${requestScope.card_id == 0 and empty requestScope.card_number_check}">
+                <c:if test="${sessionScope.card_id == 0 and empty requestScope.card_number_check}">
                     <input type="text" class="form-control" placeholder="${card_number}" name="card_number" required
                            value="${requestScope.card_parameters.card_number}" pattern="\d{16}"
                            aria-label=${card_number} aria-describedby="basic-addon1">
                 </c:if>
             </div>
-
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon2">${card_date}</span>
                 <input type="date" class="form-control" placeholder="${card_date}" name="card_expiration_date" required
@@ -89,7 +94,7 @@
             </div>
             <div class="input-group mb-3">
                 <span class="input-group-text" id="basic-addon3">${card_amount}</span>
-                <c:if test="${empty requestScope.card_id or requestScope.card_id > 0 or (requestScope.card_id == 0 and not empty requestScope.card_amount_check)}">
+                <c:if test="${empty sessionScope.card_id or sessionScope.card_id > 0 or (sessionScope.card_id == 0 and not empty requestScope.card_amount_check)}">
                     <input type="text" class="form-control" placeholder="${card_amount}" name="card_amount" required
                            value="" pattern="\d{1,4}" aria-label=${card_amount} aria-describedby="basic-addon3">
                     <c:if test="${not empty requestScope.card_amount_check}">
@@ -98,7 +103,7 @@
                         </div>
                     </c:if>
                 </c:if>
-                <c:if test="${requestScope.card_id == 0 and empty requestScope.card_amount_check}">
+                <c:if test="${sessionScope.card_id == 0 and empty requestScope.card_amount_check}">
                     <input type="text" class="form-control" placeholder="${card_amount}" name="card_amount" required
                            value="${requestScope.card_parameters.card_amount}" pattern="\d{1,4}"
                            aria-label=${card_amount} aria-describedby="basic-addon3">
@@ -111,19 +116,20 @@
             </div>
         </form>
         <div>
-            <c:if test="${requestScope.card_id > 0}">
+            <c:if test="${sessionScope.card_id > 0}">
                 ${registerd}
             </c:if>
-            <c:if test="${requestScope.card_id == 0}">
+            <c:if test="${sessionScope.card_id == 0}">
                 ${not_registerd}
             </c:if>
         </div>
         <div>
-            <a href="${path}/controller?command=go_to_card_info"
+            <a href="${path}/controller?command=go_to_find_bank_card"
                style="color: #0c4128; font-size: 20px; font-weight: bold">${find_card}</a>
         </div>
     </c:if>
-    <c:if test="${empty requestScope.register_card and empty requestScope.is_found}">
+    <c:if test="${requestScope.find_card eq true or
+    (sessionScope.is_found eq false or empty sessionScope.is_found) and empty requestScope.register_card}">
         <form method="post" action="${path}/controller">
             <input type="hidden" name="command" value="find_bank_card">
             <div class="input-group mb-3">
@@ -137,6 +143,9 @@
                 <input type="date" class="form-control" placeholder="${card_date}" name="card_expiration_date" required
                        value="" aria-label=${card_date} aria-describedby="basic-addon5">
             </div>
+            <c:if test="${sessionScope.is_found eq false}">
+                ${not_found}
+            </c:if>
             <div class="container text-lg-start">
                 <button type="submit" class="btn btn-secondary">
                         ${find_card}
@@ -148,7 +157,8 @@
                style="color: #0c4128; font-size: 20px; font-weight: bold; white-space: nowrap">${register_card}</a>
         </div>
     </c:if>
-    <c:if test="${requestScope.is_found == true}">
+    <c:if test="${sessionScope.is_found eq true and empty requestScope.register_card and
+    empty requestScope.find_card}">
     <table class="table" style="background: #86b7fe; margin-left: 50px">
         <caption></caption>
         <thead>
@@ -156,8 +166,10 @@
             <th scope="col">${card_number}</th>
             <th scope="col">${card_date}</th>
             <th scope="col">${card_amount}</th>
-            <th scope="col">${delete_card}</th>
-            <th scope="col">${top_up_card}</th>
+            <c:if test="${empty requestScope.is_deleted}">
+                <th scope="col">${delete_card}</th>
+                <th scope="col">${top_up_card}</th>
+            </c:if>
         </tr>
         </thead>
         <tbody>
@@ -165,38 +177,41 @@
             <th scope="row">${bank_card.cardNumber}</th>
             <td>${bank_card.expirationDate}</td>
             <td>${bank_card.amount}</td>
-            <td>
-                <form method="post" action="${path}/controller">
-                    <input type="hidden" name="command" value="delete_bank_card">
-                    <input type="hidden" name="card_id" value="${bank_card.id}">
-                    <div class="container text-lg-start">
-                        <button type="submit" class="btn btn-secondary">
-                                ${delete_card}
-                        </button>
-                    </div>
-                </form>
-            </td>
-            <td>
-                <form method="post" action="${path}/controller">
-                    <input type="hidden" name="command" value="top_up_card_balance">
-                    <input type="hidden" name="card_id" value="${bank_card.id}">
-                    <div class="input-group mb-3">
-                        <span class="input-group-text" id="basic-addon3">${amount}</span>
-                        <input type="text" class="form-control" placeholder="${card_amount}" name="card_amount" required
-                               value="" pattern="\d{1,4}" aria-label=${card_amount} aria-describedby="basic-addon3">
-                        <c:if test="${requestScope.result == false}">
-                            <div>
-                                    ${wrong_amount}
-                            </div>
-                        </c:if>
-                    </div>
-                    <div class="container text-lg-start">
-                        <button type="submit" class="btn btn-secondary">
-                                ${top_up_card}
-                        </button>
-                    </div>
-                </form>
-            </td>
+            <c:if test="${empty requestScope.is_deleted}">
+                <td>
+                    <form method="post" action="${path}/controller">
+                        <input type="hidden" name="command" value="delete_bank_card">
+                        <input type="hidden" name="card_id" value="${bank_card.id}">
+                        <div class="container text-lg-start">
+                            <button type="submit" class="btn btn-secondary">
+                                    ${delete_card}
+                            </button>
+                        </div>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="${path}/controller">
+                        <input type="hidden" name="command" value="top_up_card_balance">
+                        <input type="hidden" name="card_id" value="${bank_card.id}">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text" id="basic-addon3">${amount}</span>
+                            <input type="text" class="form-control" placeholder="${card_amount}" name="card_amount"
+                                   required
+                                   value="" pattern="\d{1,4}" aria-label=${card_amount} aria-describedby="basic-addon3">
+                            <c:if test="${requestScope.result == false}">
+                                <div>
+                                        ${wrong_amount}
+                                </div>
+                            </c:if>
+                        </div>
+                        <div class="container text-lg-start">
+                            <button type="submit" class="btn btn-secondary">
+                                    ${top_up_card}
+                            </button>
+                        </div>
+                    </form>
+                </td>
+            </c:if>
         </tr>
         </tbody>
     </table>
@@ -210,30 +225,16 @@
         <c:if test="${requestScope.result == false}">
             ${not_top_up}
         </c:if>
-        <c:if test="${requestScope.result == true}">
-            ${top_up}
-        </c:if>
     </div>
-    <div>
-        <a href="${path}/controller?command=go_to_registration_card"
-           style="color: #0c4128; font-size: 20px; font-weight: bold">${register_card}</a>
-        <a href="${path}/controller?command=go_to_card_info"
-           style="color: #0c4128; font-size: 20px; font-weight: bold">${find_card}</a>
+    <div style="color: #0c4128; font-size: 20px; font-weight: bold; margin-left: 50px">
+        <a href="${path}/controller?command=go_to_registration_card">${register_card}</a>
+        <a href="${path}/controller?command=go_to_find_bank_card" style="padding-left: 30px">${find_card}</a>
     </div>
 </div>
 </c:if>
-<c:if test="${requestScope.is_found == false}">
-    ${not_found}
-    <div class="row gx-5">
-        <div class="col">
-            <a href="${path}/controller?command=go_to_registration_card"
-               style="color: #0c4128; font-size: 20px; font-weight: bold; white-space: nowrap">${register_card}</a>
-        </div>
-        <div class="col">
-            <a href="${path}/controller?command=go_to_card_info"
-               style="color: #0c4128; font-size: 20px; font-weight: bold">${find_card}</a>
-        </div>
-    </div>
-</c:if>
+
+<footer>
+    <jsp:include page="../footer/footer.jsp"/>
+</footer>
 </body>
 </html>

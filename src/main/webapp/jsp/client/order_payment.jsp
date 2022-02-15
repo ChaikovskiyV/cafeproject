@@ -4,12 +4,12 @@
 
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
-<c:set var="order" value="${sessionScope.order}"/>
+<c:set var="order" value="${sessionScope.current_order}"/>
 <c:set var="bill" value="${sessionScope.bill}"/>
 <c:set var="order_parameters" value="${sessionScope.order_parameters}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
 <fmt:message key="user_research.result" var="result"/>
@@ -43,7 +43,7 @@
     <title>${result}</title>
 </head>
 <body>
-<table class="table" style="background: #86b7fe; width: 1200px">
+<table class="table" style="background: #86b7fe; width: 1200px;margin-left: 30px">
     <caption></caption>
     <thead>
     <tr>
@@ -56,7 +56,6 @@
         <th scope="col">${address}</th>
         <th scope="col">${bill_status}</th>
         <th scope="col">${price}</th>
-        <th scope="col">${action}</th>
     </tr>
     </thead>
     <tbody>
@@ -88,7 +87,7 @@
 </table>
 <form method="post" action="${path}/controller">
     <input type="hidden" name="command" value="pay">
-    <input type="hidden" name="total_price" value="${sessionScope.order_parameters.total_price}">
+    <input type="hidden" name="total_price" value="${bill.totalPrice}">
     <div class="container px-2" style="margin: 20px">
         <div class="row gx-2">
             <div class="col">
@@ -102,7 +101,7 @@
             <div class="col">
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="basic-addon2">${expiration_date}</span>
-                    <input type="date" class="form-control" placeholder="${expiration_date}" required name="card_number"
+                    <input type="date" class="form-control" placeholder="${expiration_date}" required name="card_expiration_date"
                            value=""
                            aria-label="${expiration_date}" aria-describedby="basic-addon2">
                 </div>

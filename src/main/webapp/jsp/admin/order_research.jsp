@@ -6,7 +6,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="user_research.title" var="title"/>
 <fmt:message key="order_research.find" var="find"/>
@@ -141,7 +141,7 @@
                 <div class="col">
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon3">${creation_date}</span>
-                        <input type="datetime-local" class="form-control" placeholder="${creation_date}"
+                        <input type="date" class="form-control" placeholder="${creation_date}"
                                name="creation_date" value=""
                                aria-label="${creation_date}" aria-describedby="basic-addon3">
                     </div>
@@ -149,7 +149,7 @@
                 <div class="col">
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon4">${payment_date}</span>
-                        <input type="datetime-local" class="form-control" placeholder="${payment_date}"
+                        <input type="date" class="form-control" placeholder="${payment_date}"
                                name="payment_date" value=""
                                aria-label="${payment_date}" aria-describedby="basic-addon4">
                     </div>
@@ -157,7 +157,7 @@
                 <div class="col">
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon5">${delivery_time}</span>
-                        <input type="datetime-local" class="form-control" placeholder="${delivery_time}"
+                        <input type="date" class="form-control" placeholder="${delivery_time}"
                                name="delivery_time" value=""
                                aria-label="${delivery_time}" aria-describedby="basic-addon5">
                     </div>
@@ -171,7 +171,7 @@
         </div>
     </form>
 </div>
-<div class="research result" style="width: 1200px">
+<div class="research result" style="width: 1200px; padding-left: 30px">
     <c:if test="${requestScope.result == false}">
         <h4>${not_found}</h4>
     </c:if>

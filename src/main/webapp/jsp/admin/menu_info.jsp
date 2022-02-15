@@ -9,7 +9,7 @@
 <c:set var="menu_param" value="${requestScope.menu_parameters}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="menu_info.update" var="update"/>
 <fmt:message key="menu_info.updated" var="updated"/>
@@ -52,7 +52,7 @@
 </head>
 <body>
 <div>
-    <h4 style="width: 600px; margin-left: 50px; color: #0c4128">
+    <h4 style="width: 600px; margin-left: 80px; color: #0c4128">
         ${parameters}
     </h4>
 </div>
@@ -196,22 +196,22 @@
                         </div>
                     </div>
                 </div>
-                <div class="row gx-1">
-                    <div class="col">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text" id="basic-addon5">${quantity}</span>
-                            <input type="text" class="form-control" placeholder="${quantity_in_stock}"
-                                   name="menu_quantity_in_stock"
-                                   required value="${current_menu.quantityInStock}" pattern="\d{1,4}"
-                                   aria-label="${quantity_in_stock}" aria-describedby="basic-addon1">
-                            <c:if test="${requestScope.is_updated_quantity == false}">
-                                <h5>
-                                        ${quantity_in_stock_check}
-                                </h5>
-                            </c:if>
+                <c:if test="${sessionScope.user_role eq 'ADMIN'}">
+                    <div class="row gx-1">
+                        <div class="col">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="basic-addon5">${quantity}</span>
+                                <input type="text" class="form-control" placeholder="${quantity_in_stock}"
+                                       name="menu_quantity_in_stock"
+                                       required value="${current_menu.quantityInStock}" pattern="\d{1,4}"
+                                       aria-label="${quantity_in_stock}" aria-describedby="basic-addon1">
+                                <c:if test="${requestScope.is_updated_quantity == false}">
+                                    <h5>
+                                            ${quantity_in_stock_check}
+                                    </h5>
+                                </c:if>
+                            </div>
                         </div>
-                    </div>
-                    <c:if test="${sessionScope.user_role eq 'ADMIN'}">
                         <div class="col">
                             <div class="container text-center">
                                 <button type="submit" class="btn btn-secondary">
@@ -219,27 +219,28 @@
                                 </button>
                             </div>
                         </div>
-                    </c:if>
-                </div>
+                    </div>
+                </c:if>
             </form>
         </div>
         <div class="col" style="width: 300px">
-            <form method="post" action="${path}/controller">
-                <input type="hidden" name="command" value="update_menu_image">
-                <input type="hidden" name="menu_id" value="${current_menu.id}">
-                <div class="row gx-1">
-                    <div class="col">
-                        <div class="mb-3">
-                            <img src="${sessionScope.menu_images[current_menu.id]}" width="50" class="rounded-circle"
-                                 alt="no image"/>
-                            <c:if test="${requestScope.is_updated_image == false}">
-                            <input type="file" name="menu_image" formenctype="multipart/form-data">
-                                <h5>
-                                        ${image_check}
-                                </h5>
-                            </c:if>
-                        </div>
-                        <c:if test="${sessionScope.user_role eq 'ADMIN'}">
+            <img src="${sessionScope.menu_images[current_menu.id]}" width="100" class="rounded-circle"
+                 alt="no image"/>
+            <c:if test="${sessionScope.user_role eq 'ADMIN'}">
+                <form method="post" action="${path}/controller">
+                    <input type="hidden" name="command" value="update_menu_image">
+                    <input type="hidden" name="menu_id" value="${current_menu.id}">
+                    <div class="row gx-1">
+                        <div class="col">
+                            <div class="mb-3">
+                                <c:if test="${requestScope.is_updated_image == false}">
+                                    <input type="file" name="menu_image" formenctype="multipart/form-data">
+                                    <h5>
+                                            ${image_check}
+                                    </h5>
+                                </c:if>
+                            </div>
+
                             <div class="col">
                                 <div class="container text-center">
                                     <button type="submit" class="btn btn-secondary">
@@ -247,10 +248,10 @@
                                     </button>
                                 </div>
                             </div>
-                        </c:if>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </c:if>
         </div>
     </div>
 </div>

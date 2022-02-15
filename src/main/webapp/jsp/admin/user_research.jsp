@@ -6,7 +6,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="user_research.title" var="title"/>
 <fmt:message key="reference.go_home" var="home"/>
@@ -89,6 +89,9 @@
                     </div>
                 </form>
             </div>
+
+        </div>
+        <div class="row gx-1">
             <div class="col" style="width: 500px">
                 <form method="post" action="${path}/controller">
                     <input type="hidden" name="command" value="find_user">
@@ -175,7 +178,7 @@
 </div>
 <div class="research result" style="width: 1200px">
     <c:if test="${requestScope.result == false}">
-        <h4>${not_found}</h4>
+        <h4 style="margin-left: 500px">${not_found}</h4>
     </c:if>
     <c:if test="${requestScope.result == true}">
         <jsp:include page="../table/user_table.jsp"/>

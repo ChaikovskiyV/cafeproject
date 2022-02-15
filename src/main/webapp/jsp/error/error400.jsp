@@ -23,7 +23,7 @@
     <title>Error 400</title>
 </head>
 <body>
-<div style="background: #86b7fe; margin-left: 200px; margin-top: 50px; width: 400px">
+<div style="background: #86b7fe; margin-left: 200px; margin-top: 50px; width: 600px">
     <table class="table align-content-center">
         <caption></caption>
         <thead>

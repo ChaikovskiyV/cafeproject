@@ -5,7 +5,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="client_home.title" var="title"/>
 <fmt:message key="client_home.create_order" var="create_order"/>
@@ -23,9 +23,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
           crossorigin="anonymous">
-    <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
-    <link href="${path}/css/background.css" rel="stylesheet"/>
+    <link href="../${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="../${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
+    <link href="../${path}/css/background.css" rel="stylesheet"/>
     <title>${title}</title>
 </head>
 <body>
@@ -50,9 +50,6 @@
                 </div>
             </div>
         </div>
-    </c:if>
-    <c:if test="${requestScope.show_card == true}">
-        <jsp:include page="../common/card_info.jsp"/>
     </c:if>
 </div>
 <footer>

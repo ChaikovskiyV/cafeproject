@@ -8,7 +8,7 @@
 <c:set var="menus" value="${sessionScope.menu_list}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="user_research.id" var="id"/>
 <fmt:message key="user_research.result" var="result"/>
@@ -31,29 +31,17 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
         crossorigin="anonymous">
-  <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $('#my_table').DataTable({
-        renderer: {
-          "header": "jqueryui",
-          "pageButton": "bootstrap"
-        },
-        "pageLength": 4,
-        "lengthMenu": [ 5, 10, 20, 25]
-      });
-    });
-  </script>
+  <link href="../${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="../${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
   <link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
   <script src="//cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-  <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
   <title>${result}</title>
 </head>
 <body>
 <div class="container">
     <div class="dataTables_paginate">
-        <table class="table table-striped table-hover" style="background: #86b7fe; width: 1200px; margin-left: 50px">
+        <table id="menuTable" class="table table-striped table-hover" style="background: #86b7fe; width: 1200px; margin-left: 50px">
 
 
   <caption></caption>
@@ -115,6 +103,18 @@
   </c:forEach>
   </tbody>
 </table>
+      <script type="text/javascript">
+        $(document).ready(function() {
+          $('#menuTable').DataTable({
+            renderer: {
+              "header": "jqueryui",
+              "pageButton": "bootstrap"
+            },
+            "pageLength": 4,
+            "lengthMenu": [ 5, 10, 20, 25]
+          });
+        });
+      </script>
     </div>
 </div>
 </body>

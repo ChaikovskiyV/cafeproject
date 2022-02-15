@@ -6,7 +6,7 @@
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
-<fmt:setBundle basename="pagecontent"/>
+<fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="sign_in.title" var="title"/>
 <fmt:message key="reference.sign_up" var="sign_up"/>
@@ -41,6 +41,7 @@
             color: #0c4128;
             margin: 100px;
             font-weight: bold;
+            white-space: nowrap;
         }
     </style>
 </head>
