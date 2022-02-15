@@ -240,7 +240,7 @@ public class OrderServiceImpl implements OrderService {
         if (orderParameters != null && !orderParameters.isEmpty()) {
             String billStatus = orderParameters.get(BILL_STATUS);
             String paymentDate = orderParameters.get(PAYMENT_DATE);
-            String creationDate = orderParameters.get(CREATION_DATE).replace('T', ' ');
+            String creationDate = orderParameters.get(CREATION_DATE);
             String deliveryTime = orderParameters.get(DELIVERY_TIME);
             String deliveryType = orderParameters.get(DELIVERY_TYPE);
             String userId = orderParameters.get(USER_ID);

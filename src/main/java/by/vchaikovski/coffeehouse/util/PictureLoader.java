@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
  */
 public class PictureLoader {
     private static final Logger logger = LogManager.getLogger();
-    private static final String PICTURE_PATH_PROP = "picturepath";
+    private static final String PICTURE_PATH_PROP = "properties/picturepath";
     private static final String DEFAULT_IMAGE_COFFEE = "defaultImage.coffee";
     private static final String DEFAULT_IMAGE_TEA = "defaultImage.tea";
     private static final String DEFAULT_IMAGE_PASTRY = "defaultImage.pastry";
