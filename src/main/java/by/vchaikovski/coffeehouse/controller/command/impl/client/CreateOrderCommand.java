@@ -63,7 +63,7 @@ public class CreateOrderCommand implements BaseCommand {
         orderParameters.put(HOUSE_NUMBER, houseNumber);
         orderParameters.put(BUILDING_NUMBER, buildingNumber);
         orderParameters.put(FLAT_NUMBER, flatNumber);
-        orderParameters.put(COMMENT, comment != null ? comment : DEFAULT_COMMENT);
+        orderParameters.put(COMMENT, comment.isEmpty() ? comment : DEFAULT_COMMENT);
         orderParameters.put(ORDER_STATUS, FoodOrder.OrderStatus.WAITING.name());
         orderParameters.put(USER_ID, String.valueOf(user.getId()));
         long orderId;
