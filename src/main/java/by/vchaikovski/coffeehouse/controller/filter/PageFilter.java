@@ -47,14 +47,16 @@ public class PageFilter implements Filter {
                 ORDER_INFO_PAGE,
                 MAIN_PAGE,
                 ABOUT_PAGE,
-                MENU_RESEARCH_PAGE);
+                MENU_RESEARCH_PAGE,
+                CARD_INFO_PAGE);
         baristaPages = Set.of(
                 BARISTA_HOME_PAGE,
                 ORDER_INFO_PAGE,
                 ORDER_RESEARCH_PAGE,
                 MAIN_PAGE,
                 ABOUT_PAGE,
-                MENU_RESEARCH_PAGE);
+                MENU_RESEARCH_PAGE,
+                CARD_INFO_PAGE);
         adminPages = Set.of(ADMIN_HOME_PAGE,
                 MENU_CREATION_PAGE,
                 USER_RESEARCH_PAGE,
@@ -63,7 +65,8 @@ public class PageFilter implements Filter {
                 ORDER_INFO_PAGE,
                 MAIN_PAGE,
                 ABOUT_PAGE,
-                MENU_RESEARCH_PAGE);
+                MENU_RESEARCH_PAGE,
+                CARD_INFO_PAGE);
         allPages = new HashSet<>();
         allPages.addAll(guestPages);
         allPages.addAll(clientPages);
