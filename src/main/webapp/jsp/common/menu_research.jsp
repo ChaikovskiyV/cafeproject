@@ -32,8 +32,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
           crossorigin="anonymous">
-    <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
+    <link href="../../bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="../../bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
     <link href="${path}/css/background.css" rel="stylesheet"/>
     <title>${find}</title>
 </head>
@@ -87,7 +87,7 @@
         </div>
     </form>
 </div>
-<div class="research result" style="width: 1200px">
+<div class="research result">
     <c:if test="${requestScope.result == false}">
         <h4>${not_found}</h4>
     </c:if>

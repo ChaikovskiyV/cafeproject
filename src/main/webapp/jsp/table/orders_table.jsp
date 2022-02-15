@@ -40,14 +40,24 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
           crossorigin="anonymous">
-    <link href="${path}/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="${path}/bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
+    <link href="../../bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="../../bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
+    <link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="//cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
     <title>${result}</title>
 </head>
 <body>
-<div class="container">
-    <div class="dataTables_paginate">
-        <table class="table table-striped table-hover" style="background: #86b7fe; width: 1100px; margin-top: 50px">
+<div class="container" style="background: #86b7fe; width: 1200px; margin-left: 100px">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#ordersTable').DataTable({
+                pageLength: 5,
+                lengthMenu: [5, 10, 25, 50, 100]
+            });
+        });
+    </script>
+    <table id="ordersTable" class="display table table-striped table-hover">
             <caption></caption>
             <thead>
             <tr>
@@ -91,21 +101,6 @@
             </tbody>
         </table>
     </div>
-    <link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
-    <script src="//cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#orders_table').DataTable({
-                renderer: {
-                    "header": "jqueryui",
-                    "pageButton": "bootstrap"
-                },
-                "pageLength": 5,
-                "lengthMenu": [5, 10, 20, 25]
-            });
-        });
-    </script>
 </div>
 </body>
 </html>
