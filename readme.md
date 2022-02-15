@@ -40,3 +40,5 @@ Admin\
 •	Can ban or unban user\
 •	Can add discount\
 •	Can change language
+
+![](src/main/resources/db_diagram.png)
