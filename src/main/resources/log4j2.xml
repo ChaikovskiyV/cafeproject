@@ -9,7 +9,7 @@
 <?import com.sun.tools.hat.internal.model.Root?>
 <Configuration status="error" monitorInterval="43200">
     <Properties>
-        <property name="LOG_FOLDER">logs</property>
+        <property name="LOG_FOLDER">C:\Users\User\Desktop\Все материалы\Изучение IT\Java\Epam\FinalProject\cofeehouse\logs</property>
         <property name="pattern_cmd">%logger{5}-%msg%n</property>
         <property name="pattern_file">%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{5} - %msg%n</property>
     </Properties>
