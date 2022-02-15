@@ -34,12 +34,12 @@
     <link href="../../bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="../../bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
     <link href="../../bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
-    <link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
     <title>${result}</title>
 </head>
 <body>
-<div class="container" style="background: #86b7fe; width: 1200px">
+<div class="container" style="background: #86b7fe; width: 1400px">
     <script type="text/javascript">
         $(document).ready(function () {
             $('#usersTable').DataTable({
@@ -48,7 +48,7 @@
             });
         });
     </script>
-    <table id="usersTable" class="display table table-striped table-hover" style="margin-left: 50px">
+    <table id="usersTable" class="display table-striped table-hover" style="margin-left: 50px">
         <caption></caption>
         <thead>
         <tr>

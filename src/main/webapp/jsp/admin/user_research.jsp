@@ -176,7 +176,7 @@
         </div>
     </form>
 </div>
-<div class="research result" style="width: 1200px">
+<div class="research result" style="width: 1400px">
     <c:if test="${requestScope.result == false}">
         <h4 style="margin-left: 500px">${not_found}</h4>
     </c:if>
