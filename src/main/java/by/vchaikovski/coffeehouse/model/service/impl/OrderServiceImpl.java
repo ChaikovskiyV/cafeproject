@@ -69,20 +69,22 @@ public class OrderServiceImpl implements OrderService {
             orderParameters.put(TOTAL_PRICE, findTotalPrice(cart, discountRate).toString());
             long deliveryId = serviceProvider.getDeliveryService().createDelivery(orderParameters);
             long billId = serviceProvider.getBillService().createBill(orderParameters);
-            FoodOrder order = new FoodOrder.FoodOrderBuilder()
-                    .setUserId(Long.parseLong(userIdStr))
-                    .setDeliveryId(deliveryId)
-                    .setBillId(billId)
-                    .setComment(comment)
-                    .setCart(cart)
-                    .build();
-            try {
-                orderId = orderDao.create(order);
-                orderDao.createOrderCart(orderId, cart);
-            } catch (DaoException e) {
-                String message = "FoodOrder can't be inserted in data base";
-                logger.error(message, e);
-                throw new ServiceException(message, e);
+            if(deliveryId != 0 && billId != 0) {
+                FoodOrder order = new FoodOrder.FoodOrderBuilder()
+                        .setUserId(Long.parseLong(userIdStr))
+                        .setDeliveryId(deliveryId)
+                        .setBillId(billId)
+                        .setComment(comment)
+                        .setCart(cart)
+                        .build();
+                try {
+                    orderId = orderDao.create(order);
+                    orderDao.createOrderCart(orderId, cart);
+                } catch (DaoException e) {
+                    String message = "FoodOrder can't be inserted in data base";
+                    logger.error(message, e);
+                    throw new ServiceException(message, e);
+                }
             }
         }
         return orderId;

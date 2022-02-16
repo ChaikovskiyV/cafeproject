@@ -396,7 +396,7 @@ public class MenuServiceImpl implements MenuService {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
         Path filePath = Path.of(imagePath);
-        if (validator.isPicture(imagePath) && Files.exists(filePath)) {
+        if (validator.isPicture(imagePath)) {
             try {
                 byte[] imageBytes = Files.readAllBytes(filePath);
                 result = menuDao.updateMenuImage(id, imageBytes);

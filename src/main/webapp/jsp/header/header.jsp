@@ -3,12 +3,15 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <c:set var="path" value="pageContext.request.contextPath"/>
+<c:set var="current_user" value="${sessionScope.user}"/>
 
 <fmt:setBundle basename="properties.pagecontent"/>
 
 <fmt:message key="main.title" var="main_title"/>
 <fmt:message key="client_home.welcome" var="welcome"/>
 <fmt:message key="header.guest" var="guest"/>
+<fmt:message key="user_research.user_admin" var="admin"/>
+<fmt:message key="user_research.user_barista" var="barista"/>
 <fmt:message key="header.language_en" var="en"/>
 <fmt:message key="header.language_ru" var="ru"/>
 <fmt:message key="header.title" var="title"/>
@@ -48,11 +51,17 @@
                 </div>
                 <div class="col" style="white-space: nowrap">
                     <c:choose>
-                        <c:when test="${empty sessionScope.user}">
-                            ${welcome}, ${guest}!
+                        <c:when test="${sessionScope.user_role eq 'ADMIN'}">
+                            ${welcome}, ${admin}!
+                        </c:when>
+                        <c:when test="${sessionScope.user_role eq 'BARISTA'}">
+                            ${welcome}, ${barista}!
+                        </c:when>
+                        <c:when test="${sessionScope.user_role eq 'CLIENT'}">
+                            ${welcome}, ${current_user.firstName}!
                         </c:when>
                         <c:otherwise>
-                            ${welcome}, ${sessionScope.user.login}!
+                            ${welcome}, ${guest}!
                         </c:otherwise>
                     </c:choose>
                 </div>

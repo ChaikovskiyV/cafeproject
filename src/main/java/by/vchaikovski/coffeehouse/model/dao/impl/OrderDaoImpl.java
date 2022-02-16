@@ -350,18 +350,19 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public int createOrderCart(long orderId, Map<Menu, Integer> cart) throws DaoException {
-        int rowNumber = 0;
+        int cartRows;
         Connection connection = null;
         try {
             connection = ConnectionPool.getInstance().getConnection();
             connection.setAutoCommit(false);
-            for (Map.Entry<Menu, Integer> entry : cart.entrySet()) {
-                try (PreparedStatement statement = connection.prepareStatement(CREATE_ORDER_CART)) {
+            try (PreparedStatement statement = connection.prepareStatement(CREATE_ORDER_CART)) {
+                for (Map.Entry<Menu, Integer> entry : cart.entrySet()) {
                     statement.setLong(FIRST_PARAMETER_INDEX, orderId);
                     statement.setInt(SECOND_PARAMETER_INDEX, entry.getValue());
                     statement.setLong(THIRD_PARAMETER_INDEX, entry.getKey().getId());
-                    rowNumber = rowNumber + statement.executeUpdate();
+                    statement.addBatch();
                 }
+                cartRows = statement.executeBatch().length;
             }
             connection.commit();
         } catch (SQLException e) {
@@ -386,7 +387,7 @@ public class OrderDaoImpl implements OrderDao {
                 logger.error(message, ex);
             }
         }
-        return rowNumber;
+        return cartRows;
     }
 
     @Override

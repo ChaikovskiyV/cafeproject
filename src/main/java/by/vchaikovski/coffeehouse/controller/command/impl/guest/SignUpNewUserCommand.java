@@ -52,6 +52,7 @@ public class SignUpNewUserCommand implements BaseCommand {
             }
         } else {
             request.setAttribute(PASSWORD_REPEAT_CHECK, WRONG_MEANING);
+            request.setAttribute(USER_PARAMETERS, userParameters);
             router = new Router(PagePath.REGISTRATION_PAGE);
         }
         return router;

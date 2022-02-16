@@ -102,7 +102,7 @@
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon4">${first_name}</span>
             <input type="text" class="form-control" placeholder="${first_name}" name="first_name" required
-                   value="${parameters.first_name}" pattern="\w{5,25}" aria-label="${first_name}"
+                   value="${parameters.first_name}" pattern="(.{4,30})(([a-zA-Z]+[-\s]?[a-zA-Z]+)|([а-яА-Я]+[-\s]?[а-яА-Я]+))" aria-label="${first_name}"
                    aria-describedby="basic-addon4">
             <c:if test="${not empty requestScope.first_name_check}">
                 <div>
@@ -115,7 +115,7 @@
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon5">${last_name}</span>
             <input type="text" class="form-control" placeholder="${last_name}" name="last_name" required
-                   value="${parameters.last_name}" pattern="\w{5,25}" aria-label="${last_name}"
+                   value="${parameters.last_name}" pattern="(.{4,30})(([a-zA-Z]+[-\s]?[a-zA-Z]+)|([а-яА-Я]+[-\s]?[а-яА-Я]+))" aria-label="${last_name}"
                    aria-describedby="basic-addon5">
             <c:if test="${not empty requestScope.last_name_check}">
                 <div>
@@ -128,7 +128,7 @@
         <div class="input-group mb-3">
             <span class="input-group-text" id="basic-addon6">${email}</span>
             <input type="text" class="form-control" placeholder="${email}" name="email" required
-                   value="${parameters.email}" pattern="\w+[._-]?\w+@\p{Alpha}+\.\p{Alpha}+" aria-label="${email}"
+                   value="${parameters.email}" pattern="(.{4,35})(\w+[._-]?\w+@\p{Alpha}+\.\p{Alpha}+)" aria-label="${email}"
                    aria-describedby="basic-addon6">
             <c:if test="${not empty requestScope.email_check}">
                 <div>
