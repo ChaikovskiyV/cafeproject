@@ -4,7 +4,7 @@
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 <c:set var="user" value="${sessionScope.current_user}"/>
-<c:set var="discount" value="${sessionScope.discount}"/>
+<c:set var="current_discount" value="${sessionScope.discount}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="properties.pagecontent"/>
@@ -98,7 +98,7 @@
                         <div class="col">
                             <div class="input-group mb-3">
                                 <select class="form-select" required name="user_role" aria-label="Client">
-                                    <option selected>${user_role}</option>
+                                    <option selected>${user.role.name()}</option>
                                     <option value="Admin">${user_admin}</option>
                                     <option value="Barista">${user_barista}</option>
                                     <option value="Client">${user_client}</option>
@@ -121,7 +121,7 @@
                         <div class="col">
                             <div class="input-group mb-3">
                                 <select class="form-select" required name="user_status" aria-label="${user.status}">
-                                    <option selected>${user_status}</option>
+                                    <option selected>${user.status.name()}</option>
                                     <option value="Banned">${user_banned}</option>
                                     <option value="Unbanned">${user_unbanned}</option>
                                 </select>
@@ -144,8 +144,8 @@
                             <div class="col">
                                 <div class="input-group mb-3">
                                     <select class="form-select" required name="discount_type"
-                                            aria-label="${discount.type}">
-                                        <option selected>${disc_type}</option>
+                                            aria-label="${current_discount.type}">
+                                        <option selected>${current_discount.type}</option>
                                         <option value="Zero">${discount_zero}</option>
                                         <option value="Staff">${discount_staff}</option>
                                         <option value="Personal">${discount_personal}</option>
@@ -157,7 +157,7 @@
                                     <span class="input-group-text" id="basic-addon1">${disc_rate}</span>
                                     <input type="text" class="form-control" placeholder="${disc_rate}"
                                            name="discount_rate"
-                                           value="${discount.rate}"
+                                           value="${current_discount.rate}"
                                            pattern="\d\d?" aria-label="${disc_rate}" aria-describedby="basic-addon1">
                                 </div>
                             </div>

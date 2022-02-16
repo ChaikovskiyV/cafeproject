@@ -63,6 +63,7 @@ public class PageFilter implements Filter {
                 USER_INFO_PAGE,
                 ORDER_RESEARCH_PAGE,
                 ORDER_INFO_PAGE,
+                MENU_INFO_PAGE,
                 MAIN_PAGE,
                 ABOUT_PAGE,
                 MENU_RESEARCH_PAGE,

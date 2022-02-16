@@ -25,12 +25,12 @@ public class DeliveryDaoImpl implements DeliveryDao {
     private static final String FIND_ALL_DELIVERIES = "SELECT delivery_id, delivery_type, delivery_time, address_id FROM deliveries " +
             "JOIN address ON fk_address_id=address_id";
     private static final String BY_ID = " WHERE delivery_id=";
-    private static final String BY_TYPE = " WHERE delivery_type=";
-    private static final String BY_DATE = " WHERE delivery_date=";
-    private static final String BY_PERIOD = " WHERE delivery_date>=? AND delivery_date<=?";
+    private static final String BY_TYPE = " WHERE delivery_type=?";
+    private static final String BY_DATE = " WHERE delivery_time=";
+    private static final String BY_PERIOD = " WHERE delivery_time>=? AND delivery_time<=?";
     private static final String BY_ADDRESS = " WHERE address_id=";
     private static final String UPDATE_DELIVERY_TYPE = "UPDATE deliveries SET delivery_type=? WHERE delivery_id=?";
-    private static final String UPDATE_DELIVERY_DATE = "UPDATE deliveries SET delivery_date=? WHERE delivery_id=?";
+    private static final String UPDATE_DELIVERY_DATE = "UPDATE deliveries SET delivery_time=? WHERE delivery_id=?";
     private static final String CREATE_DELIVERY = "INSERT INTO deliveries(delivery_type, delivery_time, fk_address_id) VALUES (?, ?, ?)";
     private static final String DELETE_DELIVERY_BY_ID = "DELETE FROM bills WHERE id=";
 
@@ -85,11 +85,13 @@ public class DeliveryDaoImpl implements DeliveryDao {
     public List<Delivery> findByDeliveryType(Delivery.DeliveryType deliveryType) throws DaoException {
         List<Delivery> deliveries = new ArrayList<>();
         try (Connection connection = ConnectionPool.getInstance().getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(FIND_ALL_DELIVERIES + BY_TYPE + deliveryType)) {
-            while (resultSet.next()) {
-                Delivery delivery = mapperProvider.getDeliveryMapper().createEntity(resultSet);
-                deliveries.add(delivery);
+             PreparedStatement statement = connection.prepareStatement(FIND_ALL_DELIVERIES + BY_TYPE)) {
+            statement.setString(FIRST_PARAMETER_INDEX, deliveryType.name());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Delivery delivery = mapperProvider.getDeliveryMapper().createEntity(resultSet);
+                    deliveries.add(delivery);
+                }
             }
         } catch (SQLException e) {
             String message = "The query \"find deliveries by deliveryType\" is failed. DataBase connection error.";

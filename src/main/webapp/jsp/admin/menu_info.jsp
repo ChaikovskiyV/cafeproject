@@ -52,7 +52,7 @@
 </head>
 <body>
 <div>
-    <h4 style="width: 600px; margin-left: 80px; color: #0c4128">
+    <h4 style="width: 600px; margin-left: 150px; color: #0c4128">
         ${parameters}
     </h4>
 </div>
@@ -175,7 +175,7 @@
                             </c:if>
                         </div>
                     </div>
-                    <<c:if test="${sessionScope.user_role eq 'ADMIN'}">
+                    <c:if test="${sessionScope.user_role eq 'ADMIN'}">
                     <div class="col">
                         <div class="container text-center">
                             <button type="submit" class="btn btn-secondary">
@@ -202,7 +202,7 @@
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="basic-addon5">${quantity}</span>
                                 <input type="text" class="form-control" placeholder="${quantity_in_stock}"
-                                       name="menu_quantity_in_stock"
+                                       name="menu_quantity"
                                        required value="${current_menu.quantityInStock}" pattern="\d{1,4}"
                                        aria-label="${quantity_in_stock}" aria-describedby="basic-addon1">
                                 <c:if test="${requestScope.is_updated_quantity == false}">
@@ -233,8 +233,8 @@
                     <div class="row gx-1">
                         <div class="col">
                             <div class="mb-3">
+                                <input type="file" name="menu_image" formenctype="multipart/form-data">
                                 <c:if test="${requestScope.is_updated_image == false}">
-                                    <input type="file" name="menu_image" formenctype="multipart/form-data">
                                     <h5>
                                             ${image_check}
                                     </h5>

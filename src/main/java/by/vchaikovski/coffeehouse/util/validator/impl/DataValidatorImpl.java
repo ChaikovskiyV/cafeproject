@@ -22,7 +22,7 @@ public class DataValidatorImpl implements DataValidator {
     private static final String STREET_NAME_REGEX = "(.{3,35})(([a-zA-Z]+[-\\s]?[a-zA-Z]+)|([а-яА-Я]+[-\\s]?[а-яА-Я]+))";
     private static final String HOUSE_NUMBER_REGEX = "[1-9]\\d*\\w?";
     private static final String CARD_NUMBER_REGEX = "\\d{16}";
-    private static final String DISCOUNT_RATE_REGEX = "[1-9]\\d?";
+    private static final String DISCOUNT_RATE_REGEX = "\\d\\d?";
     private static final String DATE_REGEX = "202[2-9]-((0[1-9])|(1[0-2]))-((0[1-9])|([12]\\d)|(3[01]))";
     private static final String TEXT_REGEX = "(.{3,400})([\\p{Alpha}А-Яа-я]+.*)";
     private static final String IMAGE_REGEX = "(\\.jpe?g)|(\\.tiff?)|(\\.bmp)|(\\.png)";

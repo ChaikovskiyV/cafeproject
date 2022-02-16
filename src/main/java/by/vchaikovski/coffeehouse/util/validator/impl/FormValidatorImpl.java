@@ -19,6 +19,7 @@ import static by.vchaikovski.coffeehouse.controller.command.SessionParameter.USE
 public class FormValidatorImpl extends DataValidatorImpl implements FormValidator {
     private static final Logger logger = LogManager.getLogger();
     private static final String UNCHECKED_PARAM_MESS = "Unchecked parameter: ";
+    private static final String DEFAULT_COMMENT = "No comment";
     private static FormValidatorImpl instance;
 
     private FormValidatorImpl() {
@@ -198,9 +199,13 @@ public class FormValidatorImpl extends DataValidatorImpl implements FormValidato
                 }
                 case COMMENT -> {
                     if (!isTextValid(value)) {
-                        orderParameters.replace(key, WRONG_MEANING);
-                        logger.debug("Comment is not correct");
-                        result = false;
+                        if(value == null || value.isEmpty() || value.isBlank()) {
+                            orderParameters.replace(key, DEFAULT_COMMENT);
+                        } else {
+                            orderParameters.replace(key, WRONG_MEANING);
+                            logger.debug("Comment is not correct");
+                            result = false;
+                        }
                     }
                 }
                 default -> logger.debug(() -> UNCHECKED_PARAM_MESS + key);

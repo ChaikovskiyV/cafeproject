@@ -5,6 +5,7 @@
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 <c:set var="discounts" value="${requestScope.discount_list}"/>
+<c:set var="users" value="${requestScope.user_list}"/>
 
 <fmt:setLocale value="${sessionScope.locale}" scope="session"/>
 <fmt:setBundle basename="properties.pagecontent"/>
@@ -23,6 +24,7 @@
 <fmt:message key="reference.show_details" var="details"/>
 <fmt:message key="user_research.action" var="action"/>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,22 +35,22 @@
           crossorigin="anonymous">
     <link href="../../bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="../../bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
-    <link href="../../bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js" rel="stylesheet"/>
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <link href="//cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="//cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
     <title>${result}</title>
 </head>
 <body>
-<div class="container" style="background: #86b7fe; width: 1400px">
+<div class="container-xxl" style="background: #86b7fe; width: 1300px; margin-left:25px">
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#usersTable').DataTable({
+            $('#menuTable').DataTable({
                 pageLength: 5,
                 lengthMenu: [5, 10, 25, 50, 100]
             });
         });
     </script>
-    <table id="usersTable" class="display table-striped table-hover" style="margin-left: 50px">
+    <table id="menuTable" class="display table table-striped table-hover" >
         <caption></caption>
         <thead>
         <tr>
@@ -65,23 +67,23 @@
             <th scope="col">${action}</th>
         </tr>
         </thead>
-        <tbody>
-        <c:forEach var="user" items="${requestScope.user_list}">
-            <tr>
-                <th scope="row">${user.id}</th>
-                <td>${user.firstName}</td>
-                <td>${user.lastName}</td>
-                <td>${user.login}</td>
-                <td>${user.email}</td>
-                <td>${user.phoneNumber}</td>
-                <td>${user.role}</td>
-                <td>${user.status}</td>
-                <td>${discounts[user.id].type.name()}</td>
-                <td>${discounts[user.id].rate}</td>
+        <tbody class="nav-list-search">
+        <c:forEach var="current_user" items="${users}">
+            <tr class="table-danger">
+                <th scope="row">${current_user.id}</th>
+                <td>${current_user.firstName}</td>
+                <td>${current_user.lastName}</td>
+                <td>${current_user.login}</td>
+                <td>${current_user.email}</td>
+                <td>${current_user.phoneNumber}</td>
+                <td>${current_user.role}</td>
+                <td>${current_user.status}</td>
+                <td>${discounts[current_user.id].type}</td>
+                <td>${discounts[current_user.id].rate}</td>
                 <td>
                     <form method="post" action="${path}/controller">
                         <input type="hidden" name="command" value="go_to_user_info">
-                        <input type="hidden" name="current_user_id" value="${user.id}"/>
+                        <input type="hidden" name="current_user_id" value="${current_user.id}"/>
                         <div class="container text-lg-start">
                             <button type="submit" class="btn btn-secondary">
                                     ${details}

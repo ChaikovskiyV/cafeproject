@@ -14,10 +14,7 @@ import by.vchaikovski.coffeehouse.util.validator.impl.FormValidatorImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -395,12 +392,12 @@ public class MenuServiceImpl implements MenuService {
     public boolean updateMenuImage(long id, String imagePath) throws ServiceException {
         boolean result = false;
         DataValidator validator = DataValidatorImpl.getInstance();
-        Path filePath = Path.of(imagePath);
         if (validator.isPicture(imagePath)) {
             try {
-                byte[] imageBytes = Files.readAllBytes(filePath);
+                PictureLoader pictureLoader = PictureLoader.getInstance();
+                byte[] imageBytes = pictureLoader.loadPicture(imagePath);
                 result = menuDao.updateMenuImage(id, imageBytes);
-            } catch (DaoException | IOException e) {
+            } catch (DaoException e) {
                 String message = "Menu can't be updated by image";
                 logger.error(message, e);
                 throw new ServiceException(message, e);

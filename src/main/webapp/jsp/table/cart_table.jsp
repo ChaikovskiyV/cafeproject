@@ -38,7 +38,7 @@
 </head>
 <body>
 <div>
-    <table class="table" style="background: #86b7fe; width: 1200px; margin: 50px">
+    <table class="table" style="background: #86b7fe; width: auto; margin-left: 100px">
         <caption></caption>
         <thead>
         <tr>

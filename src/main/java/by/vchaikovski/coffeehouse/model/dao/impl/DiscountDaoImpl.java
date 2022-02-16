@@ -27,7 +27,7 @@ public class DiscountDaoImpl implements DiscountDao {
     private static final String BY_TYPE_AND_RATE = " WHERE type=? AND rate=?";
     private static final String BY_TYPE = " WHERE type=?";
     private static final String BY_RATE = " WHERE rate=";
-    private static final String FIND_DISCOUNT_BY_USER_ID = "SELECT user_id FROM users" +
+    private static final String FIND_DISCOUNT_BY_USER_ID = "SELECT user_id, discount_id, type, rate FROM users " +
             "JOIN discounts ON fk_discount_id=discount_id WHERE user_id=";
     private static final String UPDATE_DISCOUNT_TYPE = "UPDATE discounts SET type=? WHERE discount_id=?";
     private static final String UPDATE_DISCOUNT_RATE = "UPDATE discounts SET rate=? WHERE discount_id=?";

@@ -33,9 +33,9 @@ public enum SessionParameter {
      */
     public static final String CARD_ID = "card_id";
     /**
-     * The constant CARD_PARAMETERS.
+     * The constant USERS_MAP.
      */
-    public static final String CARD_PARAMETERS = "card_parameters";
+    public static final String USERS_MAP = "users_map";
     /**
      * The constant USER.
      */

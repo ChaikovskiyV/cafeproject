@@ -125,7 +125,7 @@
         </div>
         <div>
             <a href="${path}/controller?command=go_to_find_bank_card"
-               style="color: #0c4128; font-size: 20px; font-weight: bold">${find_card}</a>
+               style="color: #0c4128; font-size: 20px; font-weight: bolder">${find_card}</a>
         </div>
     </c:if>
     <c:if test="${requestScope.find_card eq true or
@@ -154,7 +154,7 @@
         </form>
         <div>
             <a href="${path}/controller?command=go_to_registration_card"
-               style="color: #0c4128; font-size: 20px; font-weight: bold; white-space: nowrap">${register_card}</a>
+               style="color: #0c4128; font-size: 20px; font-weight: bolder; white-space: nowrap">${register_card}</a>
         </div>
     </c:if>
     <c:if test="${sessionScope.is_found eq true and empty requestScope.register_card and
@@ -226,7 +226,7 @@
             ${not_top_up}
         </c:if>
     </div>
-    <div style="color: #0c4128; font-size: 20px; font-weight: bold; margin-left: 50px">
+    <div style="color: #0c4128; font-size: 20px; font-weight: bolder; margin-left: 50px">
         <a href="${path}/controller?command=go_to_registration_card">${register_card}</a>
         <a href="${path}/controller?command=go_to_find_bank_card" style="padding-left: 30px">${find_card}</a>
     </div>

@@ -14,6 +14,11 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * @author VChaikovski
+ * @project Coffeehouse
+ * The type Data validator impl test.
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DataValidatorImplTest {
     private static final Logger logger = LogManager.getLogger();
@@ -38,6 +43,9 @@ class DataValidatorImplTest {
     private static Class<User.Role> enumRole;
     private static boolean result;
 
+    /**
+     * Sets up.
+     */
     @BeforeAll
     void setUp() {
         logger.info("Testing is starting...");
@@ -62,235 +70,342 @@ class DataValidatorImplTest {
         enumRole = User.Role.class;
     }
 
+    /**
+     * Tear down.
+     */
     @AfterAll
     void tearDown() {
         logger.info("Testing has finished.");
     }
 
+    /**
+     * Is login valid.
+     */
     @Test
-    public void isLoginValid() {
+    void isLoginValid() {
         result = validator.isLoginValid(login);
         assertTrue(result);
     }
 
+    /**
+     * If login not valid.
+     */
     @Test
-    public void ifLoginNotValid() {
+    void ifLoginNotValid() {
         wrongString = "123gh";
         result = validator.isLoginValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * If login too short.
+     */
     @Test
-    public void ifLoginTooShort() {
+    void ifLoginTooShort() {
         wrongString = "Lo0";
         result = validator.isLoginValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * If login too long.
+     */
     @Test
-    public void ifLoginTooLong() {
+    void ifLoginTooLong() {
         wrongString = "ThereIsTooLongLogin11";
         result = validator.isLoginValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is password valid.
+     */
     @Test
-    public void isPasswordValid() {
+    void isPasswordValid() {
         result = validator.isPasswordValid(password);
         assertTrue(result);
     }
 
+    /**
+     * If password not valid.
+     */
     @Test
-    public void ifPasswordNotValid() {
+    void ifPasswordNotValid() {
         wrongString = "*/_*_/*";
         result = validator.isPasswordValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * If password too short.
+     */
     @Test
-    public void ifPasswordTooShort() {
+    void ifPasswordTooShort() {
         wrongString = "123";
         result = validator.isPasswordValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * If password too long.
+     */
     @Test
-    public void ifPasswordTooLong() {
+    void ifPasswordTooLong() {
         wrongString = "ThereIsTooLongPassword123";
         result = validator.isPasswordValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is email valid.
+     */
     @Test
-    public void isEmailValid() {
+    void isEmailValid() {
         result = validator.isEmailValid(email);
         assertTrue(result);
     }
 
+    /**
+     * If email not valid.
+     */
     @Test
-    public void ifEmailNotValid() {
+    void ifEmailNotValid() {
         wrongString = "hjh123.by";
         result = validator.isEmailValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is number valid.
+     */
     @Test
-    public void isNumberValid() {
+    void isNumberValid() {
         result = validator.isNumberValid(numberString);
         assertTrue(result);
     }
 
+    /**
+     * If number not valid.
+     */
     @Test
-    public void ifNumberNotValid() {
+    void ifNumberNotValid() {
         wrongString = "123f";
         result = validator.isNumberValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is street valid en.
+     */
     @Test
-    public void isStreetValidEn() {
+    void isStreetValidEn() {
         result = validator.isNameValid(streetNameEn);
         assertTrue(result);
     }
 
+    /**
+     * Is street valid rus.
+     */
     @Test
-    public void isStreetValidRus() {
+    void isStreetValidRus() {
         result = validator.isNameValid(streetNameRus);
         assertTrue(result);
     }
 
+    /**
+     * If street not valid.
+     */
     @Test
-    public void ifStreetNotValid() {
+    void ifStreetNotValid() {
         wrongString = "123456";
         result = validator.isNameValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is house number valid.
+     */
     @Test
-    public void isHouseNumberValid() {
+    void isHouseNumberValid() {
         result = validator.isHouseNumberValid(houseNumber);
         assertTrue(result);
     }
 
+    /**
+     * If house number not valid.
+     */
     @Test
-    public void ifHouseNumberNotValid() {
+    void ifHouseNumberNotValid() {
         wrongString = "01A";
         result = validator.isHouseNumberValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is name valid rus.
+     */
     @Test
-    public void isNameValidRus() {
+    void isNameValidRus() {
         result = validator.isNameValid(nameRus);
         assertTrue(result);
     }
 
+    /**
+     * Is name valid en.
+     */
     @Test
-    public void isNameValidEn() {
+    void isNameValidEn() {
         result = validator.isNameValid(nameEn);
         assertTrue(result);
     }
 
+    /**
+     * If name not valid.
+     */
     @Test
-    public void ifNameNotValid() {
+    void ifNameNotValid() {
         wrongString = "Agent007";
         result = validator.isNameValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is card number valid.
+     */
     @Test
-    public void isCardNumberValid() {
+    void isCardNumberValid() {
         result = validator.isCardNumberValid(cardNumber);
         assertTrue(result);
     }
 
+    /**
+     * If card number not valid.
+     */
     @Test
-    public void ifCardNumberNotValid() {
+    void ifCardNumberNotValid() {
         wrongString = "123456789Ol234S6";
         result = validator.isCardNumberValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * If card number too short.
+     */
     @Test
-    public void ifCardNumberTooShort() {
+    void ifCardNumberTooShort() {
         wrongString = "12345678901234";
         result = validator.isCardNumberValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * If card number too long.
+     */
     @Test
-    public void ifCardNumberTooLong() {
+    void ifCardNumberTooLong() {
         wrongString = "12345678901234567";
         result = validator.isCardNumberValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is date valid.
+     */
     @Test
-    public void isDateValid() {
+    void isDateValid() {
         result = validator.isDateValid(dateString);
         assertTrue(result);
     }
 
+    /**
+     * If date not valid.
+     */
     @Test
-    public void ifDateNotValid() {
+    void ifDateNotValid() {
         wrongString = "now";
         result = validator.isDateValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is date later currently.
+     */
     @Test
-    public void isDateLaterCurrently() {
+    void isDateLaterCurrently() {
         result = validator.isDateLaterCurrently(date);
         assertTrue(result);
     }
 
+    /**
+     * If date not later currently.
+     */
     @Test
-    public void ifDateNotLaterCurrently() {
+    void ifDateNotLaterCurrently() {
         result = validator.isDateLaterCurrently(pastDate);
         assertFalse(result);
     }
 
+    /**
+     * Is discount rate valid.
+     */
     @Test
-    public void isDiscountRateValid() {
+    void isDiscountRateValid() {
         result = validator.isDiscountRateValid(discountRate);
         assertTrue(result);
     }
 
+    /**
+     * If discount rate not valid.
+     */
     @Test
-    public void ifDiscountRateNotValid() {
+    void ifDiscountRateNotValid() {
         wrongString = "101";
         result = validator.isDiscountRateValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * Is phone number valid.
+     */
     @Test
-    public void isPhoneNumberValid() {
+    void isPhoneNumberValid() {
         result = validator.isPhoneNumberValid(phoneNumber);
         assertTrue(result);
     }
 
+    /**
+     * If phone number not valid.
+     */
     @Test
-    public void ifPhoneNumberNotValid() {
+    void ifPhoneNumberNotValid() {
         wrongString = "+37533698lЗ9O";
         result = validator.isPhoneNumberValid(wrongString);
         assertFalse(result);
     }
 
+    /**
+     * If phone number null.
+     */
     @Test
-    public void ifPhoneNumberNull() {
-        wrongString = null;
-        result = validator.isPhoneNumberValid(wrongString);
+    void ifPhoneNumberNull() {
+        result = validator.isPhoneNumberValid(null);
         assertFalse(result);
     }
 
+    /**
+     * Is enum contains.
+     */
     @Test
-    public void isEnumContains() {
+    void isEnumContains() {
         result = validator.isEnumContains(enumString, enumRole);
         assertTrue(result);
     }
 
+    /**
+     * If enum not contain value.
+     */
     @Test
-    public void ifEnumNotContainValue() {
+    void ifEnumNotContainValue() {
         wrongString = "driver";
         result = validator.isEnumContains(wrongString, enumRole);
         assertFalse(result);

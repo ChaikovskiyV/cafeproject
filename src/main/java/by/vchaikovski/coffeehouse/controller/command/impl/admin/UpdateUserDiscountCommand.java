@@ -5,11 +5,13 @@ import by.vchaikovski.coffeehouse.controller.command.BaseCommand;
 import by.vchaikovski.coffeehouse.controller.command.PagePath;
 import by.vchaikovski.coffeehouse.exception.CommandException;
 import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.entity.Discount;
 import by.vchaikovski.coffeehouse.model.entity.User;
 import by.vchaikovski.coffeehouse.model.service.DiscountService;
 import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
 import by.vchaikovski.coffeehouse.model.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,14 +48,18 @@ public class UpdateUserDiscountCommand implements BaseCommand {
                 } else if (discountRate != null) {
                     result = discountService.updateDiscountRate(discountId, discountRate);
                 }
+                if(result) {
+                    HttpSession session = request.getSession();
+                    Optional<Discount> optionalDiscount = discountService.findDiscountsById(discountId);
+                    optionalDiscount.ifPresent(discount -> session.setAttribute(DISCOUNT, discount));
+                }
             }
+            request.setAttribute(IS_UPDATED_DISCOUNT, result);
         } catch (ServiceException e) {
             String message = "Update user discount command can't be completed";
             logger.error(message, e);
             throw new CommandException(message, e);
         }
-        request.setAttribute(IS_UPDATED_DISCOUNT, result);
-
         return new Router(PagePath.USER_INFO_PAGE);
     }
 }

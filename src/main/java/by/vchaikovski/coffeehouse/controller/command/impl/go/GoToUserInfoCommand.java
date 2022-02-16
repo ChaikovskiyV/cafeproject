@@ -3,7 +3,6 @@ package by.vchaikovski.coffeehouse.controller.command.impl.go;
 import by.vchaikovski.coffeehouse.controller.Router;
 import by.vchaikovski.coffeehouse.controller.command.BaseCommand;
 import by.vchaikovski.coffeehouse.controller.command.PagePath;
-import by.vchaikovski.coffeehouse.controller.command.RequestParameter;
 import by.vchaikovski.coffeehouse.exception.CommandException;
 import by.vchaikovski.coffeehouse.exception.ServiceException;
 import by.vchaikovski.coffeehouse.model.entity.Discount;
@@ -18,6 +17,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 
+import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
+
 /**
  * @author VChaikovski
  * @project Coffeehouse
@@ -29,15 +30,17 @@ public class GoToUserInfoCommand implements BaseCommand {
 
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
-        String userId = request.getParameter(RequestParameter.CURRENT_USER_ID);
+        String userIdStr = request.getParameter(CURRENT_USER_ID);
         HttpSession session = request.getSession();
+        session.removeAttribute(DISCOUNT);
         UserService userService = ServiceProvider.getInstance().getUserService();
         DiscountService discountService = ServiceProvider.getInstance().getDiscountService();
         try {
-            Optional<User> optionalUser = userService.findUserById(Long.parseLong(userId));
-            optionalUser.ifPresent(user -> session.setAttribute(RequestParameter.CURRENT_USER, user));
-            Optional<Discount> optionalDiscount = discountService.findDiscountByUserId(Long.parseLong(userId));
-            optionalDiscount.ifPresent(discount -> session.setAttribute(RequestParameter.DISCOUNT, discount));
+            long userId = Long.parseLong(userIdStr);
+            Optional<User> optionalUser = userService.findUserById(userId);
+            optionalUser.ifPresent(user -> session.setAttribute(CURRENT_USER, user));
+            Optional<Discount> optionalDiscount = discountService.findDiscountByUserId(userId);
+            optionalDiscount.ifPresent(discount -> session.setAttribute(DISCOUNT, discount));
         } catch (ServiceException e) {
             String message = "Go to user info command can't be completed";
             logger.error(message, e);

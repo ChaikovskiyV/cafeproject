@@ -221,7 +221,7 @@ public class DeliveryServiceImpl implements DeliveryService {
         List<Delivery> deliveryList = new ArrayList<>();
         DataValidator validator = DataValidatorImpl.getInstance();
         if (validator.isEnumContains(deliveryType, Delivery.DeliveryType.class)) {
-            Delivery.DeliveryType type = Delivery.DeliveryType.valueOf(deliveryType);
+            Delivery.DeliveryType type = Delivery.DeliveryType.valueOf(deliveryType.toUpperCase());
             try {
                 deliveryList = deliveryDao.findByDeliveryType(type);
             } catch (DaoException e) {

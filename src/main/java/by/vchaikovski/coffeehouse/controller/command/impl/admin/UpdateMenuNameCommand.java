@@ -5,11 +5,15 @@ import by.vchaikovski.coffeehouse.controller.command.BaseCommand;
 import by.vchaikovski.coffeehouse.controller.command.PagePath;
 import by.vchaikovski.coffeehouse.exception.CommandException;
 import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.entity.Menu;
 import by.vchaikovski.coffeehouse.model.service.MenuService;
 import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Optional;
 
 import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
 
@@ -28,8 +32,14 @@ public class UpdateMenuNameCommand implements BaseCommand {
         String menuId = request.getParameter(MENU_ID);
         String menuName = request.getParameter(MENU_NAME);
         try {
-            boolean isUpdated = menuService.updateMenuName(Long.parseLong(menuId), menuName);
+            long id = Long.parseLong(menuId);
+            boolean isUpdated = menuService.updateMenuName(id, menuName);
             request.setAttribute(IS_UPDATED_NAME, isUpdated);
+            if(isUpdated) {
+                HttpSession session = request.getSession();
+                Optional<Menu> optionalMenu = menuService.findById(id);
+                optionalMenu.ifPresent(menu -> session.setAttribute(MENU, menu));
+            }
         } catch (ServiceException e) {
             String message = "Update menu name command can't be completed";
             logger.error(message, e);

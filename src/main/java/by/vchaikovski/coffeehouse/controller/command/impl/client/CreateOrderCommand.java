@@ -33,7 +33,6 @@ import static by.vchaikovski.coffeehouse.controller.command.SessionParameter.*;
 public class CreateOrderCommand implements BaseCommand {
     private static final Logger logger = LogManager.getLogger();
     private static final String EMPTY_CART_MESS = "Your cart is empty";
-    private static final String DEFAULT_COMMENT = "No comment";
 
     @Override
     public Router execute(HttpServletRequest request) throws CommandException {
@@ -63,7 +62,7 @@ public class CreateOrderCommand implements BaseCommand {
         orderParameters.put(HOUSE_NUMBER, houseNumber);
         orderParameters.put(BUILDING_NUMBER, buildingNumber);
         orderParameters.put(FLAT_NUMBER, flatNumber);
-        orderParameters.put(COMMENT, comment.isEmpty() ? comment : DEFAULT_COMMENT);
+        orderParameters.put(COMMENT, comment);
         orderParameters.put(ORDER_STATUS, FoodOrder.OrderStatus.WAITING.name());
         orderParameters.put(USER_ID, String.valueOf(user.getId()));
         long orderId;
@@ -81,12 +80,11 @@ public class CreateOrderCommand implements BaseCommand {
                     optionalBill.ifPresent(bill -> session.setAttribute(BILL, bill));
                 }
                 session.setAttribute(ORDER_PARAMETERS, orderParameters);
-                return router;
+                router.setRouterType(Router.RouterType.REDIRECT);
             } else {
                 request.setAttribute(ORDER_PARAMETERS, orderParameters);
                 fillWrongParam(orderParameters, request);
             }
-
         } catch (ServiceException e) {
             String message = "Create order command can't be completed";
             logger.error(message, e);

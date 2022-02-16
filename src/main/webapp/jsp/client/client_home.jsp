@@ -38,15 +38,15 @@
     </c:if>
     <c:if test="${requestScope.show_cart == true}">
         <jsp:include page="../table/cart_table.jsp"/>
-        <div class="container px-2" style="margin-left: 150px">
+        <div class="container px-2">
             <div class="row gx-2">
                 <div class="col">
                     <a href="${path}/controller?command=go_to_create_order"
-                       style="color: #0c4128; font-size: 20px; font-weight: bold">${create_order}</a>
+                       style="color: #0c4128; font-size: 20px; font-weight: bolder;margin-left: 50px">${create_order}</a>
                 </div>
                 <div class="col">
                     <a href="${path}/controller?command=clear_cart"
-                       style="color: #0c4128; font-size: 20px; font-weight: bold">${cart_clear}</a>
+                       style="color: #0c4128; font-size: 20px; font-weight: bolder;margin-left:50px">${cart_clear}</a>
                 </div>
             </div>
         </div>

@@ -16,6 +16,7 @@
 <fmt:message key="card_info.info" var="card_info"/>
 <fmt:message key="client_home.cart" var="cart"/>
 <fmt:message key="header.back_main" var="back_main"/>
+<fmt:message key="main.about" var="read_about"/>
 
 
 <!DOCTYPE html>
@@ -36,6 +37,7 @@
         <li><a class="dropdown-item" href="${path}/controller?command=go_to_orders">${show_order}</a></li>
         <li><a class="dropdown-item" href="${path}/controller?command=go_to_user_profile">${profile}</a></li>
         <li><a class="dropdown-item" href="${path}/controller?command=go_to_card_info">${card_info}</a></li>
+        <li><a class="dropdown-item" href="${path}/controller?command=go_to_about">${read_about}</a></li>
         <li><a class="dropdown-item" href="${path}/controller?command=go_to_main">${back_main}</a></li>
         <li><a class="dropdown-item" href="${path}/controller?command=sign_out">${sign_out}</a></li>
     </ul>

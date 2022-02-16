@@ -32,8 +32,6 @@ public class CurrentPageFilter implements Filter {
                 CommandType.CHANGE_LOCALE != CommandType.valueOf(command.toUpperCase())) {
             String currentPage = httpServletRequest.getServletPath() + COMM_DELIM + httpServletRequest.getQueryString();
             session.setAttribute(SessionParameter.CURRENT_PAGE, currentPage);
-        } else {
-            session.setAttribute(SessionParameter.CURRENT_PAGE, httpServletRequest.getServletPath());
         }
         chain.doFilter(request, response);
     }

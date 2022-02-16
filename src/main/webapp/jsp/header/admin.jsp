@@ -17,6 +17,7 @@
 <fmt:message key="card_info.info" var="card_info"/>
 <fmt:message key="order_research.find" var="show_order"/>
 <fmt:message key="menu_creation.create" var="create_product"/>
+<fmt:message key="main.about" var="read_about"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,6 +38,7 @@
     <li><a class="dropdown-item" href="${path}/controller?command=go_to_find_order">${show_order}</a></li>
     <li><a class="dropdown-item" href="${path}/controller?command=go_to_user_profile">${profile}</a></li>
     <li><a class="dropdown-item" href="${path}/controller?command=go_to_card_info">${card_info}</a></li>
+    <li><a class="dropdown-item" href="${path}/controller?command=go_to_about">${read_about}</a></li>
     <li><a class="dropdown-item" href="${path}/controller?command=go_to_main">${back_main}</a></li>
     <li><a class="dropdown-item" href="${path}/controller?command=sign_out">${sign_out}</a></li>
 </ul>

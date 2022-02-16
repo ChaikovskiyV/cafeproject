@@ -240,132 +240,132 @@ public class MenuDaoImpl implements MenuDao {
 
     @Override
     public boolean updateMenuName(long id, String name) throws DaoException {
-        boolean result;
+        int rowNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_MENU_NAME)) {
             statement.setString(FIRST_PARAMETER_INDEX, name);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
-            result = statement.execute();
+            rowNumber = statement.executeUpdate();
         } catch (SQLException e) {
             String message = "The query \"update menu by name=" + name + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
-        return result;
+        return rowNumber > 0;
     }
 
     @Override
     public boolean updateMenuFoodType(long id, Menu.FoodType productType) throws DaoException {
-        boolean result;
+        int rowNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_MENU_PRODUCT_TYPE)) {
             statement.setString(FIRST_PARAMETER_INDEX, productType.name());
             statement.setLong(SECOND_PARAMETER_INDEX, id);
-            result = statement.execute();
+            rowNumber = statement.executeUpdate();
         } catch (SQLException e) {
             String message = "The query \"update menu by product type=" + productType + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
-        return result;
+        return rowNumber > 0;
     }
 
     @Override
     public boolean updateMenuPrice(long id, BigDecimal price) throws DaoException {
-        boolean result;
+        int rowNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_MENU_PRICE)) {
             statement.setBigDecimal(FIRST_PARAMETER_INDEX, price);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
-            result = statement.execute();
+            rowNumber = statement.executeUpdate();
         } catch (SQLException e) {
             String message = "The query \"update menu by price=" + price + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
-        return result;
+        return rowNumber > 0;
     }
 
     @Override
     public boolean updateMenuQuantityInStock(long id, int quantityInStock) throws DaoException {
-        boolean result;
+        int rowNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_MENU_QUANTITY_IN_STOCK)) {
             statement.setInt(FIRST_PARAMETER_INDEX, quantityInStock);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
-            result = statement.execute();
+            rowNumber = statement.executeUpdate();
         } catch (SQLException e) {
             String message = "The query \"update menu by quantity in stock=" + quantityInStock + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
-        return result;
+        return rowNumber > 0;
     }
 
     @Override
     public boolean increaseQuantityInStock(long id, int quantity) throws DaoException {
-        boolean result;
+        int rowNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(INCREASE_MENU_QUANTITY_IN_STOCK)) {
             statement.setInt(FIRST_PARAMETER_INDEX, quantity);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
-            result = statement.execute();
+           rowNumber = statement.executeUpdate();
         } catch (SQLException e) {
             String message = "The query \"increase quantity in stock on number=" + quantity + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
-        return result;
+        return rowNumber > 0;
     }
 
     @Override
     public boolean reduceQuantityInStock(long id, int quantity) throws DaoException {
-        boolean result;
+        int rowNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(REDUCE_MENU_QUANTITY_IN_STOCK)) {
             statement.setInt(FIRST_PARAMETER_INDEX, quantity);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
             statement.setInt(THIRD_PARAMETER_INDEX, quantity);
-            result = statement.execute();
+            rowNumber = statement.executeUpdate();
         } catch (SQLException e) {
             String message = "The query \"reduce quantity in stock on number=" + quantity + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
-        return result;
+        return rowNumber > 0;
     }
 
     @Override
     public boolean updateMenuDescription(long id, String description) throws DaoException {
-        boolean result;
+        int rowNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_MENU_DESCRIPTION)) {
             statement.setString(FIRST_PARAMETER_INDEX, description);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
-            result = statement.execute();
+            rowNumber = statement.executeUpdate();
         } catch (SQLException e) {
             String message = "The query \"update menu by description=" + description + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
-        return result;
+        return rowNumber > 0;
     }
 
     @Override
     public boolean updateMenuImage(long id, byte[] image) throws DaoException {
-        boolean result;
+        int rowNumber;
         try (Connection connection = ConnectionPool.getInstance().getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_MENU_IMAGE)) {
             Blob imageBlob = new SerialBlob(image);
             statement.setBlob(FIRST_PARAMETER_INDEX, imageBlob);
             statement.setLong(SECOND_PARAMETER_INDEX, id);
-            result = statement.execute();
+            rowNumber = statement.executeUpdate();
         } catch (SQLException e) {
             String message = "The query \"update menu by image\"" + FAILED_MESSAGE;
             logger.error(message, e);
             throw new DaoException(message, e);
         }
-        return result;
+        return rowNumber > 0;
     }
 
     @Override

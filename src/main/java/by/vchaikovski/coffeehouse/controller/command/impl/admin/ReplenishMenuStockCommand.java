@@ -5,11 +5,15 @@ import by.vchaikovski.coffeehouse.controller.command.BaseCommand;
 import by.vchaikovski.coffeehouse.controller.command.PagePath;
 import by.vchaikovski.coffeehouse.exception.CommandException;
 import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.entity.Menu;
 import by.vchaikovski.coffeehouse.model.service.MenuService;
 import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Optional;
 
 import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
 
@@ -30,9 +34,13 @@ public class ReplenishMenuStockCommand implements BaseCommand {
         String quantity = request.getParameter(MENU_QUANTITY);
         router = new Router(PagePath.MENU_INFO_PAGE);
         try {
-            boolean isUpdated = menuService.increaseQuantityInStock(Long.parseLong(menuId), quantity);
+            long id = Long.parseLong(menuId);
+            boolean isUpdated = menuService.increaseQuantityInStock(id, quantity);
             request.setAttribute(IS_UPDATED_QUANTITY, isUpdated);
             if (isUpdated) {
+                HttpSession session = request.getSession();
+                Optional<Menu> optionalMenu = menuService.findById(id);
+                optionalMenu.ifPresent(menu -> session.setAttribute(MENU, menu));
                 router.setRouterType(Router.RouterType.REDIRECT);
             }
         } catch (ServiceException e) {

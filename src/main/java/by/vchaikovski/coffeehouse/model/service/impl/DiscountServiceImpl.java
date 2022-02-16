@@ -77,7 +77,7 @@ public class DiscountServiceImpl implements DiscountService {
     public Optional<Discount> findDiscountByUserId(long userId) throws ServiceException {
         Optional<Discount> optionalDiscount;
         try {
-            optionalDiscount = discountDao.findById(userId);
+            optionalDiscount = discountDao.findByUserId(userId);
         } catch (DaoException e) {
             String message = "Discount can't be found by user id " + userId;
             logger.error(message, e);

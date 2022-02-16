@@ -56,11 +56,11 @@
 </head>
 <body>
 <div>
-    <h4 style="color: #0c4128; margin-left: 80px; white-space: nowrap">
+    <h4 style="color: #0c4128; margin-left: 150px; white-space: nowrap;font-weight: bold">
         ${title}
     </h4>
-    <div class="container px-1" style="width: 1300px; margin-left: 10px">
-        <div class="row gx-1">
+    <div class="container px-5" style="width: 1200px; margin-left: 100px">
+        <div class="row gx-5">
             <div class="col">
                 <form method="post" action="${path}/controller">
                     <input type="hidden" name="command" value="find_user">
@@ -91,8 +91,8 @@
             </div>
 
         </div>
-        <div class="row gx-1">
-            <div class="col" style="width: 500px">
+        <div class="row gx-1" style="width: 500px">
+            <div class="col">
                 <form method="post" action="${path}/controller">
                     <input type="hidden" name="command" value="find_user">
                     <div class="input-group mb-3">
@@ -140,7 +140,7 @@
             </div>
         </div>
         <div class="container px-5" style="width: 1200px">
-            <div class="row gx-5" style="width: fit-content">
+            <div class="row gx-5">
                 <div class="col">
                     <div class="input-group mb-3">
                         <select class="form-select" required name="user_status" aria-label="Unbanned">
@@ -169,14 +169,14 @@
                 </div>
             </div>
         </div>
-        <div class="container text-lg-start">
+        <div class="container text-lg-start" style="margin-left: 150px">
             <button type="submit" class="btn btn-secondary">
                 ${find_parameters}
             </button>
         </div>
     </form>
 </div>
-<div class="research result" style="width: 1400px">
+<div class="research result">
     <c:if test="${requestScope.result == false}">
         <h4 style="margin-left: 500px">${not_found}</h4>
     </c:if>

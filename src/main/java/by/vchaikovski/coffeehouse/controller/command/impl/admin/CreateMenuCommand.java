@@ -54,6 +54,7 @@ public class CreateMenuCommand implements BaseCommand {
                 request.setAttribute(MENU_PARAMETERS, menuParameters);
             } else {
                 logger.debug("New product was added successfully");
+                router.setRouterType(Router.RouterType.REDIRECT);
             }
         } catch (ServiceException e) {
             String message = "Create menu command can't be completed";

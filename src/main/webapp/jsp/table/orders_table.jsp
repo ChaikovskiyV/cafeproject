@@ -5,7 +5,7 @@
 
 <c:set var="path" value="${pageContext.request.contextPath}"/>
 <c:set var="orders" value="${requestScope.order_list}"/>
-<c:set var="users" value="${requestScope.user_list}"/>
+<c:set var="users" value="${requestScope.users_map}"/>
 <c:set var="bills" value="${requestScope.bill_list}"/>
 <c:set var="deliveries" value="${requestScope.delivery_list}"/>
 <c:set var="address_list" value="${requestScope.address_list}"/>
@@ -48,7 +48,7 @@
     <title>${result}</title>
 </head>
 <body>
-<div class="container" style="background: #86b7fe; width: 1200px; margin-left: 100px">
+<div class="container" style="background: #86b7fe; width: auto; margin-left: 100px">
     <script type="text/javascript">
         $(document).ready(function () {
             $('#ordersTable').DataTable({
@@ -58,49 +58,48 @@
         });
     </script>
     <table id="ordersTable" class="display table table-striped table-hover">
-            <caption></caption>
-            <thead>
-            <tr>
-                <th scope="col">${id}</th>
-                <th scope="col">${creation_date}</th>
-                <th scope="col">${status}</th>
-                <th scope="col">${price}</th>
-                <th scope="col">${bill_status}</th>
-                <th scope="col">${delivary_type}</th>
-                <th scope="col">${delivary_time}</th>
-                <th scope="col">${product_list}</th>
-                <th scope="col">${action}</th>
-            </tr>
-            </thead>
-            <tbody class="nav-list-search">
-            <c:forEach var="order" items="${orders}">
-            <tr class="alert-danger">
-                <th scope="row">${order.id}</th>
-                <td>${order.creationDate}</td>
-                <td>${order.status}</td>
-                <td>${bills[order.id].totalPrice}</td>
-                <td>${bills[order.id].status}</td>
-                <td>${deliveries[order.id].deliveryType}</td>
-                <td>${deliveries[order.id].deliveryTime}</td>
-                <td>
-                    <c:forEach var="food" items="${order.cart}">
-                    <br>${food.key.name}: ${food.value}
-                    </c:forEach>
-                <td>
-                    <form method="post" action="${path}/controller">
-                        <input type="hidden" name="command" value="go_to_order_info">
-                        <input type="hidden" name="current_order_id" value="${order.id}">
-                        <div class="container text-lg-start">
-                            <button type="submit" class="btn btn-secondary">
-                                    ${details}
-                            </button>
-                        </div>
-                    </form>
-                </td>
+        <caption></caption>
+        <thead>
+        <tr>
+            <th scope="col">${id}</th>
+            <th scope="col">${creation_date}</th>
+            <th scope="col">${status}</th>
+            <th scope="col">${price}</th>
+            <th scope="col">${bill_status}</th>
+            <th scope="col">${delivary_type}</th>
+            <th scope="col">${delivary_time}</th>
+            <th scope="col">${product_list}</th>
+            <th scope="col">${action}</th>
+        </tr>
+        </thead>
+        <tbody class="nav-list-search">
+        <c:forEach var="order" items="${orders}">
+        <tr class="alert-danger">
+            <th scope="row">${order.id}</th>
+            <td>${order.creationDate}</td>
+            <td>${order.status}</td>
+            <td>${bills[order.id].totalPrice}</td>
+            <td>${bills[order.id].status}</td>
+            <td>${deliveries[order.id].deliveryType}</td>
+            <td>${deliveries[order.id].deliveryTime}</td>
+            <td>
+                <c:forEach var="food" items="${order.cart}">
+                <br>${food.key.name}: ${food.value}
                 </c:forEach>
-            </tbody>
-        </table>
-    </div>
+            <td>
+                <form method="post" action="${path}/controller">
+                    <input type="hidden" name="command" value="go_to_order_info">
+                    <input type="hidden" name="current_order_id" value="${order.id}">
+                    <div class="container text-lg-start">
+                        <button type="submit" class="btn btn-secondary">
+                                ${details}
+                        </button>
+                    </div>
+                </form>
+            </td>
+            </c:forEach>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.*;
+import static by.vchaikovski.coffeehouse.controller.command.SessionParameter.USERS_MAP;
 import static by.vchaikovski.coffeehouse.controller.command.SessionParameter.USER_ID;
 
 /**
@@ -92,7 +93,7 @@ public class FindOrderCommand implements BaseCommand {
                 optionalAddress.ifPresent(address -> addressMap.put(orderId, address));
             }
         }
-        request.setAttribute(USER_LIST, users);
+        request.setAttribute(USERS_MAP, users);
         request.setAttribute(BILL_LIST, bills);
         request.setAttribute(DELIVERY_LIST, deliveries);
         request.setAttribute(ADDRESS_LIST, addressMap);

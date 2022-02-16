@@ -39,7 +39,7 @@
     <title>${result}</title>
 </head>
 <body>
-<div class="container" style="background: #86b7fe; width: 1200px; margin-left: 100px">
+<div class="container" style="background: #86b7fe; width: auto; margin-left: 100px">
     <script type="text/javascript">
         $(document).ready(function () {
             $('#menuTable').DataTable({
@@ -110,8 +110,8 @@
     </table>
 </div>
 <div>
-    <p> </p>
-    <p> </p>
+    <p></p>
+    <p></p>
 </div>
 </body>
 </html>

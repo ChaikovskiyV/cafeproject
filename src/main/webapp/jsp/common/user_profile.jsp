@@ -49,7 +49,7 @@
         <div class="col" style="width: 400px">
             <form method="post" action="${path}/controller">
                 <input type="hidden" name="command" value="update_user_data">
-                <h4 style="color: #0c4128; font-size: 20px; font-weight: bold; white-space: nowrap">
+                <h4 style="margin-left: 50px; color: #0c4128; font-size: 20px; font-weight: bold; white-space: nowrap">
                     ${profile_parameters}
                 </h4>
                 <div class="input-group mb-3">
