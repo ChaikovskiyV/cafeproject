@@ -21,6 +21,8 @@ public class SignOutCommand implements BaseCommand {
     public Router execute(HttpServletRequest request) {
         request.getSession().invalidate();
         logger.info("Session was ended.");
-        return new Router(PagePath.MAIN_PAGE);
+        Router router = new Router(PagePath.MAIN_PAGE);
+        router.setRouterType(Router.RouterType.REDIRECT);
+        return router;
     }
 }
