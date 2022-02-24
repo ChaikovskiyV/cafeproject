@@ -64,6 +64,10 @@ public class DeliveryServiceImpl implements DeliveryService {
                 && validator.isDateValid(deliveryTime)) {
             Delivery.DeliveryType type = Delivery.DeliveryType.valueOf(deliveryType.toUpperCase());
             LocalDate date = LocalDate.parse(deliveryTime);
+            if (!validator.isDateLaterCurrently(date)) {
+                deliveryParameters.replace(DELIVERY_TIME, WRONG_MEANING);
+                return deliveryId;
+            }
             long addressId = createAddress(deliveryParameters);
             Delivery delivery = new Delivery(type, date, addressId);
             try {

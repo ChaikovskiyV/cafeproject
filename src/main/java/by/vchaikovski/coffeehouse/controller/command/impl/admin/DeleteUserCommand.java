@@ -5,11 +5,14 @@ import by.vchaikovski.coffeehouse.controller.command.BaseCommand;
 import by.vchaikovski.coffeehouse.controller.command.PagePath;
 import by.vchaikovski.coffeehouse.exception.CommandException;
 import by.vchaikovski.coffeehouse.exception.ServiceException;
+import by.vchaikovski.coffeehouse.model.entity.User;
 import by.vchaikovski.coffeehouse.model.service.ServiceProvider;
 import by.vchaikovski.coffeehouse.model.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Optional;
 
 import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.IS_DELETED;
 import static by.vchaikovski.coffeehouse.controller.command.RequestParameter.USER_ID_REQ;
@@ -27,8 +30,11 @@ public class DeleteUserCommand implements BaseCommand {
         UserService userService = ServiceProvider.getInstance().getUserService();
         String userId = request.getParameter(USER_ID_REQ);
         try {
-            boolean result = userService.deleteUserById(Long.parseLong(userId));
-            request.setAttribute(IS_DELETED, result);
+            Optional<User> optionalUser = userService.findUserById(Long.parseLong(userId));
+            if (optionalUser.isPresent() && optionalUser.get().getRole() != User.Role.ADMIN) {
+                boolean result = userService.deleteUserById(Long.parseLong(userId));
+                request.setAttribute(IS_DELETED, result);
+            }
         } catch (ServiceException e) {
             String message = "Delete user command can't be completed";
             logger.error(message, e);
